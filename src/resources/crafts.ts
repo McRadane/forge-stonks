@@ -1,13 +1,14 @@
+import { ILanguage } from './lang/type';
+
 export interface ICraftMaterial {
-  id: string;
+  id: keyof ILanguage['items'];
   quantity: number;
   source: 'bazaar' | 'auction' | 'vendor';
   intermediaryCraft: boolean;
 }
 
 export interface ICraft {
-  id: string;
-  name: string;
+  id: keyof ILanguage['items'];
   craftMaterial: ICraftMaterial[];
   bazaarItem: boolean;
   hotm: number;
@@ -15,11 +16,36 @@ export interface ICraft {
   category: 'refine' | 'casting';
 }
 
+export const itemsSource: Record<keyof ILanguage['items'], 'bazaar' | 'auction' | 'vendor'> = {
+  'Bejeweled Handle': 'auction',
+  'Drill Engine': 'auction',
+  ENCHANTED_DIAMOND_BLOCK: 'bazaar',
+  ENCHANTED_GOLD_BLOCK: 'bazaar',
+  ENCHANTED_IRON_BLOCK: 'bazaar',
+  ENCHANTED_MITHRIL: 'bazaar',
+  ENCHANTED_REDSTONE_BLOCK: 'bazaar',
+  ENCHANTED_TITANIUM: 'bazaar',
+  FINE_AMBER_GEM: 'bazaar',
+  FINE_AMETHYST_GEM: 'bazaar',
+  FINE_JADE_GEM: 'bazaar',
+  FINE_SAPPHIRE_GEM: 'bazaar',
+  'Fuel Tank': 'auction',
+  'Gemstone Mixture': 'auction',
+  'Glacite Jewel': 'auction',
+  'Golden Plate': 'auction',
+  'Mithril Plate': 'auction',
+  REFINED_DIAMOND: 'bazaar',
+  REFINED_MITHRIL: 'bazaar',
+  REFINED_TITANIUM: 'bazaar',
+  SLUDGE_JUICE: 'bazaar',
+  TREASURITE: 'bazaar',
+  ENCHANTED_COAL_BLOCK: 'bazaar'
+};
+
 export const crafts: ICraft[] = [
   {
     id: 'REFINED_DIAMOND',
     bazaarItem: true,
-    name: 'Refined Diamond',
     craftMaterial: [
       {
         id: 'ENCHANTED_DIAMOND_BLOCK',
@@ -35,7 +61,6 @@ export const crafts: ICraft[] = [
   {
     id: 'REFINED_MITHRIL',
     bazaarItem: true,
-    name: 'Refined Mithril',
     craftMaterial: [
       {
         id: 'ENCHANTED_MITHRIL',
@@ -51,7 +76,6 @@ export const crafts: ICraft[] = [
   {
     id: 'REFINED_TITANIUM',
     bazaarItem: true,
-    name: 'Refined Titanium',
     craftMaterial: [
       {
         id: 'ENCHANTED_TITANIUM',
@@ -67,7 +91,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Fuel Tank',
     bazaarItem: false,
-    name: 'Fuel Tank',
     craftMaterial: [
       {
         id: 'ENCHANTED_COAL_BLOCK',
@@ -83,7 +106,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Bejeweled Handle',
     bazaarItem: false,
-    name: 'Bejeweled Handle',
     craftMaterial: [
       {
         id: 'Glacite Jewel',
@@ -99,7 +121,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Drill Engine',
     bazaarItem: false,
-    name: 'Drill Engine',
     craftMaterial: [
       {
         id: 'ENCHANTED_IRON_BLOCK',
@@ -139,7 +160,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Golden Plate',
     bazaarItem: false,
-    name: 'Golden Plate',
     craftMaterial: [
       {
         id: 'ENCHANTED_GOLD_BLOCK',
@@ -167,7 +187,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Mithril Plate',
     bazaarItem: false,
-    name: 'Mithril Plate',
     craftMaterial: [
       {
         id: 'REFINED_MITHRIL',
@@ -201,7 +220,6 @@ export const crafts: ICraft[] = [
   {
     id: 'Gemstone Mixture',
     bazaarItem: false,
-    name: 'Gemstone Mixture',
     craftMaterial: [
       {
         id: 'FINE_JADE_GEM',

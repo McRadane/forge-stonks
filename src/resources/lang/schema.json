@@ -1,0 +1,111 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "properties": {
+        "items": {
+            "additionalProperties": false,
+            "properties": {
+                "Bejeweled Handle": {
+                    "type": "string"
+                },
+                "Drill Engine": {
+                    "type": "string"
+                },
+                "ENCHANTED_COAL_BLOCK": {
+                    "type": "string"
+                },
+                "ENCHANTED_DIAMOND_BLOCK": {
+                    "type": "string"
+                },
+                "ENCHANTED_GOLD_BLOCK": {
+                    "type": "string"
+                },
+                "ENCHANTED_IRON_BLOCK": {
+                    "type": "string"
+                },
+                "ENCHANTED_MITHRIL": {
+                    "type": "string"
+                },
+                "ENCHANTED_REDSTONE_BLOCK": {
+                    "type": "string"
+                },
+                "ENCHANTED_TITANIUM": {
+                    "type": "string"
+                },
+                "FINE_AMBER_GEM": {
+                    "type": "string"
+                },
+                "FINE_AMETHYST_GEM": {
+                    "type": "string"
+                },
+                "FINE_JADE_GEM": {
+                    "type": "string"
+                },
+                "FINE_SAPPHIRE_GEM": {
+                    "type": "string"
+                },
+                "Fuel Tank": {
+                    "type": "string"
+                },
+                "Gemstone Mixture": {
+                    "type": "string"
+                },
+                "Glacite Jewel": {
+                    "type": "string"
+                },
+                "Golden Plate": {
+                    "type": "string"
+                },
+                "Mithril Plate": {
+                    "type": "string"
+                },
+                "REFINED_DIAMOND": {
+                    "type": "string"
+                },
+                "REFINED_MITHRIL": {
+                    "type": "string"
+                },
+                "REFINED_TITANIUM": {
+                    "type": "string"
+                },
+                "SLUDGE_JUICE": {
+                    "type": "string"
+                },
+                "TREASURITE": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Bejeweled Handle",
+                "Drill Engine",
+                "ENCHANTED_COAL_BLOCK",
+                "ENCHANTED_DIAMOND_BLOCK",
+                "ENCHANTED_GOLD_BLOCK",
+                "ENCHANTED_IRON_BLOCK",
+                "ENCHANTED_MITHRIL",
+                "ENCHANTED_REDSTONE_BLOCK",
+                "ENCHANTED_TITANIUM",
+                "FINE_AMBER_GEM",
+                "FINE_AMETHYST_GEM",
+                "FINE_JADE_GEM",
+                "FINE_SAPPHIRE_GEM",
+                "Fuel Tank",
+                "Gemstone Mixture",
+                "Glacite Jewel",
+                "Golden Plate",
+                "Mithril Plate",
+                "REFINED_DIAMOND",
+                "REFINED_MITHRIL",
+                "REFINED_TITANIUM",
+                "SLUDGE_JUICE",
+                "TREASURITE"
+            ],
+            "type": "object"
+        }
+    },
+    "required": [
+        "items"
+    ],
+    "type": "object"
+}
+

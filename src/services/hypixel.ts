@@ -219,7 +219,7 @@ class Services extends Dexie {
         if (!minItem[current.item_name]) {
           minItem[current.item_name] = { item: current, min: current.buyPrice };
         } else {
-          if (minItem[current.item_name].min < current.buyPrice) {
+          if (minItem[current.item_name].min > current.buyPrice) {
             minItem[current.item_name] = {
               item: current,
               min: current.buyPrice

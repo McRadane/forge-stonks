@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import { services } from '../services/hypixel';
 import { RootState } from '../store';
 import { Craft } from './Craft';
-import { crafts } from './crafts';
+import { crafts } from '../resources/crafts';
+import { useItemsWithCraftPrice } from './functions';
 
 export const Crafts: FC = () => {
   const includeAuctionsFlip = useSelector((state: RootState) => state.options.includeAuctionsFlip);
@@ -17,6 +18,10 @@ export const Crafts: FC = () => {
 
     return crafts.filter((craft) => craft.bazaarItem);
   }, [includeAuctionsFlip]);
+
+  const all = useItemsWithCraftPrice(craftsFiltered);
+
+  console.log({ all });
 
   return (
     <>
@@ -32,6 +37,7 @@ export const Crafts: FC = () => {
         <Table sx={{ minWidth: 650 }} aria-label="Craft list">
           <TableHead>
             <TableRow>
+              <TableCell />
               <TableCell>Item</TableCell>
               <TableCell align="right">Sell price</TableCell>
               <TableCell align="right">Time</TableCell>

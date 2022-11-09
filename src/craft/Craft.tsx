@@ -1,14 +1,18 @@
-import { TableCell, TableRow } from '@mui/material';
+import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { FC } from 'react';
 import { services } from '../services/hypixel';
 
-import { crafts, ICraft } from './crafts';
-import { Coin } from './Coin';
+import { crafts, ICraft } from '../resources/crafts';
+import { Coin } from '../components/Coin';
 import { resolveItemCraftPrice, useItemCraftPrice } from './functions';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Item } from '../components/Item';
+import { Details } from './Details';
 
 export const Craft: FC<{
   id: string;
@@ -30,37 +34,53 @@ export const Craft: FC<{
       return services.getItemPrice(id, 'bazaar');
     }
 
-    return services.getItemPrice(id, 'auctions+bins');
+    return services.getItemPrice(id, 'bins');
 
     //return services.getItemPrice(id, item?.bazaarItem ? "bazaar" : "auctions+bins")
   });
 
   const profit = useMemo(() => {
     console.log({ itemDb, cost });
-    if(itemDb) {
+    if (itemDb) {
       return itemDb?.sellPrice - cost;
     }
     return cost;
   }, [cost, itemDb]);
 
+  const [open, setOpen] = useState(false);
+
   return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell component="th" scope="row">
-        {item?.name}
-      </TableCell>
-      <TableCell align="right">
-        <Coin amount={itemDb?.sellPrice ?? 0} />
-      </TableCell>
-      <TableCell align="right">{item.time}</TableCell>
-      <TableCell align="right">
-        <Coin amount={cost} />
-      </TableCell>
-      <TableCell align="right">
-        <Coin amount={profit} />
-      </TableCell>
-      <TableCell align="right">
-        <Coin amount={profit / item.time} />
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <TableCell>
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row">
+          <Item>{item?.id}</Item>
+        </TableCell>
+        <TableCell align="right">
+          <Coin amount={itemDb?.sellPrice ?? 0} />
+        </TableCell>
+        <TableCell align="right">{item.time}</TableCell>
+        <TableCell align="right">
+          <Coin amount={cost} />
+        </TableCell>
+        <TableCell align="right">
+          <Coin amount={profit} />
+        </TableCell>
+        <TableCell align="right">
+          <Coin amount={profit / item.time} />
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Details item={item} />
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
   );
 };
