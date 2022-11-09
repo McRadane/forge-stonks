@@ -1,20 +1,19 @@
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-// import { options } from "./options";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { toggleAuctionsBINOnly, toggleIncludeAuctionsFlip, toggleIntermediateCraft } from '../services/options';
+import { setHOTM, toggleAuctionsBINOnly, toggleIncludeAuctionsFlip, toggleIntermediateCraft } from '../services/options';
+import { Slider } from '@mui/material';
 
 export const OptionsSwitcher = () => {
   const dispatch = useDispatch();
-  //const [includeAuctionsFlip, setIncludeAuctionsFlip] = useState(options.includeAuctionsFlip);
-  //const [auctionsBINOnly, setAuctionsBINOnly] = useState(options.auctionsBINOnly);
-  //const [intermediateCraft, setIntermediateCraft] = useState(options.intermediateCraft);
 
   const includeAuctionsFlip = useSelector((state: RootState) => state.options.includeAuctionsFlip);
   const auctionsBINOnly = useSelector((state: RootState) => state.options.auctionsBINOnly);
   const intermediateCraft = useSelector((state: RootState) => state.options.intermediateCraft);
+
+  const hotm = useSelector((state: RootState) => state.options.hotm);
 
   const setIncludeAuctionsFlip = () => {
     dispatch(toggleIncludeAuctionsFlip());
@@ -24,6 +23,10 @@ export const OptionsSwitcher = () => {
   };
   const setIntermediateCraft = () => {
     dispatch(toggleIntermediateCraft());
+  };
+
+  const setHOTMValue = (_e: any, num: any) => {
+    dispatch(setHOTM(num));
   };
 
   return (
@@ -40,6 +43,7 @@ export const OptionsSwitcher = () => {
         control={<Switch checked={intermediateCraft} onChange={setIntermediateCraft} />}
         label="Craft intermediary material instead of buying-it"
       />
+      <Slider aria-label="HOTM" value={hotm} onChange={setHOTMValue} valueLabelDisplay="auto" step={1} marks min={2} max={7} />
     </FormGroup>
   );
 };

@@ -9,5 +9,8 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
-  root: true
+  root: true,
+  rules: {
+    'no-console': 'warn'
+  }
 };

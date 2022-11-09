@@ -68,7 +68,6 @@ export const getBazaarData = (): Promise<IBazaar[]> => {
         sellPrice: data.products[key].quick_status.sellPrice
       }));
 
-      console.log({ result });
       return result;
     });
 };
@@ -174,11 +173,6 @@ class Services extends Dexie {
         const auctions = auctionsAndBins.filter((auction) => !auction.bin);
         const bins = auctionsAndBins.filter((auction) => auction.bin);
 
-        console.log(
-          'Glacite Jewel or Bejeweled Handle',
-          auctions.filter((auction) => ['Bejeweled Handle', 'Glacite Jewel'].includes(auction.item_name))
-        );
-
         const minAuctions = this.findMinPrice(auctions);
         const minBins = this.findMinPrice(bins);
 
@@ -239,23 +233,11 @@ class Services extends Dexie {
     if (store === 'bins') {
       const result = await this.bins.get(item);
 
-      if (item === 'Bejeweled Handle') {
-        console.log('searching Bejeweled Handle BIN', result);
-      } else {
-        console.log({ item });
-      }
-
       return result;
     }
 
     if (store === 'auctions') {
       const result = await this.auctions.get(item);
-
-      if (item === 'Bejeweled Handle') {
-        console.log('searching Bejeweled Handle', result);
-      } else {
-        console.log({ item });
-      }
 
       return result;
     }
@@ -263,13 +245,6 @@ class Services extends Dexie {
     if (store === 'auctions+bins') {
       const resultBins = await this.bins.get(item);
       const resultAuctions = await this.auctions.get(item);
-
-      if (item === 'Bejeweled Handle') {
-        console.log('searching Bejeweled Handle BIN', {
-          resultBins,
-          resultAuctions
-        });
-      }
 
       if (!resultBins) {
         return resultAuctions;

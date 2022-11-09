@@ -80,13 +80,11 @@ const updater = async (options: {
 }) => {
   const { auctionsBINOnly, costRef, id, intermediateCraft, isCraft, source, callback } = options;
   if (isCraft) {
-    console.log('useEffect useItemCraftPrice', id);
     const newCost = await resolveItemCraftPrice(id, intermediateCraft, auctionsBINOnly);
     if (costRef !== newCost) {
       callback(newCost);
     }
   } else {
-    console.log('useEffect resolveItemPrices', id);
     const { buy } = await resolveItemPrices(id, source as any, auctionsBINOnly);
     if (costRef !== buy) {
       callback(buy);
@@ -168,7 +166,7 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
     updateAll().then((newCosts) => {
       setCosts(newCosts);
     });
-  }, [auctionsBINOnly, intermediateCraft]);
+  }, [auctionsBINOnly, crafts, intermediateCraft]);
 
-  return costs;
+  return Object.values(costs);
 };

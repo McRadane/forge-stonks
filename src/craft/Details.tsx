@@ -7,9 +7,6 @@ import { DetailsRow } from './DetailsRow';
 export const Details: FC<{
   item: ICraft;
 }> = ({ item }) => {
-  //const cost = useMemo(async () => await resolveItemCraftPrice(id), [id]);
-  //const [cost, setCost] = useState(0);
-
   return (
     <Box sx={{ margin: 1 }}>
       <Typography variant="h6" gutterBottom component="div">
