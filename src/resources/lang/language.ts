@@ -2,18 +2,18 @@ import enUsFile from './enUs.json';
 import frFrFile from './frFr.json';
 import type { KeysLanguageType, ILanguage } from './type';
 
-const baseMap = JSON.parse(JSON.stringify(enUsFile), (_, value) => {
+/* const baseMap = JSON.parse(JSON.stringify(enUsFile), (_, value) => {
   if (typeof value === 'string') {
-    return `[MISSING] ${value}`;
+    return value;
   }
 
   return value;
-});
+}); */
 
 export const dictionaryList = {
   'en-US': enUsFile as ILanguage,
   // eslint-disable-next-line prefer-object-spread
-  'fr-FR': Object.assign({}, baseMap, frFrFile) as ILanguage
+  'fr-FR': Object.assign({}, enUsFile, frFrFile) as ILanguage
 };
 
 const keyLanguages = Object.keys(dictionaryList) as KeysLanguageType[];

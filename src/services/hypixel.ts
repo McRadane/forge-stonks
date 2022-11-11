@@ -152,15 +152,23 @@ class Services extends Dexie {
       bazaars: 'item_name, sellPrice, buyPrice',
       bins: 'item_name, sellPrice, buyPrice'
     });
+
+    const lastRefreshString = localStorage.getItem('lastRefresh');
+    if (lastRefreshString) {
+      const lastRefresh = Number(lastRefreshString);
+      if (!Number.isNaN(lastRefresh)) {
+        this._lastRefresh = lastRefresh;
+      }
+    }
   }
 
   public set cacheDuration(duration: undefined | number) {
-    console.log('Change cache duration', duration);
     if (duration === undefined) {
       this._cacheDuration = -1;
       this._stopPolling();
     } else {
-      this._cacheDuration = -1;
+      this._cacheDuration = duration;
+      // this._refresh();
       this._startPolling();
     }
   }
@@ -169,7 +177,7 @@ class Services extends Dexie {
     if (!this._polling && this._cacheDuration !== -1 && this._reduxDispatch !== undefined) {
       this._polling = setInterval(() => {
         this._doPolling();
-      }, 60_000);
+      }, 1000);
     }
   }
 
@@ -182,8 +190,8 @@ class Services extends Dexie {
   private _doPolling() {
     const now = Date.now();
     if (this._lastRefresh + this._cacheDuration < now) {
-      console.log('Data will be refreshed');
       this._lastRefresh = now;
+      localStorage.setItem('lastRefresh', String(now));
       this._refresh();
     }
   }
@@ -191,8 +199,8 @@ class Services extends Dexie {
   public forceRefresh() {
     const now = Date.now();
     if (this._reduxDispatch !== undefined) {
-      console.log('Data will be refreshed (forced)');
       this._lastRefresh = now;
+      localStorage.setItem('lastRefresh', String(now));
       this._refresh();
     }
   }
@@ -314,7 +322,6 @@ class Services extends Dexie {
   }
 
   public set dispatcher(dispatch: Dispatch<AnyAction>) {
-    console.log('Services', 'dispatcher has been set');
     this._reduxDispatch = dispatch;
   }
 }
