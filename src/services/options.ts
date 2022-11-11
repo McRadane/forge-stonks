@@ -1,51 +1,50 @@
-import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 export interface IOptionsState {
-  playFrequency: 'nonstop' | 'three-time' | 'twice' | 'everyday' | 'less';
-  includeAuctionsFlip: boolean;
   auctionsBINOnly: boolean;
-  intermediateCraft: boolean;
+  cacheDuration: number;
   hotm: number;
-  language: 'en' | 'fr';
+  includeAuctionsFlip: boolean;
+  intermediateCraft: boolean;
+  playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
 }
 
 const initialState: IOptionsState = {
-  playFrequency: 'nonstop',
-  includeAuctionsFlip: true,
   auctionsBINOnly: true,
+  cacheDuration: 60,
   hotm: 2,
+  includeAuctionsFlip: true,
   intermediateCraft: false,
-  language: 'en'
+  playFrequency: 'nonstop'
 };
 
 export const optionsSlice = createSlice({
-  name: 'options',
   initialState,
+  name: 'options',
   reducers: {
-    setPlayFrequency: (state, action: PayloadAction<IOptionsState['playFrequency']>) => {
-      state.playFrequency = action.payload;
-    },
-    toggleIncludeAuctionsFlip: (state) => {
-      state.includeAuctionsFlip = !state.includeAuctionsFlip;
-    },
-    toggleAuctionsBINOnly: (state) => {
-      state.auctionsBINOnly = !state.auctionsBINOnly;
-    },
-    toggleIntermediateCraft: (state) => {
-      state.intermediateCraft = !state.intermediateCraft;
+    setCacheDuration: (state, action: PayloadAction<number>) => {
+      state.cacheDuration = action.payload;
     },
     setHOTM: (state, action: PayloadAction<number>) => {
       state.hotm = action.payload;
     },
-    setLanguage: (state, action: PayloadAction<IOptionsState['language']>) => {
-      state.language = action.payload;
+    setPlayFrequency: (state, action: PayloadAction<IOptionsState['playFrequency']>) => {
+      state.playFrequency = action.payload;
+    },
+    toggleAuctionsBINOnly: (state) => {
+      state.auctionsBINOnly = !state.auctionsBINOnly;
+    },
+    toggleIncludeAuctionsFlip: (state) => {
+      state.includeAuctionsFlip = !state.includeAuctionsFlip;
+    },
+    toggleIntermediateCraft: (state) => {
+      state.intermediateCraft = !state.intermediateCraft;
     }
   }
 });
 
-// Action creators are generated for each case reducer function
-export const { setHOTM, setLanguage, setPlayFrequency, toggleAuctionsBINOnly, toggleIncludeAuctionsFlip, toggleIntermediateCraft } =
+export const { setCacheDuration, setHOTM, setPlayFrequency, toggleAuctionsBINOnly, toggleIncludeAuctionsFlip, toggleIntermediateCraft } =
   optionsSlice.actions;
 
-export default optionsSlice.reducer;
+export const { reducer: optionsReducer } = optionsSlice;

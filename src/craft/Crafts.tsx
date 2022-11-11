@@ -1,17 +1,17 @@
 import { Paper, Table, TableBody, TableContainer } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { FC } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { services } from '../services/hypixel';
-import { RootState } from '../store';
-import { Craft } from './Craft';
+
+import { EnhancedTableHead, Order, getComparator } from '../components/EnhancedTableHead';
 import { crafts } from '../resources/crafts';
+import { useLanguage } from '../resources/lang/LanguageContext';
+import { RootState } from '../store';
+
+import { Craft } from './Craft';
 import { useItemsWithCraftPrice } from './functions';
-import { EnhancedTableHead, getComparator, Order } from '../components/Table/EnhancedTableHead';
 
 export const Crafts: FC = () => {
-  const includeAuctionsFlip = useSelector((state: RootState) => state.options.includeAuctionsFlip);
-  const hotm = useSelector((state: RootState) => state.options.hotm);
+  const { hotm, includeAuctionsFlip, playFrequency } = useSelector((state: RootState) => state.options);
 
   const craftsFiltered = useMemo(() => {
     let filtersCraft = crafts;
@@ -27,53 +27,78 @@ export const Crafts: FC = () => {
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<string>('id');
 
+  const { ui } = useLanguage();
+
   const allCrafts = useItemsWithCraftPrice(craftsFiltered);
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
-    if (orderBy === property) {
-      setOrder(order === 'asc' ? 'desc' : 'asc');
-    } else {
-      if (property === 'id') {
-        setOrder('asc');
+  const handleRequestSort = useCallback(
+    (_event: React.MouseEvent<unknown>, property: string) => {
+      if (orderBy === property) {
+        setOrder(order === 'asc' ? 'desc' : 'asc');
       } else {
-        setOrder('desc');
+        if (property === 'id') {
+          setOrder('asc');
+        } else {
+          setOrder('desc');
+        }
+        setOrderBy(property);
       }
-      setOrderBy(property);
+    },
+    [order, orderBy]
+  );
+
+  const headCells = useMemo(() => {
+    const heads = [
+      { disablePadding: true, id: 'id', label: ui.item, numeric: false },
+      { disablePadding: false, id: 'sell', label: ui.sellPrice, numeric: true },
+      { disablePadding: false, id: 'time', label: ui.time, numeric: true },
+      { disablePadding: false, id: 'craft', label: ui.craftCost, numeric: true },
+      { disablePadding: false, id: 'profit', label: ui.profit, numeric: true }
+    ];
+
+    switch (playFrequency) {
+      case 'everyday':
+        heads.push({ disablePadding: false, id: 'profitHourly', label: ui.profitByTimeEveryday, numeric: true });
+        break;
+      case 'less':
+        // Hide the column
+        break;
+
+      case 'nonstop':
+        heads.push({ disablePadding: false, id: 'profitHourly', label: ui.profitByTimeNonStop, numeric: true });
+        break;
+      case 'three-time':
+        heads.push({ disablePadding: false, id: 'profitHourly', label: ui.profitByTimeThreeTime, numeric: true });
+        break;
+      case 'twice':
+        heads.push({ disablePadding: false, id: 'profitHourly', label: ui.profitByTimeTwice, numeric: true });
+        break;
     }
-  };
+
+    return heads;
+  }, [
+    playFrequency,
+    ui.craftCost,
+    ui.item,
+    ui.profit,
+    ui.profitByTimeEveryday,
+    ui.profitByTimeNonStop,
+    ui.profitByTimeThreeTime,
+    ui.profitByTimeTwice,
+    ui.sellPrice,
+    ui.time
+  ]);
 
   return (
-    <>
-      <h1>Crafts</h1>
-      <button
-        onClick={() => {
-          services.refresh();
-        }}
-      >
-        Refresh data
-      </button>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="Craft list">
-          <EnhancedTableHead
-            headCells={[
-              { id: 'id', label: 'Item', numeric: false, disablePadding: true },
-              { id: 'sell', label: 'Sell price', numeric: true, disablePadding: false },
-              { id: 'time', label: 'Time', numeric: true, disablePadding: false },
-              { id: 'craft', label: 'Craft cost', numeric: true, disablePadding: false },
-              { id: 'profit', label: 'Profit', numeric: true, disablePadding: false },
-              { id: 'profitHourly', label: 'Profit/H', numeric: true, disablePadding: false }
-            ]}
-            onRequestSort={handleRequestSort}
-            order={order}
-            orderBy={orderBy}
-          />
-          <TableBody>
-            {allCrafts.sort(getComparator(order, orderBy)).map((craft) => (
-              <Craft key={craft.id} craft={craft} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+    <TableContainer component={Paper}>
+      <Table aria-label={ui.title} sx={{ minWidth: 650 }}>
+        <EnhancedTableHead headCells={headCells} onRequestSort={handleRequestSort} order={order} orderBy={orderBy} />
+        <TableBody>
+          {allCrafts.sort(getComparator(order, orderBy)).map((craft) => (
+            <Craft craft={craft} key={craft.id} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };

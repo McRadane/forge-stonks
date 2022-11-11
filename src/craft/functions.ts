@@ -1,14 +1,13 @@
-// import { options } from "../options/options";
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+import { crafts, itemsSource, ICraft } from '../resources/crafts';
 import { services } from '../services/hypixel';
 import { RootState } from '../store';
 
-import { crafts, ICraft, itemsSource } from '../resources/crafts';
-
 export const resolveItemPrices = async (
   id: string,
-  source: 'bazaar' | 'auction',
+  source: 'auction' | 'bazaar',
   auctionsBINOnly: boolean
 ): Promise<{ buy: number; sell: number }> => {
   //console.log("Resolving prices for", id, "on source", source);
@@ -70,21 +69,22 @@ export const resolveItemCraftPrice = async (id: string, intermediateCraft: boole
 };
 
 const updater = async (options: {
+  auctionsBINOnly: boolean;
+  costRef: number;
   id: string;
   intermediateCraft: boolean;
-  auctionsBINOnly: boolean;
   isCraft: boolean;
-  costRef: number;
   source?: string;
   callback(newPrice: number): void;
 }) => {
-  const { auctionsBINOnly, costRef, id, intermediateCraft, isCraft, source, callback } = options;
+  const { auctionsBINOnly, callback, costRef, id, intermediateCraft, isCraft, source } = options;
   if (isCraft) {
     const newCost = await resolveItemCraftPrice(id, intermediateCraft, auctionsBINOnly);
     if (costRef !== newCost) {
       callback(newCost);
     }
   } else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { buy } = await resolveItemPrices(id, source as any, auctionsBINOnly);
     if (costRef !== buy) {
       callback(buy);
@@ -96,10 +96,9 @@ export const useItemCraftPrice = (id: string) => {
   const [cost, setCost] = useState(0);
   const costRef = useRef(0);
   const isCraft = useRef(false);
-  const source = useRef<string | undefined>();
+  const source = useRef<undefined | string>();
 
-  const auctionsBINOnly = useSelector((state: RootState) => state.options.auctionsBINOnly);
-  const intermediateCraft = useSelector((state: RootState) => state.options.intermediateCraft);
+  const { auctionsBINOnly, intermediateCraft } = useSelector((state: RootState) => state.options);
 
   source.current = itemsSource[id as keyof typeof itemsSource] ?? 'vendor';
   isCraft.current = crafts.find((item) => item.id === id) !== undefined;
@@ -122,18 +121,17 @@ export const useItemCraftPrice = (id: string) => {
 };
 
 export interface ICraftWithCosts extends ICraft {
-  sell: number;
   craft: number;
   profit: number;
   profitHourly: number;
+  sell: number;
 }
 
 export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
   const [costs, setCosts] = useState<Record<ICraft['id'], ICraftWithCosts>>({} as Record<ICraft['id'], ICraftWithCosts>);
   const costsRef = useRef({} as Record<ICraft['id'], number>);
 
-  const auctionsBINOnly = useSelector((state: RootState) => state.options.auctionsBINOnly);
-  const intermediateCraft = useSelector((state: RootState) => state.options.intermediateCraft);
+  const { auctionsBINOnly, intermediateCraft, playFrequency } = useSelector((state: RootState) => state.options);
 
   useEffect(() => {
     const updateAll = async () => {
@@ -146,17 +144,28 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
 
         await updater({
           auctionsBINOnly,
-          callback: (newCost: number) => {
-            //setCosts((current) => ({ ...current, [craft.id]: newCost }));
-            const profit = sell - newCost;
-
-            newCosts[craft.id] = { ...craft, craft: newCost, sell, profit, profitHourly: profit / craft.time };
-          },
           costRef: costsRef.current[craft.id],
           id: craft.id,
           intermediateCraft,
           isCraft: true,
-          source
+          source,
+          callback: (newCost: number) => {
+            const profit = sell - newCost;
+            let time = craft.time;
+            switch (playFrequency) {
+              case 'everyday':
+                time = 24;
+                break;
+              case 'three-time':
+                time = 8;
+                break;
+              case 'twice':
+                time = 12;
+                break;
+            }
+
+            newCosts[craft.id] = { ...craft, craft: newCost, profit, profitHourly: profit / time, sell };
+          }
         });
       }
 
@@ -166,7 +175,7 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
     updateAll().then((newCosts) => {
       setCosts(newCosts);
     });
-  }, [auctionsBINOnly, crafts, intermediateCraft]);
+  }, [auctionsBINOnly, crafts, intermediateCraft, playFrequency]);
 
   return Object.values(costs);
 };

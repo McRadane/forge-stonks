@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": false,
-    "properties": {
-        "items": {
+    "definitions": {
+        "ILanguageItems": {
             "additionalProperties": false,
             "properties": {
                 "Bejeweled Handle": {
@@ -101,10 +101,199 @@
                 "TREASURITE"
             ],
             "type": "object"
+        },
+        "ILanguageUI": {
+            "additionalProperties": false,
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "auction": {
+                    "type": "string"
+                },
+                "bazaar": {
+                    "type": "string"
+                },
+                "craftCost": {
+                    "type": "string"
+                },
+                "hotm": {
+                    "type": "string"
+                },
+                "hour": {
+                    "type": "string"
+                },
+                "item": {
+                    "type": "string"
+                },
+                "itemPrice": {
+                    "type": "string"
+                },
+                "material": {
+                    "type": "string"
+                },
+                "options": {
+                    "$ref": "#/definitions/ILanguageUIOptions"
+                },
+                "profit": {
+                    "type": "string"
+                },
+                "profitByTimeEveryday": {
+                    "type": "string"
+                },
+                "profitByTimeNonStop": {
+                    "type": "string"
+                },
+                "profitByTimeThreeTime": {
+                    "type": "string"
+                },
+                "profitByTimeTwice": {
+                    "type": "string"
+                },
+                "sellPrice": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "totalPrice": {
+                    "type": "string"
+                },
+                "vendor": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "amount",
+                "auction",
+                "bazaar",
+                "craftCost",
+                "hotm",
+                "hour",
+                "item",
+                "itemPrice",
+                "material",
+                "options",
+                "profit",
+                "profitByTimeEveryday",
+                "profitByTimeNonStop",
+                "profitByTimeThreeTime",
+                "profitByTimeTwice",
+                "sellPrice",
+                "time",
+                "title",
+                "totalPrice",
+                "vendor"
+            ],
+            "type": "object"
+        },
+        "ILanguageUIOptions": {
+            "additionalProperties": false,
+            "properties": {
+                "auctionsBINOnlyDescription": {
+                    "type": "string"
+                },
+                "auctionsBINOnlyLabel": {
+                    "type": "string"
+                },
+                "forceRefresh": {
+                    "type": "string"
+                },
+                "hotmDescription": {
+                    "type": "string"
+                },
+                "hotmLabel": {
+                    "type": "string"
+                },
+                "includeAuctionsFlipDescription": {
+                    "type": "string"
+                },
+                "includeAuctionsFlipLabel": {
+                    "type": "string"
+                },
+                "intermediateCraftDescription": {
+                    "type": "string"
+                },
+                "intermediateCraftLabel": {
+                    "type": "string"
+                },
+                "languageDescription": {
+                    "type": "string"
+                },
+                "languageLabel": {
+                    "type": "string"
+                },
+                "languageOptionEnglish": {
+                    "type": "string"
+                },
+                "languageOptionFrench": {
+                    "type": "string"
+                },
+                "playFrequencyDescription": {
+                    "type": "string"
+                },
+                "playFrequencyLabel": {
+                    "type": "string"
+                },
+                "playFrequencyOptionEveryday": {
+                    "type": "string"
+                },
+                "playFrequencyOptionLess": {
+                    "type": "string"
+                },
+                "playFrequencyOptionNonStop": {
+                    "type": "string"
+                },
+                "playFrequencyOptionThreeTime": {
+                    "type": "string"
+                },
+                "playFrequencyOptionTwice": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "auctionsBINOnlyDescription",
+                "auctionsBINOnlyLabel",
+                "forceRefresh",
+                "hotmDescription",
+                "hotmLabel",
+                "includeAuctionsFlipDescription",
+                "includeAuctionsFlipLabel",
+                "intermediateCraftDescription",
+                "intermediateCraftLabel",
+                "languageDescription",
+                "languageLabel",
+                "languageOptionEnglish",
+                "languageOptionFrench",
+                "playFrequencyDescription",
+                "playFrequencyLabel",
+                "playFrequencyOptionEveryday",
+                "playFrequencyOptionLess",
+                "playFrequencyOptionNonStop",
+                "playFrequencyOptionThreeTime",
+                "playFrequencyOptionTwice",
+                "title"
+            ],
+            "type": "object"
+        }
+    },
+    "properties": {
+        "items": {
+            "$ref": "#/definitions/ILanguageItems"
+        },
+        "ui": {
+            "$ref": "#/definitions/ILanguageUI"
         }
     },
     "required": [
-        "items"
+        "items",
+        "ui"
     ],
     "type": "object"
 }

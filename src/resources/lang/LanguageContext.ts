@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { dictionaryList } from './language';
 import type { KeysLanguageType, ILanguage, ILanguageContextDefinition } from './type';
 
@@ -39,6 +40,7 @@ export const useLanguageResolver = () => {
     return pathToken;
   };
 };
+
 export const useLocale = (): KeysLanguageType => {
   const languageContext = useContext(LanguageContext);
 

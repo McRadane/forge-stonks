@@ -12,17 +12,15 @@ interface HeadCell {
 }
 
 interface EnhancedTableProps {
-  //numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
-  // onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  headCells: HeadCell[];
   order: Order;
   orderBy: string;
-  //rowCount: number;
-  headCells: HeadCell[];
+  onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
 }
 
 export const EnhancedTableHead: FC<EnhancedTableProps> = (props) => {
-  const { order, orderBy, onRequestSort, headCells } = props;
+  const { headCells, onRequestSort, order, orderBy } = props;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -33,8 +31,8 @@ export const EnhancedTableHead: FC<EnhancedTableProps> = (props) => {
         <TableCell padding="checkbox" />
         {headCells.map((headCell) => (
           <TableCell
-            key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
+            key={headCell.id}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -67,6 +65,7 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   return 0;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getComparator<Key extends keyof any>(order: Order, orderBy: Key): (a: any, b: any) => number {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 }

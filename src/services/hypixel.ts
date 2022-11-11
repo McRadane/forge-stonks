@@ -1,12 +1,10 @@
+import { AnyAction, Dispatch } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Dexie from 'dexie';
 
+import { setLoading, setNotLoading } from './loading';
+
 interface IAuctionsAPIPaginatedResponse {
-  success: boolean;
-  page: number;
-  totalPages: number;
-  totalAuctions: number;
-  lastUpdated: number;
   auctions: {
     // _id: string,
     uuid: string;
@@ -25,32 +23,37 @@ interface IAuctionsAPIPaginatedResponse {
     highest_bid_amount: number; // Price of auctions
     bin: boolean; // Indicate if auction or BIN
   }[];
+  lastUpdated: number;
+  page: number;
+  success: boolean;
+  totalAuctions: number;
+  totalPages: number;
 }
 
 export interface IAuctions {
+  buyPrice: number;
   item_name: string;
   sellPrice: number;
-  buyPrice: number;
 }
 
 interface IBazaarAPIResponse {
-  success: boolean;
   products: Record<
     string,
     {
       product_id: string;
       quick_status: {
-        sellPrice: number;
         buyPrice: number;
+        sellPrice: number;
       };
     }
   >;
+  success: boolean;
 }
 
 export interface IBazaar {
+  buyPrice: number;
   item_name: string;
   sellPrice: number;
-  buyPrice: number;
 }
 
 export const getBazaarData = (): Promise<IBazaar[]> => {
@@ -63,8 +66,8 @@ export const getBazaarData = (): Promise<IBazaar[]> => {
       }
 
       const result: IBazaar[] = Object.keys(data.products).map((key) => ({
-        item_name: key,
         buyPrice: data.products[key].quick_status.buyPrice,
+        item_name: key,
         sellPrice: data.products[key].quick_status.sellPrice
       }));
 
@@ -96,12 +99,12 @@ const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
 
       data.auctions
         .filter((auction) => !auction.claimed)
-        .forEach(({ uuid, highest_bid_amount, starting_bid, item_name, bin }) => {
+        .forEach(({ bin, highest_bid_amount, item_name, starting_bid, uuid }) => {
           auctions.set(uuid, {
-            item_name,
+            bin,
             buyPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
-            sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
-            bin
+            item_name,
+            sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount
           });
         });
 
@@ -126,13 +129,13 @@ const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
       return Promise.all(promises).then((results) => {
         results.forEach((element) => {
           element.forEach((item) => {
-            const { uuid, highest_bid_amount, starting_bid, item_name, bin } = item;
+            const { bin, highest_bid_amount, item_name, starting_bid, uuid } = item;
 
             auctions.set(uuid, {
-              item_name,
+              bin,
               buyPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
-              sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
-              bin
+              item_name,
+              sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount
             });
           });
         });
@@ -147,16 +150,71 @@ class Services extends Dexie {
   auctions!: Dexie.Table<IAuctions, string>;
   bins!: Dexie.Table<IAuctions, string>;
 
+  private _cacheDuration = -1;
+  private _lastRefresh = -1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private _polling!: any;
+  private _reduxDispatch!: Dispatch<AnyAction>;
+
   constructor() {
     super('Services');
     this.version(1).stores({
-      bazaars: 'item_name, sellPrice, buyPrice',
       auctions: 'item_name, sellPrice, buyPrice',
+      bazaars: 'item_name, sellPrice, buyPrice',
       bins: 'item_name, sellPrice, buyPrice'
     });
   }
 
-  public async refresh() {
+  public set cacheDuration(duration: undefined | number) {
+    console.log('Change cache duration', duration);
+    if (duration === undefined) {
+      this._cacheDuration = -1;
+      this._stopPolling();
+    } else {
+      this._cacheDuration = -1;
+      this._startPolling();
+    }
+  }
+
+  private _startPolling() {
+    if (!this._polling && this._cacheDuration !== -1 && this._reduxDispatch !== undefined) {
+      this._polling = setInterval(() => {
+        this._doPolling();
+      }, 60_000);
+    }
+  }
+
+  private _stopPolling() {
+    if (this._polling) {
+      clearInterval(this._polling);
+    }
+  }
+
+  private _doPolling() {
+    const now = Date.now();
+    if (this._lastRefresh + this._cacheDuration < now) {
+      console.log('Data will be refreshed');
+      this._lastRefresh = now;
+      this._refresh();
+    }
+  }
+
+  public forceRefresh() {
+    const now = Date.now();
+    if (this._reduxDispatch !== undefined) {
+      console.log('Data will be refreshed (forced)');
+      this._lastRefresh = now;
+      this._refresh();
+    }
+  }
+
+  private async _refresh() {
+    const refreshPromiseBazaar = Promise;
+    const refreshPromiseAuctions = Promise;
+    const refreshPromiseBins = Promise;
+
+    this._reduxDispatch(setLoading());
+
     getBazaarData().then((bazaars) => {
       this.transaction('rw', this.bazaars, async () => {
         this.bazaars
@@ -164,6 +222,7 @@ class Services extends Dexie {
           .delete()
           .then(() => {
             this.bazaars.bulkAdd(bazaars);
+            refreshPromiseBazaar.resolve();
           });
       });
     });
@@ -173,8 +232,8 @@ class Services extends Dexie {
         const auctions = auctionsAndBins.filter((auction) => !auction.bin);
         const bins = auctionsAndBins.filter((auction) => auction.bin);
 
-        const minAuctions = this.findMinPrice(auctions);
-        const minBins = this.findMinPrice(bins);
+        const minAuctions = this._findMinPrice(auctions);
+        const minBins = this._findMinPrice(bins);
 
         this.auctions
           .toCollection()
@@ -191,23 +250,16 @@ class Services extends Dexie {
       });
     });
 
-    /*this.transaction("rw", this.auctions, this.bins, async () => {
-      const auctionsAndBins = await getAuctionData();
-      await this.auctions.toCollection().delete();
-      await this.bins.toCollection().delete();
-
-      const auctions = auctionsAndBins.filter((auction) => !auction.bin);
-      const bins = auctionsAndBins.filter((auction) => auction.bin);
-
-      const minAuctions = this.findMinPrice(auctions);
-      const minBins = this.findMinPrice(bins);
-
-      await this.auctions.bulkAdd(minAuctions);
-      await this.bins.bulkAdd(minBins);
-    });*/
+    Promise.all([refreshPromiseBazaar, refreshPromiseAuctions, refreshPromiseBins])
+      .then(() => {
+        this._reduxDispatch(setNotLoading());
+      })
+      .catch(() => {
+        this._reduxDispatch(setNotLoading());
+      });
   }
 
-  private findMinPrice(auctions: IAuctions[]): IAuctions[] {
+  private _findMinPrice(auctions: IAuctions[]): IAuctions[] {
     const minAuctionsRecord = auctions.reduce(
       (minItem, current) => {
         if (!minItem[current.item_name]) {
@@ -223,13 +275,13 @@ class Services extends Dexie {
 
         return minItem;
       },
-      {} as Record<string, { min: number; item: IAuctions }> // { min: Number.MAX_VALUE, item: undefined as unknown as IAuctions }
+      {} as Record<string, { item: IAuctions; min: number }> // { min: Number.MAX_VALUE, item: undefined as unknown as IAuctions }
     );
 
     return Object.values(minAuctionsRecord).map((record) => record.item);
   }
 
-  public async getItemPrice(item: string, store: 'auctions' | 'bazaar' | 'bins' | 'auctions+bins') {
+  public async getItemPrice(item: string, store: 'auctions' | 'auctions+bins' | 'bazaar' | 'bins') {
     if (store === 'bins') {
       const result = await this.bins.get(item);
 
@@ -270,6 +322,11 @@ class Services extends Dexie {
 
   public async getItemBinsPrice(item: string) {
     return await this.bins.get(item);
+  }
+
+  public set dispatcher(dispatch: Dispatch<AnyAction>) {
+    console.log('Services', 'dispatcher has been set');
+    this._reduxDispatch = dispatch;
   }
 }
 
