@@ -1,4 +1,6 @@
-import { Chip, TableCell, TableRow } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
 import { FC } from 'react';
 
 import { Coin } from '../components/Coin';

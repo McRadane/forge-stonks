@@ -108,22 +108,11 @@ const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
           });
         });
 
-      /*const page1 = data.auctions
-        .filter((auction) => !auction.claimed);*/
-
       const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
 
       if (data.totalPages > 1) {
         for (let page = 1; page < data.totalPages; page++) {
           promises.push(getPageAuctionsRequests(page));
-          /* 
-            .forEach(({ uuid, highest_bid_amount, starting_bid, ...auctionData }) => {
-        auctions.set(uuid, {
-          ...auctionData,
-          price: auctionData.bin ? starting_bid : highest_bid_amount,
-        });
-      });
-            */
         }
       }
       return Promise.all(promises).then((results) => {

@@ -151,20 +151,23 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
           source,
           callback: (newCost: number) => {
             const profit = sell - newCost;
-            let time = craft.time;
+            let period = 1;
+
             switch (playFrequency) {
               case 'everyday':
-                time = 24;
+                period = 24;
                 break;
               case 'three-time':
-                time = 8;
+                period = 8;
                 break;
               case 'twice':
-                time = 12;
+                period = 12;
                 break;
             }
 
-            newCosts[craft.id] = { ...craft, craft: newCost, profit, profitHourly: profit / time, sell };
+            const profitHourly = (profit / Math.max(craft.time, period)) * period;
+
+            newCosts[craft.id] = { ...craft, craft: newCost, profit, profitHourly, sell };
           }
         });
       }

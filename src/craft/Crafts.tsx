@@ -1,4 +1,7 @@
-import { Paper, Table, TableBody, TableContainer } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
