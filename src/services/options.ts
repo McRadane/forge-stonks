@@ -7,6 +7,7 @@ export interface IOptionsState {
   hotm: number;
   includeAuctionsFlip: boolean;
   intermediateCraft: boolean;
+  maxCraftingCost: number;
   playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
 }
 
@@ -16,6 +17,7 @@ const initialState: IOptionsState = {
   hotm: 2,
   includeAuctionsFlip: true,
   intermediateCraft: false,
+  maxCraftingCost: 0,
   playFrequency: 'nonstop'
 };
 
@@ -28,6 +30,9 @@ export const optionsSlice = createSlice({
     },
     setHOTM: (state, action: PayloadAction<number>) => {
       state.hotm = action.payload;
+    },
+    setMaxCraftingCost: (state, action: PayloadAction<number>) => {
+      state.maxCraftingCost = action.payload;
     },
     setPlayFrequency: (state, action: PayloadAction<IOptionsState['playFrequency']>) => {
       state.playFrequency = action.payload;
@@ -44,7 +49,14 @@ export const optionsSlice = createSlice({
   }
 });
 
-export const { setCacheDuration, setHOTM, setPlayFrequency, toggleAuctionsBINOnly, toggleIncludeAuctionsFlip, toggleIntermediateCraft } =
-  optionsSlice.actions;
+export const {
+  setCacheDuration,
+  setHOTM,
+  setMaxCraftingCost,
+  setPlayFrequency,
+  toggleAuctionsBINOnly,
+  toggleIncludeAuctionsFlip,
+  toggleIntermediateCraft
+} = optionsSlice.actions;
 
 export const { reducer: optionsReducer } = optionsSlice;

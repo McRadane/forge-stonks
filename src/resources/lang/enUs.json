@@ -133,6 +133,8 @@
       "languageDescription": "Only the interface is translated, the item names are in english.",
       "languageLabel": "Language",
       "languageOptionEnglish": "English",
+      "maxCraftingCostDescription": "Limit to max crafting cost. Set to 0 to disable",
+      "maxCraftingCostLabel": "Max crafting cost",
       "languageOptionFrench": "French",
       "playFrequencyDescription": "Adjust your play-frequency to profit calculation.",
       "playFrequencyLabel": "Play frequency",
@@ -150,7 +152,7 @@
     "profitByTimeTwice": "Profits for 12h",
     "sellPrice": "Sell price",
     "time": "Duration",
-    "title": "Forge Stonks",
+    "title": "HyPixel Skyblock's Forge Stonks",
     "totalPrice": "Total price",
     "vendor": "Vendor"
   }

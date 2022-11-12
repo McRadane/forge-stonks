@@ -5,34 +5,20 @@ import TableContainer from '@mui/material/TableContainer';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { EnhancedTableHead, Order, getComparator } from '../components/EnhancedTableHead';
-import { crafts } from '../resources/crafts';
-import { useLanguage } from '../resources/lang/LanguageContext';
-import { RootState } from '../store';
+import { EnhancedTableHead, Order, getComparator } from '../../components/EnhancedTableHead';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import { RootState } from '../../store';
+import { ICraftWithCosts } from '../functions';
 
-import { Craft } from './Craft';
-import { useItemsWithCraftPrice } from './functions';
+import { CraftRow } from './CraftRow';
 
-export const Crafts: FC = () => {
-  const { hotm, includeAuctionsFlip, playFrequency } = useSelector((state: RootState) => state.options);
-
-  const craftsFiltered = useMemo(() => {
-    let filtersCraft = crafts;
-    if (!includeAuctionsFlip) {
-      filtersCraft = filtersCraft.filter((craft) => craft.bazaarItem);
-    }
-
-    filtersCraft = filtersCraft.filter((craft) => craft.hotm <= hotm);
-
-    return filtersCraft;
-  }, [hotm, includeAuctionsFlip]);
+export const CraftsTable: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
+  const { playFrequency } = useSelector((state: RootState) => state.options);
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<string>('id');
 
   const { ui } = useLanguage();
-
-  const allCrafts = useItemsWithCraftPrice(craftsFiltered);
 
   const handleRequestSort = useCallback(
     (_event: React.MouseEvent<unknown>, property: string) => {
@@ -94,11 +80,11 @@ export const Crafts: FC = () => {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label={ui.title} sx={{ minWidth: 650 }}>
+      <Table aria-label={ui.title} sx={{ minWidth: 650 }} size="small">
         <EnhancedTableHead headCells={headCells} onRequestSort={handleRequestSort} order={order} orderBy={orderBy} />
         <TableBody>
-          {allCrafts.sort(getComparator(order, orderBy)).map((craft) => (
-            <Craft craft={craft} key={craft.id} />
+          {crafts.sort(getComparator(order, orderBy)).map((craft) => (
+            <CraftRow craft={craft} key={craft.id} />
           ))}
         </TableBody>
       </Table>

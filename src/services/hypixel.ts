@@ -2,6 +2,8 @@ import { AnyAction, Dispatch } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Dexie from 'dexie';
 
+import { Logger } from '../logger';
+
 import { setLoading, setNotLoading } from './loading';
 
 interface IAuctionsAPIPaginatedResponse {
@@ -206,25 +208,24 @@ class Services extends Dexie {
   }
 
   private async _refresh() {
-    const refreshPromiseBazaar = Promise;
-    const refreshPromiseAuctions = Promise;
-    const refreshPromiseBins = Promise;
-
     this._reduxDispatch(setLoading());
 
-    getBazaarData().then((bazaars) => {
-      this.transaction('rw', this.bazaars, async () => {
-        this.bazaars
-          .toCollection()
-          .delete()
-          .then(() => {
-            this.bazaars.bulkAdd(bazaars);
-            refreshPromiseBazaar.resolve();
-          });
+    const refreshPromiseBazaar = new Promise<void>((resolve) => {
+      getBazaarData().then((bazaars) => {
+        this.transaction('rw', this.bazaars, async () => {
+          this.bazaars
+            .toCollection()
+            .delete()
+            .then(() => {
+              this.bazaars.bulkAdd(bazaars);
+              resolve();
+              Logger.log('Bazaar data has been updated');
+            });
+        });
       });
     });
 
-    getAuctionData().then((auctionsAndBins) => {
+    const refreshPromiseAuctionsAndBins = getAuctionData().then((auctionsAndBins) => {
       this.transaction('rw', this.auctions, this.bins, async () => {
         const auctions = auctionsAndBins.filter((auction) => !auction.bin);
         const bins = auctionsAndBins.filter((auction) => auction.bin);
@@ -232,26 +233,39 @@ class Services extends Dexie {
         const minAuctions = this._findMinPrice(auctions);
         const minBins = this._findMinPrice(bins);
 
-        this.auctions
-          .toCollection()
-          .delete()
-          .then(() => {
-            this.auctions.bulkAdd(minAuctions);
-          });
-        this.bins
-          .toCollection()
-          .delete()
-          .then(() => {
-            this.bins.bulkAdd(minBins);
-          });
+        const refreshPromiseAuctions = new Promise<void>((resolve) => {
+          this.auctions
+            .toCollection()
+            .delete()
+            .then(() => {
+              this.auctions.bulkAdd(minAuctions);
+              resolve();
+              Logger.log('Auctions data has been updated');
+            });
+        });
+
+        const refreshPromiseBins = new Promise<void>((resolve) => {
+          this.bins
+            .toCollection()
+            .delete()
+            .then(() => {
+              this.bins.bulkAdd(minBins);
+              resolve();
+              Logger.log('BINs data has been updated');
+            });
+        });
+
+        return Promise.all([refreshPromiseAuctions, refreshPromiseBins]);
       });
     });
 
-    Promise.all([refreshPromiseBazaar, refreshPromiseAuctions, refreshPromiseBins])
+    Promise.all([refreshPromiseBazaar, refreshPromiseAuctionsAndBins])
       .then(() => {
+        Logger.log('All data has been updated');
         this._reduxDispatch(setNotLoading());
       })
-      .catch(() => {
+      .catch((err) => {
+        Logger.log('An error occured', err);
         this._reduxDispatch(setNotLoading());
       });
   }

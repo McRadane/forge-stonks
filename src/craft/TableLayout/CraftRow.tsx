@@ -1,18 +1,22 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Avatar, Chip, Collapse, IconButton, TableCell, TableRow } from '@mui/material';
 import { FC, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import IconButton from '@mui/material/IconButton';
+import Chip from '@mui/material/Chip';
+import Avatar from '@mui/material/Avatar';
+import Collapse from '@mui/material/Collapse';
 
-import { Coin } from '../components/Coin';
-import { Item } from '../components/Item';
-import { useLanguage } from '../resources/lang/LanguageContext';
-import { RootState } from '../store';
+import { Coin } from '../../components/Coin';
+import { Item } from '../../components/Item';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import { RootState } from '../../store';
+import { ICraftWithCosts } from '../functions';
+import { Details } from '../Details';
 
-import { Details } from './Details';
-import { ICraftWithCosts } from './functions';
-
-export const Craft: FC<{
+export const CraftRow: FC<{
   craft: ICraftWithCosts;
 }> = ({ craft }) => {
   const [open, setOpen] = useState(false);

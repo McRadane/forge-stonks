@@ -8,11 +8,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 
-import { Crafts } from './craft/Crafts';
 import { OptionsSwitcher } from './options/OptionsSwitcher';
 import { useLanguage } from './resources/lang/LanguageContext';
 import { services } from './services/hypixel';
 import { RootState } from './store';
+import { CraftsContainer } from './craft/CraftsContainer';
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -48,7 +48,7 @@ export const App = () => {
       </Box>
       <Box component="main" sx={{ width: '100%' }}>
         <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
-        <Crafts />
+        <CraftsContainer />
       </Box>
     </Box>
   );

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { crafts, itemsSource, ICraft } from '../resources/crafts';
+import { ILanguage } from '../resources/lang/type';
 import { services } from '../services/hypixel';
+import { IOptionsState } from '../services/options';
 import { RootState } from '../store';
 
 export const resolveItemPrices = async (
@@ -181,4 +183,27 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
   }, [auctionsBINOnly, crafts, intermediateCraft, playFrequency]);
 
   return Object.values(costs);
+};
+
+export const getProfitByTimeLabel = (playFrequency: IOptionsState['playFrequency'], ui: ILanguage['ui']) => {
+  switch (playFrequency) {
+    case 'everyday':
+      return ui.profitByTimeEveryday;
+      break;
+    case 'less':
+      // Hide the column
+      break;
+
+    case 'nonstop':
+      return ui.profitByTimeNonStop;
+      break;
+    case 'three-time':
+      return ui.profitByTimeThreeTime;
+      break;
+    case 'twice':
+      return ui.profitByTimeTwice;
+      break;
+  }
+
+  return;
 };

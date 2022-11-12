@@ -576,6 +576,12 @@
                 "languageOptionFrench": {
                     "type": "string"
                 },
+                "maxCraftingCostDescription": {
+                    "type": "string"
+                },
+                "maxCraftingCostLabel": {
+                    "type": "string"
+                },
                 "playFrequencyDescription": {
                     "type": "string"
                 },
@@ -615,6 +621,8 @@
                 "languageLabel",
                 "languageOptionEnglish",
                 "languageOptionFrench",
+                "maxCraftingCostDescription",
+                "maxCraftingCostLabel",
                 "playFrequencyDescription",
                 "playFrequencyLabel",
                 "playFrequencyOptionEveryday",

@@ -122,6 +122,8 @@ interface ILanguageUIOptions {
   intermediateCraftLabel: string;
   languageDescription: string;
   languageLabel: string;
+  maxCraftingCostLabel: string;
+  maxCraftingCostDescription: string;
   languageOptionEnglish: string;
   languageOptionFrench: string;
   playFrequencyDescription: string;

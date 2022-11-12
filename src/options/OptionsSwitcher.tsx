@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -23,7 +24,8 @@ import {
   toggleAuctionsBINOnly,
   toggleIncludeAuctionsFlip,
   toggleIntermediateCraft,
-  IOptionsState
+  IOptionsState,
+  setMaxCraftingCost
 } from '../services/options';
 import { RootState } from '../store';
 
@@ -34,7 +36,9 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
 
   const dispatch = useDispatch();
 
-  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, playFrequency } = useSelector((state: RootState) => state.options);
+  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, playFrequency, maxCraftingCost } = useSelector(
+    (state: RootState) => state.options
+  );
   const { userLanguage, userLanguageChange } = useContext(LanguageContext);
 
   const handlPlayFrequency = useCallback(
@@ -74,13 +78,20 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
     [userLanguageChange]
   );
 
+  const handleMaxCraftingCost = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      dispatch(setMaxCraftingCost(event.target.value === '' ? 0 : Number(event.target.value)));
+    },
+    [dispatch]
+  );
+
   const handleForceRefresh = useCallback(() => {
     services.forceRefresh();
   }, []);
 
   return (
     <Drawer anchor={'right'} onClose={toggle} open={open}>
-      <Box role="presentation" sx={{ width: 350, padding: 2, textAlign: 'left' }}>
+      <Box role="presentation" sx={{ /* width: 350, */ padding: 2, textAlign: 'left' }}>
         <Typography component="div" gutterBottom variant="h6">
           {options.title}
         </Typography>
@@ -198,9 +209,26 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
             </FormControl>
           </ListItem>
           <ListItem divider>
-            <button onClick={handleForceRefresh} type="button">
-              {options.forceRefresh}
-            </button>
+            <FormControl fullWidth variant="standard">
+              <Typography id="maxCraftingCost-label">{options.maxCraftingCostLabel}</Typography>
+              <Input
+                aria-describedby="maxCraftingCost-description"
+                aria-labelledby="maxCraftingCost-label"
+                id="maxCraftingCost"
+                inputProps={{
+                  min: 0,
+                  type: 'number',
+                  'aria-labelledby': 'input-slider'
+                }}
+                onChange={handleMaxCraftingCost}
+                value={maxCraftingCost ?? 0}
+              />
+
+              <FormHelperText id="maxCraftingCost-description">{options.maxCraftingCostDescription}</FormHelperText>
+            </FormControl>
+          </ListItem>
+          <ListItem divider>
+            <Button onClick={handleForceRefresh}>{options.forceRefresh}</Button>
           </ListItem>
         </List>
       </Box>
