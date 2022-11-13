@@ -80,11 +80,11 @@ export const CraftsTable: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label={ui.title} sx={{ minWidth: 650 }} size="small">
+      <Table aria-label={ui.title} size="small" sx={{ minWidth: 650 }}>
         <EnhancedTableHead headCells={headCells} onRequestSort={handleRequestSort} order={order} orderBy={orderBy} />
         <TableBody>
           {crafts.sort(getComparator(order, orderBy)).map((craft) => (
-            <CraftRow craft={craft} key={craft.id} />
+            <CraftRow craft={craft} key={craft.itemId} />
           ))}
         </TableBody>
       </Table>

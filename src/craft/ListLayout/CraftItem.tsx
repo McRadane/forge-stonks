@@ -1,21 +1,21 @@
-import { FC, useCallback, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import Collapse from '@mui/material/Collapse';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Collapse from '@mui/material/Collapse';
-import List from '@mui/material/List';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { RootState } from '../../store';
 import { getProfitByTimeLabel, ICraftWithCosts } from '../functions';
-import { Details } from '../Details';
 
+import { DetailsList } from './DetailsList';
 import { GridRow } from './GridRow';
 
 export const CraftItem: FC<{
@@ -25,7 +25,7 @@ export const CraftItem: FC<{
 
   const { ui } = useLanguage();
 
-  const { bazaarItem, craft: cost, hotm, id, profit, profitHourly, sell, time } = craft;
+  const { bazaarItem, category, craft: cost, hotm, itemId: id, profit, profitHourly, sell, time } = craft;
 
   const playFrequency = useSelector((state: RootState) => state.options.playFrequency);
 
@@ -40,15 +40,16 @@ export const CraftItem: FC<{
           primary={
             <Grid container>
               <Grid item xs={12}>
-                <Typography variant="h6">
+                <Typography variant="h4">
                   <Item>{id}</Item>
                 </Typography>
               </Grid>
 
-              <GridRow left={'Type'} right={bazaarItem ? ui.bazaar : ui.auction} />
+              <GridRow left={ui.sell} right={bazaarItem ? ui.bazaar : ui.auction} />
               <GridRow left={ui.hotm} right={hotm} />
+              <GridRow left={ui.type} right={category === 'casting' ? ui.casting : ui.refine} />
               <GridRow left={ui.sellPrice} right={<Coin amount={sell} />} />
-              <GridRow left={ui.time} right={time} />
+              <GridRow left={ui.time} right={time < 0.5 ? 0 : time} />
               <GridRow left={ui.craftCost} right={<Coin amount={cost} />} />
               <GridRow left={ui.profit} right={<Coin amount={profit} />} />
 
@@ -61,7 +62,7 @@ export const CraftItem: FC<{
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <ListItemButton sx={{ pl: 4 }}>
-            <ListItemText primary={<Details item={craft} />} />
+            <ListItemText primary={<DetailsList item={craft} />} />
           </ListItemButton>
         </List>
       </Collapse>

@@ -36,7 +36,7 @@ export const CraftsList: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
   return (
     <List component={Paper}>
       <ListItemButton onClick={handleClick}>
-        <ListItemText primary="Filters" />
+        <ListItemText primary={ui.filters} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -73,7 +73,7 @@ export const CraftsList: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
       </Collapse>
 
       {crafts.sort(getComparator(order, orderBy)).map((craft) => (
-        <CraftItem craft={craft} key={craft.id} />
+        <CraftItem craft={craft} key={craft.itemId} />
       ))}
     </List>
   );

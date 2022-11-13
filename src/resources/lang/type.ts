@@ -122,10 +122,10 @@ interface ILanguageUIOptions {
   intermediateCraftLabel: string;
   languageDescription: string;
   languageLabel: string;
-  maxCraftingCostLabel: string;
-  maxCraftingCostDescription: string;
   languageOptionEnglish: string;
   languageOptionFrench: string;
+  maxCraftingCostDescription: string;
+  maxCraftingCostLabel: string;
   playFrequencyDescription: string;
   playFrequencyLabel: string;
   playFrequencyOptionEveryday: string;
@@ -140,7 +140,9 @@ interface ILanguageUI {
   amount: string;
   auction: string;
   bazaar: string;
+  casting: string;
   craftCost: string;
+  filters: string;
   hotm: string;
   hour: string;
   item: string;
@@ -151,8 +153,11 @@ interface ILanguageUI {
   profitByTimeNonStop: string;
   profitByTimeThreeTime: string;
   profitByTimeTwice: string;
+  refine: string;
+  sell: string;
   sellPrice: string;
   shoppingList: string;
+  type: string;
   time: string;
   title: string;
   totalPrice: string;
