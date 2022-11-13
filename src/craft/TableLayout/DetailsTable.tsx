@@ -28,7 +28,9 @@ export const DetailsTable: FC<{
             <TableCell>{ui.item}</TableCell>
             <TableCell align="right">{ui.itemPrice}</TableCell>
             <TableCell align="right">{ui.amount}</TableCell>
+            <TableCell align="right">{ui.amount} x 5</TableCell>
             <TableCell align="right">{ui.totalPrice}</TableCell>
+            <TableCell align="right">{ui.totalPrice} x 5</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

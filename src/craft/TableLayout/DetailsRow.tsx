@@ -26,8 +26,12 @@ export const DetailsRow: FC<{
           <Coin amount={cost} />
         </TableCell>
         <TableCell align="right">{material.quantity}</TableCell>
+        <TableCell align="right">{material.quantity * 5}</TableCell>
         <TableCell align="right">
           <Coin amount={material.quantity * cost} />
+        </TableCell>
+        <TableCell align="right">
+          <Coin amount={material.quantity * cost * 5} />
         </TableCell>
       </TableRow>
     </>
