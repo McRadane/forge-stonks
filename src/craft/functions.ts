@@ -1,26 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { crafts, itemsSource, ICraft } from '../resources/crafts';
+import { crafts, itemsSource, ICraft, itemsVendorPrice } from '../resources/crafts';
 import { ILanguage } from '../resources/lang/type';
 import { services } from '../services/hypixel';
 import { IOptionsState } from '../services/options';
 import { RootState } from '../store';
 
 export const resolveItemPrices = async (
-  id: string,
-  source: 'auction' | 'bazaar',
+  id: keyof ILanguage['items'],
+  source: 'auction' | 'bazaar' | 'vendor',
   auctionsBINOnly: boolean
 ): Promise<{ buy: number; sell: number }> => {
-  //console.log("Resolving prices for", id, "on source", source);
   if (source === 'bazaar') {
     const found = await services.getItemBazaarPrice(id);
 
     if (found) {
       return { buy: found.buyPrice, sell: found.sellPrice };
     }
-    //console.log("item not found");
     return { buy: NaN, sell: NaN };
+  } else if (source === 'vendor') {
+    const price = itemsVendorPrice[id] ?? 0;
+
+    return { buy: price, sell: price };
   }
 
   const foundBins = await services.getItemBinsPrice(id);
@@ -32,37 +34,30 @@ export const resolveItemPrices = async (
   const foundAuctions = await services.getItemAuctionsPrice(id);
 
   if (foundBins || foundAuctions) {
-    //console.log("item found", foundBins, foundAuctions);
-
     const lowerPrice = Math.min(...([foundBins?.buyPrice, foundAuctions?.buyPrice].filter((price) => price) as number[]));
 
     return { buy: lowerPrice, sell: lowerPrice };
   }
 
-  //console.log("item not found");
-
   return { buy: NaN, sell: NaN };
 };
 
 export const resolveItemCraftPrice = async (id: string, intermediateCraft: boolean, auctionsBINOnly: boolean) => {
-  const found = crafts.find((item) => item.id === id);
+  const found = crafts.find((item) => item.itemId === id);
 
   if (found) {
     let sum = 0;
     for await (const material of found.craftMaterial) {
       if (intermediateCraft && material.intermediaryCraft) {
-        const buy = await resolveItemCraftPrice(material.id, intermediateCraft, auctionsBINOnly);
+        const buy = await resolveItemCraftPrice(material.itemId, intermediateCraft, auctionsBINOnly);
         sum += buy * material.quantity;
       } else if (material.source === 'vendor') {
-        // nothing to do
+        sum += (itemsVendorPrice[material.itemId] ?? 0) * material.quantity;
       } else {
-        const { buy } = await resolveItemPrices(material.id, material.source, auctionsBINOnly);
+        const { buy } = await resolveItemPrices(material.itemId, material.source, auctionsBINOnly);
         sum += buy * material.quantity;
       }
     }
-    /*found.craftMaterial.forEach(async (material) => {
-      
-    });*/
 
     return sum;
   }
@@ -73,7 +68,7 @@ export const resolveItemCraftPrice = async (id: string, intermediateCraft: boole
 const updater = async (options: {
   auctionsBINOnly: boolean;
   costRef: number;
-  id: string;
+  id: keyof ILanguage['items'];
   intermediateCraft: boolean;
   isCraft: boolean;
   source?: string;
@@ -94,7 +89,7 @@ const updater = async (options: {
   }
 };
 
-export const useItemCraftPrice = (id: string) => {
+export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
   const [cost, setCost] = useState(0);
   const costRef = useRef(0);
   const isCraft = useRef(false);
@@ -102,8 +97,8 @@ export const useItemCraftPrice = (id: string) => {
 
   const { auctionsBINOnly, intermediateCraft } = useSelector((state: RootState) => state.options);
 
-  source.current = itemsSource[id as keyof typeof itemsSource] ?? 'vendor';
-  isCraft.current = crafts.find((item) => item.id === id) !== undefined;
+  source.current = itemsSource[id] ?? 'vendor';
+  isCraft.current = crafts.find((item) => item.itemId === id) !== undefined;
 
   costRef.current = cost;
 
@@ -130,24 +125,26 @@ export interface ICraftWithCosts extends ICraft {
 }
 
 export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
-  const [costs, setCosts] = useState<Record<ICraft['id'], ICraftWithCosts>>({} as Record<ICraft['id'], ICraftWithCosts>);
-  const costsRef = useRef({} as Record<ICraft['id'], number>);
+  const [costs, setCosts] = useState<Record<ICraft['itemId'], ICraftWithCosts>>({} as Record<ICraft['itemId'], ICraftWithCosts>);
+  const costsRef = useRef({} as Record<ICraft['itemId'], number>);
 
   const { auctionsBINOnly, intermediateCraft, playFrequency } = useSelector((state: RootState) => state.options);
 
   useEffect(() => {
     const updateAll = async () => {
-      const newCosts = {} as Record<ICraft['id'], ICraftWithCosts>;
+      const newCosts = {} as Record<ICraft['itemId'], ICraftWithCosts>;
       for await (const craft of crafts) {
-        const source = itemsSource[craft.id as keyof typeof itemsSource] ?? 'vendor';
+        const source = itemsSource[craft.itemId as keyof typeof itemsSource] ?? 'vendor';
 
-        const itemDb = craft.bazaarItem ? await services.getItemPrice(craft.id, 'bazaar') : await services.getItemPrice(craft.id, 'bins');
+        const itemDb = craft.bazaarItem
+          ? await services.getItemPrice(craft.itemId, 'bazaar')
+          : await services.getItemPrice(craft.itemId, 'bins');
         const sell = itemDb?.sellPrice ?? 0;
 
         await updater({
           auctionsBINOnly,
-          costRef: costsRef.current[craft.id],
-          id: craft.id,
+          costRef: costsRef.current[craft.itemId],
+          id: craft.itemId,
           intermediateCraft,
           isCraft: true,
           source,
@@ -169,7 +166,7 @@ export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
 
             const profitHourly = (profit / Math.max(craft.time, period)) * period;
 
-            newCosts[craft.id] = { ...craft, craft: newCost, profit, profitHourly, sell };
+            newCosts[craft.itemId] = { ...craft, craft: newCost, profit, profitHourly, sell };
           }
         });
       }

@@ -7,12 +7,12 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { FC } from 'react';
 
-import { ICraft } from '../resources/crafts';
-import { useLanguage } from '../resources/lang/LanguageContext';
+import { ICraft } from '../../resources/crafts';
+import { useLanguage } from '../../resources/lang/LanguageContext';
 
 import { DetailsRow } from './DetailsRow';
 
-export const Details: FC<{
+export const DetailsTable: FC<{
   item: ICraft;
 }> = ({ item }) => {
   const { ui } = useLanguage();
@@ -33,7 +33,7 @@ export const Details: FC<{
         </TableHead>
         <TableBody>
           {item.craftMaterial.map((material) => (
-            <DetailsRow key={material.id} material={material} />
+            <DetailsRow key={material.itemId} material={material} />
           ))}
         </TableBody>
       </Table>

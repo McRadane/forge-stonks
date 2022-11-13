@@ -1,20 +1,23 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Avatar from '@mui/material/Avatar';
+import Chip from '@mui/material/Chip';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { FC, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import IconButton from '@mui/material/IconButton';
-import Chip from '@mui/material/Chip';
-import Avatar from '@mui/material/Avatar';
-import Collapse from '@mui/material/Collapse';
 
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { RootState } from '../../store';
 import { ICraftWithCosts } from '../functions';
-import { Details } from '../Details';
+
+import { DetailsTable } from './DetailsTable';
 
 export const CraftRow: FC<{
   craft: ICraftWithCosts;
@@ -23,11 +26,14 @@ export const CraftRow: FC<{
 
   const { ui } = useLanguage();
 
-  const { bazaarItem, craft: cost, hotm, id, profit, profitHourly, sell, time } = craft;
+  const { bazaarItem, craft: cost, hotm, itemId, profit, profitHourly, sell, time } = craft;
 
   const playFrequency = useSelector((state: RootState) => state.options.playFrequency);
 
   const toggle = useCallback(() => setOpen((status) => !status), []);
+
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('lg'));
 
   return (
     <>
@@ -38,13 +44,19 @@ export const CraftRow: FC<{
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          <Item>{id}</Item> <Chip label={bazaarItem ? ui.bazaar : ui.auction} size="small" />{' '}
-          <Chip avatar={<Avatar>{hotm}</Avatar>} label={ui.hotm} size="small" />
+          <Item>{itemId}</Item>{' '}
+          {matches && (
+            <>
+              <Chip label={bazaarItem ? ui.bazaar : ui.auction} size="small" />{' '}
+              <Chip avatar={<Avatar>{hotm}</Avatar>} label={ui.hotm} size="small" />{' '}
+              <Chip label={craft.category === 'casting' ? ui.casting : ui.refine} size="small" />
+            </>
+          )}
         </TableCell>
         <TableCell align="right">
           <Coin amount={sell} />
         </TableCell>
-        <TableCell align="right">{time}</TableCell>
+        <TableCell align="right">{time < 0.5 ? 0 : time}</TableCell>
         <TableCell align="right">
           <Coin amount={cost} />
         </TableCell>
@@ -60,7 +72,7 @@ export const CraftRow: FC<{
       <TableRow>
         <TableCell colSpan={7} style={{ paddingBottom: 0, paddingTop: 0 }}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Details item={craft} />
+            <DetailsTable item={craft} />
           </Collapse>
         </TableCell>
       </TableRow>

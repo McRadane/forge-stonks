@@ -3,7 +3,9 @@
     "amount": "Quantité",
     "auction": "Actions",
     "bazaar": "Bazaar",
+    "casting": "Moulage",
     "craftCost": "Coût de fabrication",
+    "filters": "Filtres",
     "hotm": "HOTM",
     "hour": "H",
     "item": "Objet",
@@ -38,11 +40,14 @@
     "profitByTimeNonStop": "Bénéfices par heure",
     "profitByTimeThreeTime": "Bénéfices pour 8h",
     "profitByTimeTwice": "Bénéfices pour 12h",
+    "refine": "Affinage",
+    "sell": "Vente",
     "sellPrice": "Prix de vente",
     "shoppingList": "Liste d'achat",
     "time": "Durée",
     "title": "HyPixel Skyblock's Forge Stonks",
     "totalPrice": "Prix total",
+    "type": "Type",
     "vendor": "Vendeur"
   }
 }
