@@ -1,3 +1,4 @@
+import { red } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -8,6 +9,11 @@ import { persistor, store } from './store';
 
 export const Container = () => {
   const theme = createTheme({
+    palette: {
+      primary: {
+        main: red[500]
+      }
+    },
     breakpoints: {
       values: {
         xs: 0,

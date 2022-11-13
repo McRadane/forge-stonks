@@ -1,10 +1,5 @@
-import { AnyAction, Dispatch } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Dexie from 'dexie';
-
-import { Logger } from '../logger';
-
-import { setLoading, setNotLoading } from './loading';
 
 interface IAuctionsAPIPaginatedResponse {
   auctions: {
@@ -136,32 +131,41 @@ const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
     });
 };
 
-class Services extends Dexie {
+export class Services extends Dexie {
   bazaars!: Dexie.Table<IBazaar, string>;
   auctions!: Dexie.Table<IAuctions, string>;
   bins!: Dexie.Table<IAuctions, string>;
+  cache!: Dexie.Table<{ key: string; value: unknown }, string>;
 
   private _cacheDuration = -1;
   private _lastRefresh = -1;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _polling!: any;
-  private _reduxDispatch!: Dispatch<AnyAction>;
+  // private _reduxDispatch!: Dispatch<AnyAction>;
+  private ctx!: Worker;
+  private postRefresh: () => void;
 
-  constructor() {
+  constructor(ctx: Worker, postRefresh: () => void) {
     super('Services');
+
+    this.ctx = ctx;
+    this.postRefresh = postRefresh;
+
     this.version(1).stores({
       auctions: 'item_name, sellPrice, buyPrice',
       bazaars: 'item_name, sellPrice, buyPrice',
-      bins: 'item_name, sellPrice, buyPrice'
+      bins: 'item_name, sellPrice, buyPrice',
+      cache: 'key'
     });
 
-    const lastRefreshString = localStorage.getItem('lastRefresh');
-    if (lastRefreshString) {
-      const lastRefresh = Number(lastRefreshString);
-      if (!Number.isNaN(lastRefresh)) {
-        this._lastRefresh = lastRefresh;
+    this.cache.get('lastRefresh').then((lastRefreshString) => {
+      if (lastRefreshString) {
+        const lastRefresh = Number(lastRefreshString.value);
+        if (!Number.isNaN(lastRefresh)) {
+          this._lastRefresh = lastRefresh;
+        }
       }
-    }
+    });
   }
 
   public set cacheDuration(duration: undefined | number) {
@@ -176,7 +180,7 @@ class Services extends Dexie {
   }
 
   private _startPolling() {
-    if (!this._polling && this._cacheDuration !== -1 && this._reduxDispatch !== undefined) {
+    if (!this._polling && this._cacheDuration !== -1) {
       this._polling = setInterval(() => {
         this._doPolling();
       }, 1000);
@@ -193,22 +197,33 @@ class Services extends Dexie {
     const now = Date.now();
     if (this._lastRefresh + this._cacheDuration < now) {
       this._lastRefresh = now;
-      localStorage.setItem('lastRefresh', String(now));
+
+      this.addToCache('lastRefresh', now);
+
       this._refresh();
     }
   }
 
-  public forceRefresh() {
+  private addToCache(key: string, value: unknown) {
+    this.cache.get(key).then((exists) => {
+      if (exists) {
+        this.cache.update(key, { value });
+      } else {
+        this.cache.add({ key, value });
+      }
+    });
+  }
+
+  public async forceRefresh() {
     const now = Date.now();
-    if (this._reduxDispatch !== undefined) {
-      this._lastRefresh = now;
-      localStorage.setItem('lastRefresh', String(now));
-      this._refresh();
-    }
+
+    this._lastRefresh = now;
+    this.addToCache('lastRefresh', now);
+    await this._refresh();
   }
 
   private async _refresh() {
-    this._reduxDispatch(setLoading());
+    this.ctx.postMessage({ command: 'loading', loading: true });
 
     const refreshPromiseBazaar = new Promise<void>((resolve) => {
       getBazaarData().then((bazaars) => {
@@ -219,7 +234,7 @@ class Services extends Dexie {
             .then(() => {
               this.bazaars.bulkAdd(bazaars);
               resolve();
-              Logger.log('Bazaar data has been updated');
+              this.ctx.postMessage({ command: 'message', message: 'Bazaar data has been updated' });
             });
         });
       });
@@ -240,7 +255,7 @@ class Services extends Dexie {
             .then(() => {
               this.auctions.bulkAdd(minAuctions);
               resolve();
-              Logger.log('Auctions data has been updated');
+              this.ctx.postMessage({ command: 'message', message: 'Auctions data has been updated' });
             });
         });
 
@@ -251,7 +266,7 @@ class Services extends Dexie {
             .then(() => {
               this.bins.bulkAdd(minBins);
               resolve();
-              Logger.log('BINs data has been updated');
+              this.ctx.postMessage({ command: 'message', message: 'BINs data has been updated' });
             });
         });
 
@@ -261,12 +276,14 @@ class Services extends Dexie {
 
     Promise.all([refreshPromiseBazaar, refreshPromiseAuctionsAndBins])
       .then(() => {
-        Logger.log('All data has been updated');
-        this._reduxDispatch(setNotLoading());
+        this.ctx.postMessage({ command: 'message', message: 'All data has been updated' });
+        this.ctx.postMessage({ command: 'loading', loading: false });
+        this.postRefresh();
       })
       .catch((err) => {
-        Logger.log('An error occured', err);
-        this._reduxDispatch(setNotLoading());
+        this.ctx.postMessage({ command: 'message', message: JSON.stringify({ message: 'An error occured', err }) });
+        this.ctx.postMessage({ command: 'loading', loading: false });
+        this.postRefresh();
       });
   }
 
@@ -334,10 +351,4 @@ class Services extends Dexie {
   public async getItemBinsPrice(item: string) {
     return await this.bins.get(item);
   }
-
-  public set dispatcher(dispatch: Dispatch<AnyAction>) {
-    this._reduxDispatch = dispatch;
-  }
 }
-
-export const services = new Services();

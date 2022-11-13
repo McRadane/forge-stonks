@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
 import { KeysLanguageType } from '../resources/lang/type';
-import { services } from '../services/hypixel';
 import {
   setHOTM,
   setPlayFrequency,
@@ -28,6 +27,7 @@ import {
   setMaxCraftingCost
 } from '../services/options';
 import { RootState } from '../store';
+import { useWorker } from '../worker/runWorker';
 
 export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ open, toggle }) => {
   const {
@@ -35,6 +35,7 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
   } = useLanguage();
 
   const dispatch = useDispatch();
+  const worker = useWorker();
 
   const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, playFrequency, maxCraftingCost } = useSelector(
     (state: RootState) => state.options
@@ -86,8 +87,8 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
   );
 
   const handleForceRefresh = useCallback(() => {
-    services.forceRefresh();
-  }, []);
+    worker.forceRefresh();
+  }, [worker]);
 
   return (
     <Drawer anchor={'right'} onClose={toggle} open={open}>

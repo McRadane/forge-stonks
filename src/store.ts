@@ -6,6 +6,7 @@ import { createLogger } from 'redux-logger';
 import { loadingReducer } from './services/loading';
 import { optionsReducer } from './services/options';
 import { Logger } from './logger';
+import { workerReducer } from './services/worker';
 
 const persistConfig = {
   key: 'root',
@@ -25,7 +26,8 @@ if (process.env.NODE_ENV === `development`) {
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
-  options: optionsReducer
+  options: optionsReducer,
+  worker: workerReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
