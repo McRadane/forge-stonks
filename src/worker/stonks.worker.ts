@@ -1,27 +1,27 @@
 import { ICraftWithCosts } from '../craft/functions';
-import { crafts, ICraft, itemsSource, itemsVendorPrice } from '../resources/crafts';
-import { ILanguage, KeysLanguageType } from '../resources/lang/type';
+import { crafts, itemsSource, itemsVendorPrice, ICraft } from '../resources/crafts';
 import enUs from '../resources/lang/enUs.json';
 import frFr from '../resources/lang/frFr.json';
+import { KeysLanguageType, ILanguage } from '../resources/lang/type';
 import { IOptionsState } from '../services/options';
 
 import { Database } from './database';
 import {
-  IWorkerCommandGetPrices,
   WorkerCommandEvents,
-  IWorkerResponseMessage,
-  IWorkerCommandStartTimer,
-  IWorkerCommandStopTimer,
-  IWorkerResponseTimers,
-  IWorkerResponseTimerSet,
   ITimer,
-  IWorkerResponseGetLanguage,
   IWorkerCommandDeleteCacheItem,
   IWorkerCommandGetCacheItem,
+  IWorkerCommandGetPrices,
   IWorkerCommandSetCacheItem,
-  IWorkerResponseCacheGetResult,
+  IWorkerCommandStartTimer,
+  IWorkerCommandStopTimer,
   IWorkerResponseCacheDeleteExecuted,
-  IWorkerResponseCacheSetExecuted
+  IWorkerResponseCacheGetResult,
+  IWorkerResponseCacheSetExecuted,
+  IWorkerResponseGetLanguage,
+  IWorkerResponseMessage,
+  IWorkerResponseTimerSet,
+  IWorkerResponseTimers
 } from './type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,7 +31,7 @@ const CACHE_DURATION = 3_600_000;
 
 class ComputationWorker {
   private database: Database;
-  private timersInterval: number | undefined;
+  private timersInterval: undefined | number;
   private languageKey: KeysLanguageType = 'en-US';
   private crafts!: ICraft[];
   private withNotification = false;
@@ -60,7 +60,7 @@ class ComputationWorker {
 
   public getCacheItem({ key }: IWorkerCommandGetCacheItem) {
     this.database.getFromCache(key).then((value) => {
-      const command: IWorkerResponseCacheGetResult = { command: 'cacheGetResult', key, value: value as string | number | undefined };
+      const command: IWorkerResponseCacheGetResult = { command: 'cacheGetResult', key, value: value as undefined | number | string };
       ctx.postMessage(command);
     });
   }
@@ -85,13 +85,13 @@ class ComputationWorker {
 
     let options: IOptionsState = {
       auctionsBINOnly: true,
-      hotm: 7,
-      intermediateCraft: false,
-      includeAuctionsFlip: true,
-      quickForge: 0,
-      playFrequency: 'nonstop',
       cacheDuration: CACHE_DURATION,
-      maxCraftingCost: 0
+      hotm: 7,
+      includeAuctionsFlip: true,
+      intermediateCraft: false,
+      maxCraftingCost: 0,
+      playFrequency: 'nonstop',
+      quickForge: 0
     };
 
     const optionsCached = (await this.database.getFromCache('persist:root')) as string;
@@ -197,14 +197,12 @@ class ComputationWorker {
 
   private notifyMe(message: string) {
     // Check if the browser supports notifications
-    if (this.withNotification) {
-      if (Notification.permission === 'granted') {
-        // Check whether notification permissions have already been granted;
-        // if so, create a notification
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const notification = new Notification(message);
-        // …
-      }
+    if (this.withNotification && Notification.permission === 'granted') {
+      // Check whether notification permissions have already been granted;
+      // if so, create a notification
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const notification = new Notification(message);
+      // …
     }
   }
 
@@ -314,10 +312,10 @@ class ComputationWorker {
   private async getItemsWithCraftPrice({
     auctionsBINOnly,
     crafts,
-    quickForge,
     // costsRef,
     intermediateCraft,
-    playFrequency
+    playFrequency,
+    quickForge
   }: IOptionsState & { crafts: ICraft[] }) {
     const newCosts = {} as Record<ICraft['itemId'], ICraftWithCosts>;
 
@@ -358,7 +356,7 @@ class ComputationWorker {
 
           const profitHourly = (profit / Math.max(time, period)) * period;
 
-          newCosts[craft.itemId] = { ...craft, time, craft: newCost, profit, profitHourly, sell };
+          newCosts[craft.itemId] = { ...craft, craft: newCost, profit, profitHourly, sell, time };
         }
       });
     }

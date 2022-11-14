@@ -1,10 +1,10 @@
-import enUsFile from './enUs.json';
-import frFrFile from './frFr.json';
 import type { KeysLanguageType, ILanguage } from './type';
 
 export const dictionaryList = {
-  'en-US': enUsFile as ILanguage,
-  'fr-FR': Object.assign({}, enUsFile, frFrFile) as ILanguage
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-commonjs
+  'en-US': require('./enUs.json') as ILanguage,
+  // eslint-disable-next-line import/no-commonjs, @typescript-eslint/no-var-requires
+  'fr-FR': require('./frFr.json') as ILanguage
 };
 
 const keyLanguages = Object.keys(dictionaryList) as KeysLanguageType[];
@@ -14,7 +14,7 @@ keyLanguages.forEach((key) => {
   shortnameLanguages[key.substring(0, 2)] = key;
 });
 
-const resolveLanguage = (lang: KeysLanguageType): KeysLanguageType | undefined => {
+const resolveLanguage = (lang: KeysLanguageType): undefined | KeysLanguageType => {
   const wShortBrowserLanguage = lang.substring(0, 2);
 
   // Check if the Cache language correspond to a known language

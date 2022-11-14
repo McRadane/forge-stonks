@@ -8,6 +8,7 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'plugin:sonarjs/recommended',
     'plugin:jsx-a11y/strict'
   ],
   parser: '@typescript-eslint/parser',

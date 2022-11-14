@@ -35,21 +35,15 @@ export const getProfitByTimeLabel = (playFrequency: IOptionsState['playFrequency
   switch (playFrequency) {
     case 'everyday':
       return ui.profitByTimeEveryday;
-      break;
     case 'less':
       // Hide the column
       break;
 
     case 'nonstop':
       return ui.profitByTimeNonStop;
-      break;
     case 'three-time':
       return ui.profitByTimeThreeTime;
-      break;
     case 'twice':
       return ui.profitByTimeTwice;
-      break;
   }
-
-  return;
 };

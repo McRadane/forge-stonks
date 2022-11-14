@@ -1,36 +1,34 @@
-import Box from '@mui/material/Box';
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import LinearProgress from '@mui/material/LinearProgress';
 import AlarmOffIcon from '@mui/icons-material/AlarmOff';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
-import { ITimer } from '../worker/type';
 import { useWorker } from '../worker/runWorker';
+import { ITimer } from '../worker/type';
 
 const getStyles = () => ({
-  container: { flex: 1, display: 'grid', gridTemplateAreas: '"item timer" "progress progress"' },
+  container: { display: 'grid', flex: 1, gridTemplateAreas: '"item timer" "progress progress"' },
   item: {
     gridArea: 'item',
     paddingLeft: 1
   },
-  timer: {
-    gridArea: 'timer',
-    justifySelf: 'self-end',
-    alignSelf: 'self-end',
-    paddingRight: 1
-  },
   progress: {
     gridArea: 'progress'
+  },
+  timer: {
+    alignSelf: 'self-end',
+    gridArea: 'timer',
+    justifySelf: 'self-end',
+    paddingRight: 1
   }
 });
 
-export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
+export const Timer: FC<ITimer> = ({ endTime, id, itemId, startTime }) => {
   const calculateTime = useCallback((now: number) => ((now - startTime) * 100) / (endTime - startTime), [endTime, startTime]);
 
   const [currentTime, setCurrentTime] = useState(Date.now);
-  // const [progress, setProgress] = useState(calculateTime(currentTime));
-  // const [label, setLabel] = useState<string>();
 
   const progress = useMemo(() => calculateTime(currentTime), [calculateTime, currentTime]);
   const styles = useMemo(() => getStyles(), []);
@@ -54,7 +52,6 @@ export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
   }, []);
 
   useEffect(() => {
-    // const newLabel = prettyPrint(endTime - currentTime);
     let seconds = Math.floor((endTime - currentTime) / 1000);
     let minutes;
     let hours;
@@ -74,7 +71,6 @@ export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
 
     if (newLabel !== previousLabel.current) {
       previousLabel.current = newLabel;
-      //setLabel(newLabel);
     }
   }, [currentTime, endTime]);
 
@@ -88,7 +84,7 @@ export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
       </Box>
       <Box sx={styles.timer}>{previousLabel.current}</Box>
       <Box sx={styles.progress}>
-        <LinearProgress variant="determinate" value={progress} />
+        <LinearProgress value={progress} variant="determinate" />
       </Box>
     </Box>
   );

@@ -14,10 +14,6 @@ export const CraftsContainer: FC = () => {
   const { hotm, includeAuctionsFlip, maxCraftingCost } = useSelector((state: RootState) => state.options);
 
   const preFiltered = useMemo(() => {
-    //if (Object.keys(prices).length === 0) {
-    //return [];
-    // }
-
     let filtersCraft = crafts;
     if (!includeAuctionsFlip) {
       filtersCraft = filtersCraft.filter((craft) => craft.bazaarItem);
@@ -31,7 +27,6 @@ export const CraftsContainer: FC = () => {
   const allCrafts = useItemsWithCraftPrice(preFiltered);
 
   const postFiltered = useMemo(() => {
-    //let filtered = allCrafts.filter((craft) => craft.profit >= 0 && craft.sell >= 0);
     let filtered = allCrafts.filter((craft) => craft.sell > 0);
 
     if (maxCraftingCost !== undefined && maxCraftingCost !== 0) {

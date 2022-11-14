@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -98,12 +99,6 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
     },
     [dispatch]
   );
-
-  /*
-  const handleForceRefresh = useCallback(() => {
-    worker.forceRefresh();
-  }, [worker]);
-  */
 
   const quickForgeLevel = useMemo(() => {
     if (quickForge >= 2 && quickForge <= 10) {
@@ -303,9 +298,6 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
               </FormHelperText>
             </FormControl>
           </ListItem>
-          {/*<ListItem divider>
-            <Button onClick={handleForceRefresh}>{options.forceRefresh}</Button>
-              </ListItem>*/}
         </List>
       </Box>
     </Drawer>

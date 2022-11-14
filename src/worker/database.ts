@@ -29,6 +29,7 @@ export class Database extends Dexie {
     this.postRefresh = postRefresh;
 
     this.version(1).stores({
+      // eslint-disable-next-line sonarjs/no-duplicate-string
       auctions: 'item_name, sellPrice, buyPrice',
       bazaars: 'item_name, sellPrice, buyPrice',
       bins: 'item_name, sellPrice, buyPrice',
@@ -202,15 +203,11 @@ export class Database extends Dexie {
 
   public async getItemPrice(item: string, store: 'auctions' | 'auctions+bins' | 'bazaar' | 'bins') {
     if (store === 'bins') {
-      const result = await this.bins.get(item);
-
-      return result;
+      return await this.bins.get(item);
     }
 
     if (store === 'auctions') {
-      const result = await this.auctions.get(item);
-
-      return result;
+      return await this.auctions.get(item);
     }
 
     if (store === 'auctions+bins') {
