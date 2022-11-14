@@ -10,6 +10,7 @@ export const LanguageContext = createContext<ILanguageContextDefinition>({
 
   userLanguageChange: () => {
     // Nothing
+    return 'en-US';
   }
 });
 

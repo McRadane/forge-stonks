@@ -1,9 +1,10 @@
+import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,22 +13,23 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { FC, useCallback, useContext } from 'react';
+import { FC, useCallback, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
 import { KeysLanguageType } from '../resources/lang/type';
-import { services } from '../services/hypixel';
 import {
   setHOTM,
+  setMaxCraftingCost,
   setPlayFrequency,
+  setQuickForge,
   toggleAuctionsBINOnly,
   toggleIncludeAuctionsFlip,
   toggleIntermediateCraft,
-  IOptionsState,
-  setMaxCraftingCost
+  IOptionsState
 } from '../services/options';
 import { RootState } from '../store';
+import { useWorker } from '../worker/runWorker';
 
 export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ open, toggle }) => {
   const {
@@ -36,10 +38,11 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
 
   const dispatch = useDispatch();
 
-  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, playFrequency, maxCraftingCost } = useSelector(
+  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, maxCraftingCost, playFrequency, quickForge } = useSelector(
     (state: RootState) => state.options
   );
-  const { userLanguage, userLanguageChange } = useContext(LanguageContext);
+  const { userLanguage } = useContext(LanguageContext);
+  const worker = useWorker();
 
   const handlPlayFrequency = useCallback(
     (event: SelectChangeEvent) => {
@@ -73,9 +76,9 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
 
   const handleLanguage = useCallback(
     (event: SelectChangeEvent) => {
-      userLanguageChange(event.target.value as KeysLanguageType);
+      worker.setLanguage(event.target.value as KeysLanguageType);
     },
-    [userLanguageChange]
+    [worker]
   );
 
   const handleMaxCraftingCost = useCallback(
@@ -85,16 +88,50 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
     [dispatch]
   );
 
+  const handleQuickForge = useCallback(
+    (_e: Event, num: number | number[]) => {
+      if (Array.isArray(num)) {
+        dispatch(setQuickForge(num[0]));
+      } else {
+        dispatch(setQuickForge(num));
+      }
+    },
+    [dispatch]
+  );
+
+  /*
   const handleForceRefresh = useCallback(() => {
-    services.forceRefresh();
-  }, []);
+    worker.forceRefresh();
+  }, [worker]);
+  */
+
+  const quickForgeLevel = useMemo(() => {
+    if (quickForge >= 2 && quickForge <= 10) {
+      return 15;
+    }
+
+    if (quickForge >= 11 && quickForge <= 19) {
+      return 19.5;
+    }
+
+    if (quickForge === 20) {
+      return 30;
+    }
+
+    return 0;
+  }, [quickForge]);
 
   return (
     <Drawer anchor={'right'} onClose={toggle} open={open}>
       <Box role="presentation" sx={{ /* width: 350, */ padding: 2, textAlign: 'left' }}>
-        <Typography component="div" gutterBottom variant="h6">
-          {options.title}
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'self-start' }}>
+          <Typography component="div" gutterBottom variant="h6">
+            {options.title}
+          </Typography>
+          <IconButton onClick={toggle} size="small">
+            <CloseIcon />
+          </IconButton>
+        </Box>
         <List>
           <ListItem divider>
             <FormControl fullWidth variant="standard">
@@ -228,8 +265,47 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
             </FormControl>
           </ListItem>
           <ListItem divider>
-            <Button onClick={handleForceRefresh}>{options.forceRefresh}</Button>
+            <FormControl fullWidth variant="standard">
+              <Typography id="quickForge-label">{options.quickForgeLabel}</Typography>
+              <Grid alignItems="center" container spacing={2} sx={{ padding: 2 }}>
+                <Grid item xs>
+                  <Slider
+                    aria-describedby="quickForge-description"
+                    aria-label={options.quickForgeLabel}
+                    aria-labelledby="quickForge-label"
+                    id="quickForge"
+                    marks
+                    max={20}
+                    min={0}
+                    onChange={handleQuickForge}
+                    step={1}
+                    value={quickForge}
+                    valueLabelDisplay="auto"
+                  />
+                </Grid>
+                <Grid item>
+                  <Input
+                    inputProps={{
+                      step: 10,
+                      min: 0,
+                      max: 20,
+                      type: 'number',
+                      'aria-labelledby': 'quickForge'
+                    }}
+                    readOnly
+                    size="small"
+                    value={quickForge}
+                  />
+                </Grid>
+              </Grid>
+              <FormHelperText id="quickForge-description">
+                {options.quickForgeDescription}: {quickForgeLevel}%
+              </FormHelperText>
+            </FormControl>
           </ListItem>
+          {/*<ListItem divider>
+            <Button onClick={handleForceRefresh}>{options.forceRefresh}</Button>
+              </ListItem>*/}
         </List>
       </Box>
     </Drawer>

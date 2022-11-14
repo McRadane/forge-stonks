@@ -13,6 +13,7 @@ import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { RootState } from '../../store';
+import { TimerButton } from '../../timers/TimerButton';
 import { getProfitByTimeLabel, ICraftWithCosts } from '../functions';
 
 import { DetailsList } from './DetailsList';
@@ -45,6 +46,7 @@ export const CraftItem: FC<{
                 </Typography>
               </Grid>
 
+              <GridRow left={ui.timer} right={<TimerButton itemId={craft.itemId} />} />
               <GridRow left={ui.sell} right={bazaarItem ? ui.bazaar : ui.auction} />
               <GridRow left={ui.hotm} right={hotm} />
               <GridRow left={ui.type} right={category === 'casting' ? ui.casting : ui.refine} />

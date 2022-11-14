@@ -110,6 +110,9 @@
     "WORM_MEMBRANE": "Worm Membrane",
     "coins": "Coins"
   },
+  "notification": {
+    "timerEnded": "Your {0} timer has ended"
+  },
   "ui": {
     "amount": "Amount",
     "auction": "Auction",
@@ -144,6 +147,8 @@
       "playFrequencyOptionNonStop": "Non-stop",
       "playFrequencyOptionThreeTime": "Three-time per days",
       "playFrequencyOptionTwice": "Twice a day",
+      "quickForgeDescription": "Quick Forge perks level. Current bonus",
+      "quickForgeLabel": "Quick Forge",
       "title": "Options"
     },
     "profit": "Profit",
@@ -156,6 +161,8 @@
     "sellPrice": "Sell price",
     "shoppingList": "Shopping list",
     "time": "Duration",
+    "timer": "Timer",
+    "timerButton": "Start timer",
     "title": "HyPixel Skyblock's Forge Stonks",
     "totalPrice": "Total price",
     "type": "Type",

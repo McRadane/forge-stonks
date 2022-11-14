@@ -6,29 +6,22 @@ import type { KeysLanguageType, ILanguageContextDefinition } from './type';
 
 interface ILanguageProviderProps {
   children: React.ReactNode;
-  defaultLanguage?: KeysLanguageType;
 }
 
-export const LanguageProvider: FC<ILanguageProviderProps> = ({
-  children,
-  defaultLanguage: defaultLanguageBase
-}: ILanguageProviderProps) => {
-  const defaultLangage = languageSelectorHelper(defaultLanguageBase);
-  const [userLanguage, setUserLanguage] = useState<KeysLanguageType>(defaultLangage);
+export const LanguageProvider: FC<ILanguageProviderProps> = ({ children }: ILanguageProviderProps) => {
+  const [userLanguage, setUserLanguage] = useState<KeysLanguageType>(languageSelectorHelper());
 
   const provider: ILanguageContextDefinition = {
     allDictionary: dictionaryList,
 
     dictionary: dictionaryList[userLanguage],
     userLanguage,
-    /**
-     * Update the site language
-     * @param selected SP Language identifier
-     */
+
     userLanguageChange: (selected) => {
       const resultLanguage = languageSelectorHelper(selected);
-      localStorage.setItem('language', resultLanguage);
       setUserLanguage(resultLanguage);
+
+      return resultLanguage;
     }
   };
 

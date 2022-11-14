@@ -2,17 +2,8 @@ import enUsFile from './enUs.json';
 import frFrFile from './frFr.json';
 import type { KeysLanguageType, ILanguage } from './type';
 
-/* const baseMap = JSON.parse(JSON.stringify(enUsFile), (_, value) => {
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  return value;
-}); */
-
 export const dictionaryList = {
   'en-US': enUsFile as ILanguage,
-  // eslint-disable-next-line prefer-object-spread
   'fr-FR': Object.assign({}, enUsFile, frFrFile) as ILanguage
 };
 
@@ -40,15 +31,6 @@ const resolveLanguage = (lang: KeysLanguageType): KeysLanguageType | undefined =
 export const languageSelectorHelper = (language?: KeysLanguageType): keyof typeof dictionaryList => {
   if (language) {
     const lang = resolveLanguage(language);
-    if (lang) {
-      return lang;
-    }
-  }
-
-  const cacheLanguage = localStorage.getItem('language') as KeysLanguageType;
-
-  if (cacheLanguage) {
-    const lang = resolveLanguage(cacheLanguage);
     if (lang) {
       return lang;
     }

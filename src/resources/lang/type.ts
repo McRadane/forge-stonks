@@ -133,6 +133,8 @@ interface ILanguageUIOptions {
   playFrequencyOptionNonStop: string;
   playFrequencyOptionThreeTime: string;
   playFrequencyOptionTwice: string;
+  quickForgeDescription: string;
+  quickForgeLabel: string;
   title: string;
 }
 
@@ -157,15 +159,20 @@ interface ILanguageUI {
   sell: string;
   sellPrice: string;
   shoppingList: string;
-  type: string;
   time: string;
+  timer: string;
+  timerButton: string;
   title: string;
   totalPrice: string;
+  type: string;
   vendor: string;
 }
 
 export interface ILanguage {
   items: ILanguageItems;
+  notification: {
+    timerEnded: string;
+  };
   ui: ILanguageUI;
 }
 
@@ -180,5 +187,5 @@ export interface ILanguageContextDefinition {
    * Change the current language
    * @param selected
    */
-  userLanguageChange(selected: KeysLanguageType): void;
+  userLanguageChange(selected: KeysLanguageType): KeysLanguageType;
 }

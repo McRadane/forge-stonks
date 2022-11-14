@@ -1,11 +1,9 @@
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { crafts } from '../resources/crafts';
-import { services } from '../services/hypixel';
 import { RootState } from '../store';
 
 import { CraftsList } from './ListLayout/CraftsList';
@@ -15,12 +13,10 @@ import { useItemsWithCraftPrice } from './functions';
 export const CraftsContainer: FC = () => {
   const { hotm, includeAuctionsFlip, maxCraftingCost } = useSelector((state: RootState) => state.options);
 
-  const ready = useLiveQuery(() => services.bazaars.count());
-
   const preFiltered = useMemo(() => {
-    if (!ready || ready === 0) {
-      return [];
-    }
+    //if (Object.keys(prices).length === 0) {
+    //return [];
+    // }
 
     let filtersCraft = crafts;
     if (!includeAuctionsFlip) {
@@ -30,7 +26,7 @@ export const CraftsContainer: FC = () => {
     filtersCraft = filtersCraft.filter((craft) => craft.hotm <= hotm);
 
     return filtersCraft;
-  }, [ready, hotm, includeAuctionsFlip]);
+  }, [includeAuctionsFlip, hotm]);
 
   const allCrafts = useItemsWithCraftPrice(preFiltered);
 
