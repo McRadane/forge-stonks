@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: '/forge-stonks/',
   plugins: [react()],
-  define: {
+  /*define: {
     'process.env': {},
     global: {}
-  }
+  }*/
 });

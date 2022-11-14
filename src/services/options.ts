@@ -9,6 +9,7 @@ export interface IOptionsState {
   intermediateCraft: boolean;
   maxCraftingCost: number;
   playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
+  quickForge: number;
 }
 
 const initialState: IOptionsState = {
@@ -18,7 +19,8 @@ const initialState: IOptionsState = {
   includeAuctionsFlip: true,
   intermediateCraft: false,
   maxCraftingCost: 0,
-  playFrequency: 'nonstop'
+  playFrequency: 'nonstop',
+  quickForge: 0
 };
 
 export const optionsSlice = createSlice({
@@ -37,6 +39,9 @@ export const optionsSlice = createSlice({
     setPlayFrequency: (state, action: PayloadAction<IOptionsState['playFrequency']>) => {
       state.playFrequency = action.payload;
     },
+    setQuickForge: (state, action: PayloadAction<number>) => {
+      state.quickForge = action.payload;
+    },
     toggleAuctionsBINOnly: (state) => {
       state.auctionsBINOnly = !state.auctionsBINOnly;
     },
@@ -54,6 +59,7 @@ export const {
   setHOTM,
   setMaxCraftingCost,
   setPlayFrequency,
+  setQuickForge,
   toggleAuctionsBINOnly,
   toggleIncludeAuctionsFlip,
   toggleIntermediateCraft

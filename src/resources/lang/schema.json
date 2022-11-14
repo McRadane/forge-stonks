@@ -512,6 +512,12 @@
                 "time": {
                     "type": "string"
                 },
+                "timer": {
+                    "type": "string"
+                },
+                "timerButton": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -547,6 +553,8 @@
                 "sellPrice",
                 "shoppingList",
                 "time",
+                "timer",
+                "timerButton",
                 "title",
                 "totalPrice",
                 "type",
@@ -623,6 +631,12 @@
                 "playFrequencyOptionTwice": {
                     "type": "string"
                 },
+                "quickForgeDescription": {
+                    "type": "string"
+                },
+                "quickForgeLabel": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 }
@@ -650,6 +664,8 @@
                 "playFrequencyOptionNonStop",
                 "playFrequencyOptionThreeTime",
                 "playFrequencyOptionTwice",
+                "quickForgeDescription",
+                "quickForgeLabel",
                 "title"
             ],
             "type": "object"
@@ -659,12 +675,25 @@
         "items": {
             "$ref": "#/definitions/ILanguageItems"
         },
+        "notification": {
+            "additionalProperties": false,
+            "properties": {
+                "timerEnded": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "timerEnded"
+            ],
+            "type": "object"
+        },
         "ui": {
             "$ref": "#/definitions/ILanguageUI"
         }
     },
     "required": [
         "items",
+        "notification",
         "ui"
     ],
     "type": "object"

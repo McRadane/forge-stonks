@@ -16,6 +16,7 @@ import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { RootState } from '../../store';
 import { ICraftWithCosts } from '../functions';
+import { TimerButton } from '../../timers/TimerButton';
 
 import { DetailsTable } from './DetailsTable';
 
@@ -54,6 +55,9 @@ export const CraftRow: FC<{
           )}
         </TableCell>
         <TableCell align="right">
+          <TimerButton itemId={craft.itemId} />
+        </TableCell>
+        <TableCell align="right">
           <Coin amount={sell} />
         </TableCell>
         <TableCell align="right">{time < 0.5 ? 0 : time}</TableCell>
@@ -70,7 +74,7 @@ export const CraftRow: FC<{
         )}
       </TableRow>
       <TableRow>
-        <TableCell colSpan={7} style={{ paddingBottom: 0, paddingTop: 0 }}>
+        <TableCell colSpan={playFrequency !== 'less' ? 8 : 7} style={{ paddingBottom: 0, paddingTop: 0 }}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <DetailsTable item={craft} />
           </Collapse>

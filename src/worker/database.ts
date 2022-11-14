@@ -1,152 +1,29 @@
-import axios from 'axios';
 import Dexie from 'dexie';
 
-interface IAuctionsAPIPaginatedResponse {
-  auctions: {
-    // _id: string,
-    uuid: string;
-    // auctioneer: string,
-    // profile_id: string,
-    // coop: {},
-    // start: number,
-    // end: number,
-    item_name: string;
-    // item_lore: string,
-    // extra: string,
-    category: string;
-    tier: string;
-    claimed: boolean; // Indicate if the auction is active
-    starting_bid: number; // Price for BIN
-    highest_bid_amount: number; // Price of auctions
-    bin: boolean; // Indicate if auction or BIN
-  }[];
-  lastUpdated: number;
-  page: number;
-  success: boolean;
-  totalAuctions: number;
-  totalPages: number;
+import { getAuctionData, getBazaarData } from './axios';
+import { IAuctions, IBazaar, ITimer } from './type';
+
+interface ICache {
+  key: string;
+  value: unknown;
 }
 
-export interface IAuctions {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
-
-interface IBazaarAPIResponse {
-  products: Record<
-    string,
-    {
-      product_id: string;
-      quick_status: {
-        buyPrice: number;
-        sellPrice: number;
-      };
-    }
-  >;
-  success: boolean;
-}
-
-export interface IBazaar {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
-
-export const getBazaarData = (): Promise<IBazaar[]> => {
-  return axios
-    .get<IBazaarAPIResponse>('https://api.hypixel.net/skyblock/bazaar')
-    .then((response) => response.data)
-    .then((data) => {
-      if (!data || !data.success) {
-        throw new Error('Invalid query');
-      }
-
-      const result: IBazaar[] = Object.keys(data.products).map((key) => ({
-        buyPrice: data.products[key].quick_status.buyPrice,
-        item_name: key,
-        sellPrice: data.products[key].quick_status.sellPrice
-      }));
-
-      return result;
-    });
-};
-
-const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPaginatedResponse['auctions']> => {
-  const pageDataResponse = await axios.get<IAuctionsAPIPaginatedResponse>(`https://api.hypixel.net/skyblock/auctions?page=${page}`);
-  const pageData = pageDataResponse.data;
-
-  if (pageData && pageData.success) {
-    return pageData.auctions.filter((auction) => !auction.claimed);
-  }
-
-  return Promise.reject();
-};
-
-const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
-  return axios
-    .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
-    .then((response) => response.data)
-    .then((data) => {
-      if (!data || !data.success) {
-        throw new Error('Invalid query');
-      }
-
-      const auctions: Map<string, IAuctions & { bin: boolean }> = new Map();
-
-      data.auctions
-        .filter((auction) => !auction.claimed)
-        .forEach(({ bin, highest_bid_amount, item_name, starting_bid, uuid }) => {
-          auctions.set(uuid, {
-            bin,
-            buyPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
-            item_name,
-            sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount
-          });
-        });
-
-      const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
-
-      if (data.totalPages > 1) {
-        for (let page = 1; page < data.totalPages; page++) {
-          promises.push(getPageAuctionsRequests(page));
-        }
-      }
-      return Promise.all(promises).then((results) => {
-        results.forEach((element) => {
-          element.forEach((item) => {
-            const { bin, highest_bid_amount, item_name, starting_bid, uuid } = item;
-
-            auctions.set(uuid, {
-              bin,
-              buyPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
-              item_name,
-              sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount
-            });
-          });
-        });
-
-        return Array.from(auctions.values());
-      });
-    });
-};
-
-export class Services extends Dexie {
+export class Database extends Dexie {
   bazaars!: Dexie.Table<IBazaar, string>;
   auctions!: Dexie.Table<IAuctions, string>;
   bins!: Dexie.Table<IAuctions, string>;
-  cache!: Dexie.Table<{ key: string; value: unknown }, string>;
+  cache!: Dexie.Table<ICache, string>;
+  timers!: Dexie.Table<ITimer, number>;
 
   private _cacheDuration = -1;
   private _lastRefresh = -1;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _polling!: any;
-  // private _reduxDispatch!: Dispatch<AnyAction>;
+  private _polling!: number;
+
   private ctx!: Worker;
   private postRefresh: () => void;
 
   constructor(ctx: Worker, postRefresh: () => void) {
-    super('Services');
+    super('Database');
 
     this.ctx = ctx;
     this.postRefresh = postRefresh;
@@ -155,7 +32,8 @@ export class Services extends Dexie {
       auctions: 'item_name, sellPrice, buyPrice',
       bazaars: 'item_name, sellPrice, buyPrice',
       bins: 'item_name, sellPrice, buyPrice',
-      cache: 'key'
+      cache: 'key',
+      timers: 'id++, itemId, startTime, endTime'
     });
 
     this.cache.get('lastRefresh').then((lastRefreshString) => {
@@ -174,7 +52,6 @@ export class Services extends Dexie {
       this._stopPolling();
     } else {
       this._cacheDuration = duration;
-      // this._refresh();
       this._startPolling();
     }
   }
@@ -183,7 +60,7 @@ export class Services extends Dexie {
     if (!this._polling && this._cacheDuration !== -1) {
       this._polling = setInterval(() => {
         this._doPolling();
-      }, 1000);
+      }, 1000) as unknown as number;
     }
   }
 
@@ -204,13 +81,27 @@ export class Services extends Dexie {
     }
   }
 
-  private addToCache(key: string, value: unknown) {
-    this.cache.get(key).then((exists) => {
+  public addToCache(key: string, value: unknown) {
+    return this.cache.get(key).then((exists) => {
       if (exists) {
         this.cache.update(key, { value });
       } else {
         this.cache.add({ key, value });
       }
+    });
+  }
+
+  public removeFromCache(key: string) {
+    return this.cache.get(key).then((exists) => {
+      if (exists) {
+        this.cache.delete(key);
+      }
+    });
+  }
+
+  public getFromCache(key: string) {
+    return this.cache.get(key).then((exists) => {
+      return exists?.value;
     });
   }
 
@@ -281,7 +172,7 @@ export class Services extends Dexie {
         this.postRefresh();
       })
       .catch((err) => {
-        this.ctx.postMessage({ command: 'message', message: JSON.stringify({ message: 'An error occured', err }) });
+        this.ctx.postMessage({ command: 'message', message: JSON.stringify({ err, message: 'An error occurred' }) });
         this.ctx.postMessage({ command: 'loading', loading: false });
         this.postRefresh();
       });

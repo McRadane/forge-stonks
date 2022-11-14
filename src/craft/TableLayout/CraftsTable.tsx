@@ -39,6 +39,7 @@ export const CraftsTable: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
   const headCells = useMemo(() => {
     const heads = [
       { disablePadding: true, id: 'id', label: ui.item, numeric: false },
+      { disablePadding: false, id: 'timer', label: ui.timer, numeric: true },
       { disablePadding: false, id: 'sell', label: ui.sellPrice, numeric: true },
       { disablePadding: false, id: 'time', label: ui.time, numeric: true },
       { disablePadding: false, id: 'craft', label: ui.craftCost, numeric: true },
@@ -75,7 +76,8 @@ export const CraftsTable: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
     ui.profitByTimeThreeTime,
     ui.profitByTimeTwice,
     ui.sellPrice,
-    ui.time
+    ui.time,
+    ui.timer
   ]);
 
   return (

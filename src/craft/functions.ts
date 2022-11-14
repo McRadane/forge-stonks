@@ -21,16 +21,12 @@ export interface ICraftWithCosts extends ICraft {
 }
 
 export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
-  // const [costs, setCosts] = useState<Record<ICraft['itemId'], ICraftWithCosts>>({} as Record<ICraft['itemId'], ICraftWithCosts>);
-
-  const { auctionsBINOnly, intermediateCraft, playFrequency } = useSelector((state: RootState) => state.options);
   const costs = useSelector((state: RootState) => state.worker.prices);
   const workerRunner = useWorker();
 
   useEffect(() => {
-    console.log('now', performance.now(), { auctionsBINOnly, crafts, intermediateCraft, playFrequency, workerRunner });
-    workerRunner.getPrices({ auctionsBINOnly, crafts, intermediateCraft, playFrequency });
-  }, [auctionsBINOnly, crafts, intermediateCraft, playFrequency, workerRunner]);
+    workerRunner.getPrices({ crafts });
+  }, [crafts, workerRunner]);
 
   return Object.values(costs);
 };
