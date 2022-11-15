@@ -5,7 +5,7 @@ import { ICraft } from '../resources/crafts';
 import { ILanguage } from '../resources/lang/type';
 import { IOptionsState } from '../services/options';
 import { RootState } from '../store';
-import { useWorker } from '../worker/runWorker';
+import { useWorker } from '../worker/WorkerContext';
 
 export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
   const costs = useSelector((state: RootState) => state.worker.prices);
@@ -20,13 +20,13 @@ export interface ICraftWithCosts extends ICraft {
   sell: number;
 }
 
-export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
+export const useItemsWithCraftPrice = () => {
   const costs = useSelector((state: RootState) => state.worker.prices);
   const workerRunner = useWorker();
 
   useEffect(() => {
-    workerRunner.getPrices({ crafts });
-  }, [crafts, workerRunner]);
+    workerRunner.getPrices();
+  }, [workerRunner]);
 
   return Object.values(costs);
 };

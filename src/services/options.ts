@@ -12,7 +12,7 @@ export interface IOptionsState {
   quickForge: number;
 }
 
-const initialState: IOptionsState = {
+export const initialState: IOptionsState = {
   auctionsBINOnly: true,
   cacheDuration: 60,
   hotm: 2,
@@ -25,9 +25,12 @@ const initialState: IOptionsState = {
 
 export const optionsSlice = createSlice({
   initialState,
-  name: 'options',
+  name: 'Response-Options',
   reducers: {
-    setCacheDuration: (state, action: PayloadAction<number>) => {
+    setOptions: (state, action: PayloadAction<Partial<IOptionsState>>) => {
+      return { ...state, ...action.payload };
+    }
+    /*setCacheDuration: (state, action: PayloadAction<number>) => {
       state.cacheDuration = action.payload;
     },
     setHOTM: (state, action: PayloadAction<number>) => {
@@ -50,19 +53,20 @@ export const optionsSlice = createSlice({
     },
     toggleIntermediateCraft: (state) => {
       state.intermediateCraft = !state.intermediateCraft;
-    }
+    }*/
   }
 });
 
 export const {
-  setCacheDuration,
+  /*setCacheDuration,
   setHOTM,
   setMaxCraftingCost,
   setPlayFrequency,
   setQuickForge,
   toggleAuctionsBINOnly,
   toggleIncludeAuctionsFlip,
-  toggleIntermediateCraft
+  toggleIntermediateCraft,*/
+  setOptions
 } = optionsSlice.actions;
 
 export const { reducer: optionsReducer } = optionsSlice;

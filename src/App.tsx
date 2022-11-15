@@ -14,7 +14,7 @@ import { OptionsSwitcher } from './options/OptionsSwitcher';
 import { LanguageContext } from './resources/lang/LanguageContext';
 import { RootState } from './store';
 import { Timers } from './timers/Timers';
-import { useWorker } from './worker/runWorker';
+import { useWorker } from './worker/WorkerContext';
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -38,12 +38,14 @@ export const App = () => {
     if (!workerInit.current && worker) {
       Logger.log('Initializing WebWorker');
       workerInit.current = true;
-      worker.setup(dispatch, languageContext);
       worker.getLanguage().then((language) => {
-        const resultLanguage = userLanguageChange(language);
-        if (resultLanguage !== language) {
-          worker.setLanguage(resultLanguage);
+        if (language) {
+          const resultLanguage = userLanguageChange(language);
+          if (resultLanguage !== language) {
+            worker.setLanguage(resultLanguage);
+          }
         }
+
         worker.initialize();
       });
     }

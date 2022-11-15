@@ -100,9 +100,9 @@ export class Database extends Dexie {
     });
   }
 
-  public getFromCache(key: string) {
+  public getFromCache<T>(key: string): Promise<undefined | T> {
     return this.cache.get(key).then((exists) => {
-      return exists?.value;
+      return exists?.value as T;
     });
   }
 

@@ -5,7 +5,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
-import { useWorker } from '../worker/runWorker';
+import { useWorker } from '../worker/WorkerContext';
 import { ITimer } from '../worker/type';
 
 const getStyles = () => ({
@@ -64,6 +64,10 @@ export const Timer: FC<ITimer> = ({ endTime, id, itemId, startTime }) => {
         hours = Math.floor(minutes / 60);
         minutes = minutes % 60;
       }
+    }
+
+    if (seconds < 0) {
+      seconds = 0;
     }
 
     const newLabel =

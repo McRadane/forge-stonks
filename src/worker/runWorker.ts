@@ -1,59 +1,56 @@
 import { AnyAction, Dispatch } from '@reduxjs/toolkit';
-import { createContext, useContext } from 'react';
 
 import { Logger } from '../logger';
 import { ICraft } from '../resources/crafts';
-import { ILanguageContextDefinition, KeysLanguageType } from '../resources/lang/type';
-import { setPrices, setLoading, setNotLoading, setTimers, setTimerLaunched } from '../services/worker';
+import { KeysLanguageType, ILanguageContextDefinition } from '../resources/lang/type';
+import { setOptions, IOptionsState } from '../services/options';
+import { setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
 
 // eslint-disable-next-line import/no-unresolved
 import Worker from './stonks.worker?worker';
 import {
-  IWorkerCommandDeleteCacheItem,
+  WorkerResponseEvents,
   IWorkerCommandForceRefresh,
-  IWorkerCommandGetCacheItem,
   IWorkerCommandGetLanguage,
   IWorkerCommandGetPrices,
   IWorkerCommandInitialize,
-  IWorkerCommandSetCacheItem,
   IWorkerCommandSetLanguage,
+  IWorkerCommandSetOptions,
   IWorkerCommandStartTimer,
-  IWorkerCommandStopTimer,
-  WorkerResponseEvents
+  IWorkerCommandStopTimer
 } from './type';
+
+const audio = new Audio('/forge-stonks/orb.mp3');
+audio.volume = 0.3;
 
 export class WorkerRunner {
   private dispatch!: Dispatch<AnyAction>;
   private worker!: Worker;
-  private timeGetPrices!: number | undefined;
-  private languageKeyResponse: KeysLanguageType | undefined;
-  private cacheGetResponse: Record<string, string | number> = {};
-  private cacheSetResponse: string[] = [];
-  private cacheDeleteResponse: string[] = [];
+  private timeGetPrices!: undefined | number;
+  private languageKeyResponse: undefined | KeysLanguageType;
+
   private languageContext!: ILanguageContextDefinition;
 
-  constructor() {
+  constructor(languageContext: ILanguageContextDefinition, dispatch: Dispatch<AnyAction>) {
     this.worker = new Worker();
+    this.dispatch = dispatch;
+    this.languageContext = languageContext;
 
     this.listener();
   }
 
-  public setup(dispatch: Dispatch<AnyAction>, languageContext: ILanguageContextDefinition) {
-    this.dispatch = dispatch;
-    this.languageContext = languageContext;
-  }
-
   public initialize() {
     const command: IWorkerCommandInitialize = {
-      command: 'initialize',
+      command: 'Command-Initialize',
       withNotification: 'Notification' in window
     };
     this.worker.postMessage(command);
     this.logCommand(`Initializing`);
   }
+
   public setLanguage(language: KeysLanguageType) {
     const command: IWorkerCommandSetLanguage = {
-      command: 'setLanguage',
+      command: 'Command-SetLanguage',
       language
     };
     this.worker.postMessage(command);
@@ -61,27 +58,36 @@ export class WorkerRunner {
     this.logCommand(`set language to ${language}`);
   }
 
-  public getLanguage(): Promise<KeysLanguageType> {
+  public setOption(option: keyof IOptionsState, value: IOptionsState['playFrequency'] | boolean | number) {
+    const command: IWorkerCommandSetOptions = {
+      command: 'Command-SetOptions',
+      options: {
+        [option]: value
+      }
+    };
+    this.worker.postMessage(command);
+    this.logCommand(`set option ${option} to ${value}`);
+  }
+
+  public getLanguage(): Promise<undefined | KeysLanguageType> {
     const command: IWorkerCommandGetLanguage = {
-      command: 'getLanguage'
+      command: 'Command-GetLanguage'
     };
     this.worker.postMessage(command);
     this.logCommand(`get language`);
 
     return new Promise((resolve) => {
       const timer = setInterval(() => {
-        if (this.languageKeyResponse !== undefined) {
-          clearInterval(timer);
-          resolve(this.languageKeyResponse);
-          this.logCommand(`get language : resolved to ${this.languageKeyResponse}`);
-        }
+        clearInterval(timer);
+        resolve(this.languageKeyResponse);
+        this.logCommand(`get language : resolved to ${this.languageKeyResponse}`);
       }, 10);
     });
   }
 
   public startTimer(itemId: ICraft['itemId']) {
     const command: IWorkerCommandStartTimer = {
-      command: 'startTimer',
+      command: 'Command-StartTimer',
       itemId
     };
     this.worker.postMessage(command);
@@ -90,19 +96,18 @@ export class WorkerRunner {
 
   public stopTimer(id: number) {
     const command: IWorkerCommandStopTimer = {
-      command: 'stopTimer',
+      command: 'Command-StopTimer',
       id
     };
     this.worker.postMessage(command);
     this.logCommand(`stop timer for ${id}`);
   }
 
-  public getPrices(options: Omit<IWorkerCommandGetPrices, 'command'>) {
+  public getPrices() {
     if (this.timeGetPrices === undefined) {
       this.timeGetPrices = performance.now();
       const command: IWorkerCommandGetPrices = {
-        command: 'getPrices',
-        crafts: options.crafts
+        command: 'Command-GetPrices'
       };
       this.worker.postMessage(command);
       this.logCommand(`get prices`);
@@ -111,71 +116,10 @@ export class WorkerRunner {
 
   public forceRefresh() {
     const command: IWorkerCommandForceRefresh = {
-      command: 'forceRefresh'
+      command: 'Command-ForceRefresh'
     };
     this.worker.postMessage(command);
     this.logCommand(`force refresh`);
-  }
-
-  public cacheGet(key: string): Promise<string | number> {
-    const command: IWorkerCommandGetCacheItem = {
-      command: 'getCacheItem',
-      key
-    };
-    this.worker.postMessage(command);
-    this.logCommand(`get cache item`, key);
-
-    return new Promise((resolve) => {
-      const timer = setInterval(() => {
-        if (this.cacheGetResponse[key] !== undefined) {
-          clearInterval(timer);
-          resolve(this.cacheGetResponse[key]);
-          this.logCommand(`get cache item : resolved to ${this.cacheGetResponse[key]}`);
-          delete this.cacheGetResponse[key];
-        }
-      }, 10);
-    });
-  }
-
-  public cacheSet(key: string, value: string | number): Promise<void> {
-    const command: IWorkerCommandSetCacheItem = {
-      command: 'setCacheItem',
-      key,
-      value
-    };
-    this.worker.postMessage(command);
-    this.logCommand(`set cache item`, key, value);
-
-    return new Promise((resolve) => {
-      const timer = setInterval(() => {
-        if (this.cacheSetResponse.includes(key)) {
-          clearInterval(timer);
-          this.cacheSetResponse = this.cacheSetResponse.filter((cache) => cache !== key);
-          resolve();
-          this.logCommand(`set cache item : resolved`);
-        }
-      }, 10);
-    });
-  }
-
-  public cacheDelete(key: string): Promise<void> {
-    const command: IWorkerCommandDeleteCacheItem = {
-      command: 'deleteCacheItem',
-      key
-    };
-    this.worker.postMessage(command);
-    this.logCommand(`delete cache item`, key);
-
-    return new Promise((resolve) => {
-      const timer = setInterval(() => {
-        if (this.cacheDeleteResponse.includes(key)) {
-          clearInterval(timer);
-          this.cacheDeleteResponse = this.cacheDeleteResponse.filter((cache) => cache !== key);
-          resolve();
-          this.logCommand(`delete cache item : resolved`);
-        }
-      }, 10);
-    });
   }
 
   private logCommand(...message: unknown[]) {
@@ -189,43 +133,12 @@ export class WorkerRunner {
   private listener() {
     this.worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
-        case 'cacheDeleteExecuted':
-          this.logResponse('Cache delete executed', event.data.key);
-          this.cacheDeleteResponse.push(event.data.key);
-          break;
-        case 'cacheGetResult':
-          this.logResponse('Cache get executed', event.data.key, event.data.value);
-          if (event.data.value !== undefined) {
-            this.cacheGetResponse[event.data.key] = event.data.value;
-          }
-
-          break;
-        case 'cacheSetExecuted':
-          this.logResponse('Cache set executed', event.data.key);
-          this.cacheSetResponse.push(event.data.key);
-          break;
-        case 'getLanguageResponse':
+        case 'Response-GetLanguage':
           this.logResponse(`Received language key ${event.data.language}`);
 
           this.languageKeyResponse = event.data.language;
           break;
-        case 'loading':
-          if (event.data.loading) {
-            this.logResponse('Set Loading');
-            this.dispatch(setLoading());
-          } else {
-            this.logResponse('End Loading');
-            this.dispatch(setNotLoading());
-          }
-          break;
-        case 'message':
-          if (event.data.message.startsWith('{')) {
-            this.logResponse(JSON.parse(event.data.message));
-          } else {
-            this.logResponse(event.data.message);
-          }
-          break;
-        case 'resultGetPrices':
+        case 'Response-GetPrices':
           if (this.timeGetPrices !== undefined) {
             const endTime = performance.now();
             // worker.terminate();
@@ -235,11 +148,35 @@ export class WorkerRunner {
 
           this.dispatch(setPrices(event.data.results));
           break;
-        case 'timerSet':
+        case 'Response-Loading':
+          if (event.data.loading) {
+            this.logResponse('Set Loading');
+            this.dispatch(setLoading());
+          } else {
+            this.logResponse('End Loading');
+            this.dispatch(setNotLoading());
+          }
+          break;
+        case 'Response-Message':
+          if (event.data.message.startsWith('{')) {
+            this.logResponse(JSON.parse(event.data.message));
+          } else {
+            this.logResponse(event.data.message);
+          }
+          break;
+        case 'Response-Options':
+          this.dispatch(setOptions(event.data));
+          break;
+        case 'Response-TimerEnded':
+          this.logResponse(`A timer has ended`);
+
+          audio.play();
+          break;
+        case 'Response-TimerSet':
           this.logResponse('Timer has been set');
           this.dispatch(setTimerLaunched(event.data.itemId));
           break;
-        case 'timers':
+        case 'Response-Timers':
           this.logResponse('Get Timers');
           this.dispatch(setTimers(event.data.timers));
           break;
@@ -247,12 +184,3 @@ export class WorkerRunner {
     });
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const WorkerRunnerContext = createContext<{ instance: WorkerRunner }>({ instance: undefined as any });
-
-export const useWorker = () => {
-  const { instance } = useContext(WorkerRunnerContext);
-
-  return instance;
-};

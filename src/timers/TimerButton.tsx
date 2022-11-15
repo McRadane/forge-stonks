@@ -7,7 +7,7 @@ import { ICraft } from '../resources/crafts';
 import { useLanguage } from '../resources/lang/LanguageContext';
 import { setTimerPressed } from '../services/worker';
 import { RootState } from '../store';
-import { useWorker } from '../worker/runWorker';
+import { useWorker } from '../worker/WorkerContext';
 
 export const TimerButton: FC<{ itemId: ICraft['itemId'] }> = ({ itemId }) => {
   const timerActive = useSelector((state: RootState) => state.worker.timerLaunched.some((timer) => timer === itemId));

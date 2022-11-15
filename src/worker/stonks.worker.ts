@@ -3,23 +3,19 @@ import { crafts, itemsSource, itemsVendorPrice, ICraft } from '../resources/craf
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
 import { KeysLanguageType, ILanguage } from '../resources/lang/type';
-import { IOptionsState } from '../services/options';
+import { initialState, IOptionsState } from '../services/options';
 
 import { Database } from './database';
 import {
   WorkerCommandEvents,
   ITimer,
-  IWorkerCommandDeleteCacheItem,
-  IWorkerCommandGetCacheItem,
-  IWorkerCommandGetPrices,
-  IWorkerCommandSetCacheItem,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
-  IWorkerResponseCacheDeleteExecuted,
-  IWorkerResponseCacheGetResult,
-  IWorkerResponseCacheSetExecuted,
   IWorkerResponseGetLanguage,
+  IWorkerResponseGetPrices,
   IWorkerResponseMessage,
+  IWorkerResponseOptions,
+  IWorkerResponseTimerEnded,
   IWorkerResponseTimerSet,
   IWorkerResponseTimers
 } from './type';
@@ -33,36 +29,22 @@ class ComputationWorker {
   private database: Database;
   private timersInterval: undefined | number;
   private languageKey: KeysLanguageType = 'en-US';
-  private crafts!: ICraft[];
   private withNotification = false;
 
   constructor() {
     this.database = new Database(ctx, () => {
-      if (this.crafts) {
-        this.getPrices({ command: 'getPrices', crafts: this.crafts });
-      }
+      /* if (this.crafts) {
+        this.getPrices({ command: 'Command-GetPrices', crafts: this.crafts });
+      } */
     });
 
     this.database.cacheDuration = CACHE_DURATION;
   }
 
-  public deleteCacheItem({ key }: IWorkerCommandDeleteCacheItem) {
-    this.database.removeFromCache(key).then(() => {
-      const command: IWorkerResponseCacheDeleteExecuted = { command: 'cacheDeleteExecuted', key };
-      ctx.postMessage(command);
-    });
-  }
   public async forceRefresh(): Promise<void> {
     // console.log('starting getPrices');
     this.messageResponse('Starting forceRefresh');
     await this.database.forceRefresh();
-  }
-
-  public getCacheItem({ key }: IWorkerCommandGetCacheItem) {
-    this.database.getFromCache(key).then((value) => {
-      const command: IWorkerResponseCacheGetResult = { command: 'cacheGetResult', key, value: value as undefined | number | string };
-      ctx.postMessage(command);
-    });
   }
 
   public async getLanguage() {
@@ -70,47 +52,34 @@ class ComputationWorker {
     const data = await this.database.cache.get('language');
     if (data) {
       this.languageKey = data.value as KeysLanguageType;
-      const command: IWorkerResponseGetLanguage = { command: 'getLanguageResponse', language: this.languageKey };
+      const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: this.languageKey };
       ctx.postMessage(command);
     }
 
-    const command: IWorkerResponseGetLanguage = { command: 'getLanguageResponse', language: undefined };
+    const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: undefined };
     ctx.postMessage(command);
   }
-  public async getPrices(command: IWorkerCommandGetPrices): Promise<void> {
+  public async getPrices(): Promise<void> {
     // console.log('starting getPrices');
     // this.messageResponse('Starting getPrices');
 
-    this.crafts = command.crafts;
+    const options = await this.getAllOptions();
+    const crafts = await this.getCrafts();
 
-    let options: IOptionsState = {
-      auctionsBINOnly: true,
-      cacheDuration: CACHE_DURATION,
-      hotm: 7,
-      includeAuctionsFlip: true,
-      intermediateCraft: false,
-      maxCraftingCost: 0,
-      playFrequency: 'nonstop',
-      quickForge: 0
-    };
+    this.messageResponse('Starting getPrices');
 
-    const optionsCached = (await this.database.getFromCache('persist:root')) as string;
-
-    if (optionsCached) {
-      const hydrated = JSON.parse(optionsCached);
-
-      options = { ...options, ...JSON.parse(hydrated.options) };
-    }
-
-    this.messageResponse('Starting getPrices' + JSON.stringify(options));
-
-    this.getItemsWithCraftPrice({ crafts: command.crafts, ...options }).then((results) => {
+    this.getItemsWithCraftPrice({ crafts, ...options }).then((results) => {
       this.messageResponse('Ending getPrices');
-      ctx.postMessage({ command: 'resultGetPrices', results });
+      const command: IWorkerResponseGetPrices = {
+        command: 'Response-GetPrices',
+        results
+      };
+      ctx.postMessage(command);
     });
   }
   public async initialize(withNotification: boolean) {
     this.messageResponse('Initializing');
+    this.getOptions();
     this.withNotification = withNotification;
     const count = await this.database.timers.count();
 
@@ -121,21 +90,39 @@ class ComputationWorker {
     }
 
     this.getTimers();
+    this.getPrices();
   }
-  public setCacheItem({ key, value }: IWorkerCommandSetCacheItem) {
-    this.database.addToCache(key, value).then(() => {
-      const command: IWorkerResponseCacheSetExecuted = { command: 'cacheSetExecuted', key };
-      ctx.postMessage(command);
-      if (this.crafts) {
-        this.getPrices({ command: 'getPrices', crafts: this.crafts });
-      }
-    });
-  }
+
   public setLanguage(language: KeysLanguageType) {
     this.database.addToCache('language', language);
 
     this.languageKey = language;
   }
+
+  public async setOptions(options: Partial<IOptionsState>) {
+    const allOptions = await this.getAllOptions();
+    const touched: Partial<IOptionsState> = {};
+
+    Object.keys(options).forEach((optionName) => {
+      const value = options[optionName as keyof Partial<IOptionsState>];
+      if (value !== allOptions[optionName as keyof Partial<IOptionsState>]) {
+        this.database.addToCache(optionName, value);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        touched[optionName as keyof Partial<IOptionsState>] = value as any;
+      }
+    });
+
+    if (Object.keys(touched).length > 0) {
+      const command: IWorkerResponseOptions = {
+        command: 'Response-Options',
+        ...touched
+      };
+      ctx.postMessage(command);
+
+      this.getPrices();
+    }
+  }
+
   public async startTimer({ itemId }: IWorkerCommandStartTimer) {
     const found = crafts.find((item) => item.itemId === itemId);
 
@@ -159,7 +146,7 @@ class ComputationWorker {
 
     this.getTimers();
 
-    const command: IWorkerResponseTimerSet = { command: 'timerSet', itemId };
+    const command: IWorkerResponseTimerSet = { command: 'Response-TimerSet', itemId };
     ctx.postMessage(command);
   }
 
@@ -176,9 +163,44 @@ class ComputationWorker {
 
   private getTimers() {
     this.database.timers.toArray().then((timers) => {
-      const command: IWorkerResponseTimers = { command: 'timers', timers };
+      const command: IWorkerResponseTimers = { command: 'Response-Timers', timers };
       ctx.postMessage(command);
     });
+  }
+
+  private async getOptions() {
+    const command: IWorkerResponseOptions = {
+      command: 'Response-Options',
+      ...(await this.getAllOptions())
+    };
+
+    ctx.postMessage(command);
+  }
+
+  private async getCrafts() {
+    const { hotm, includeAuctionsFlip } = await this.getAllOptions();
+
+    let filtersCraft = crafts;
+    if (!includeAuctionsFlip) {
+      filtersCraft = filtersCraft.filter((craft) => craft.bazaarItem);
+    }
+
+    filtersCraft = filtersCraft.filter((craft) => craft.hotm <= hotm);
+
+    return filtersCraft;
+  }
+
+  private async getAllOptions() {
+    return {
+      auctionsBINOnly: (await this.database.getFromCache<boolean>('auctionsBINOnly')) ?? initialState.auctionsBINOnly,
+      cacheDuration: (await this.database.getFromCache<number>('cacheDuration')) ?? initialState.cacheDuration,
+      hotm: (await this.database.getFromCache<number>('hotm')) ?? initialState.hotm,
+      includeAuctionsFlip: (await this.database.getFromCache<boolean>('includeAuctionsFlip')) ?? initialState.includeAuctionsFlip,
+      intermediateCraft: (await this.database.getFromCache<boolean>('intermediateCraft')) ?? initialState.intermediateCraft,
+      maxCraftingCost: (await this.database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
+      playFrequency: (await this.database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
+      quickForge: (await this.database.getFromCache<number>('quickForge')) ?? initialState.quickForge
+    };
   }
 
   private async checkTimers() {
@@ -191,6 +213,8 @@ class ComputationWorker {
         this.notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]));
         this.database.timers.delete(timer.id);
         this.getTimers();
+        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded' };
+        ctx.postMessage(command);
       }
     });
   }
@@ -207,7 +231,7 @@ class ComputationWorker {
   }
 
   private messageResponse(message: string) {
-    const command: IWorkerResponseMessage = { command: 'message', message };
+    const command: IWorkerResponseMessage = { command: 'Response-Message', message };
     ctx.postMessage(command);
   }
 
@@ -379,34 +403,28 @@ const worker = new ComputationWorker();
 
 ctx.addEventListener('message', (event: WorkerCommandEvents) => {
   switch (event.data.command) {
-    case 'deleteCacheItem':
-      worker.deleteCacheItem(event.data);
-      break;
-    case 'forceRefresh':
+    case 'Command-ForceRefresh':
       worker.forceRefresh();
       break;
-    case 'getCacheItem':
-      worker.getCacheItem(event.data);
-      break;
-    case 'getLanguage':
+    case 'Command-GetLanguage':
       worker.getLanguage();
       break;
-    case 'getPrices':
-      worker.getPrices(event.data);
+    case 'Command-GetPrices':
+      worker.getPrices();
       break;
-    case 'initialize':
+    case 'Command-Initialize':
       worker.initialize(event.data.withNotification);
       break;
-    case 'setCacheItem':
-      worker.setCacheItem(event.data);
-      break;
-    case 'setLanguage':
+    case 'Command-SetLanguage':
       worker.setLanguage(event.data.language);
       break;
-    case 'startTimer':
+    case 'Command-SetOptions':
+      worker.setOptions(event.data.options);
+      break;
+    case 'Command-StartTimer':
       worker.startTimer(event.data);
       break;
-    case 'stopTimer':
+    case 'Command-StopTimer':
       worker.stopTimer(event.data);
       break;
   }
