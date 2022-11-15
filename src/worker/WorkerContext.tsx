@@ -6,8 +6,11 @@ import { LanguageContext } from '../resources/lang/LanguageContext';
 
 import { WorkerRunner } from './runWorker';
 
+interface IWorkerContextDefinition {
+  instance: WorkerRunner;
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const WorkerRunnerContext = createContext<{ instance: WorkerRunner }>({ instance: undefined as any });
+const WorkerRunnerContext = createContext<IWorkerContextDefinition>({ instance: undefined as any });
 
 export const useWorker = () => {
   const { instance } = useContext(WorkerRunnerContext);
@@ -15,7 +18,11 @@ export const useWorker = () => {
   return instance;
 };
 
-export const WorkerProvider: FC<{ children: ReactNode }> = ({ children }) => {
+interface IWorkerProviderProps {
+  children: ReactNode;
+}
+
+export const WorkerProvider: FC<IWorkerProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
   const language = useContext(LanguageContext);
   const notification = useContext(NotificationContext);

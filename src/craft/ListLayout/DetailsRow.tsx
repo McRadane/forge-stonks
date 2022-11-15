@@ -11,9 +11,10 @@ import { useItemCraftPrice } from '../functions';
 
 import { GridRow } from './GridRow';
 
-export const DetailsRow: FC<{
+interface IDetailsRowProps {
   material: ICraftMaterial;
-}> = ({ material }) => {
+}
+export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
   const cost = useItemCraftPrice(material.itemId);
 
   const { ui } = useLanguage();

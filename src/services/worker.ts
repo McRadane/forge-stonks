@@ -3,7 +3,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { ICraft, ICraftWithCosts } from '../resources/types';
 import type { ITimer } from '../worker/type';
 
-export interface IWorkerState {
+interface IWorkerState {
   loading: boolean;
   prices: Partial<Record<ICraft['itemId'], ICraftWithCosts>>;
   timerLaunched: ICraft['itemId'][];
@@ -17,7 +17,7 @@ const initialState: IWorkerState = {
   timers: []
 };
 
-export const workerSlice = createSlice({
+const workerSlice = createSlice({
   initialState,
   name: 'worker',
   reducers: {

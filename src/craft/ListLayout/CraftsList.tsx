@@ -20,7 +20,11 @@ import { getProfitByTimeLabel } from '../functions';
 import { CraftItem } from './CraftItem';
 import { Filter } from './Filter';
 
-export const CraftsList: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
+interface ICraftsListProps {
+  crafts: ICraftWithCosts[];
+}
+
+export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
   const { playFrequency } = useSelector((state: RootState) => state.options);
 
   const [order, setOrder] = useState<Order>('asc');

@@ -1,11 +1,11 @@
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 
 import { LanguageContext } from './LanguageContext';
 import { dictionaryList, languageSelectorHelper } from './language';
 import type { KeysLanguageType, ILanguageContextDefinition } from './type';
 
 interface ILanguageProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const LanguageProvider: FC<ILanguageProviderProps> = ({ children }: ILanguageProviderProps) => {

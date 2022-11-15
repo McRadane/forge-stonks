@@ -38,7 +38,9 @@ const getStyles = (theme: Theme) => ({
   }
 });
 
-export const Timer: FC<ITimer> = ({ endTime, id, itemId, startTime }) => {
+type ITimerProps = ITimer;
+
+export const Timer: FC<ITimerProps> = ({ endTime, id, itemId, startTime }) => {
   const calculateTime = useCallback((now: number) => ((now - startTime) * 100) / (endTime - startTime), [endTime, startTime]);
 
   const [currentTime, setCurrentTime] = useState(Date.now);

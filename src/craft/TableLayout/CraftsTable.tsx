@@ -12,7 +12,11 @@ import type { RootState } from '../../store';
 
 import { CraftRow } from './CraftRow';
 
-export const CraftsTable: FC<{ crafts: ICraftWithCosts[] }> = ({ crafts }) => {
+interface ICraftsTableProps {
+  crafts: ICraftWithCosts[];
+}
+
+export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
   const { playFrequency } = useSelector((state: RootState) => state.options);
 
   const [order, setOrder] = useState<Order>('asc');

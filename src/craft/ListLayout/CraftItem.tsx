@@ -20,9 +20,11 @@ import { getProfitByTimeLabel } from '../functions';
 import { DetailsList } from './DetailsList';
 import { GridRow } from './GridRow';
 
-export const CraftItem: FC<{
+interface ICraftItemProps {
   craft: ICraftWithCosts;
-}> = ({ craft }) => {
+}
+
+export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
   const [open, setOpen] = useState(false);
 
   const { ui } = useLanguage();

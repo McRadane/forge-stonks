@@ -1,12 +1,15 @@
 import Dexie from 'dexie';
 
 import { getAuctionData, getBazaarData } from './axios';
-import type { IAuctions, IBazaar, ITimer } from './type';
+import type { IAuctions, IBazaar, ITimer, IWorkerResponseLoading, IWorkerResponseMessage } from './type';
 
 interface ICache {
   key: string;
   value: unknown;
 }
+
+const commandLoadingTrue: IWorkerResponseLoading = { command: 'Response-Loading', loading: true };
+const commandLoadingFalse: IWorkerResponseLoading = { command: 'Response-Loading', loading: false };
 
 export class Database extends Dexie {
   bazaars!: Dexie.Table<IBazaar, string>;
@@ -114,11 +117,19 @@ export class Database extends Dexie {
     await this._refresh();
   }
 
+  private sendMessage(message: string) {
+    const command: IWorkerResponseMessage = {
+      command: 'Response-Message',
+      message
+    };
+    this.ctx.postMessage(command);
+  }
+
   private async _refresh() {
-    this.ctx.postMessage({ command: 'loading', loading: true });
+    this.ctx.postMessage(commandLoadingTrue);
 
     const refreshPromiseBazaar = new Promise<void>((resolve) => {
-      getBazaarData().then((bazaars) => {
+      return getBazaarData().then((bazaars) => {
         this.transaction('rw', this.bazaars, async () => {
           this.bazaars
             .toCollection()
@@ -126,14 +137,14 @@ export class Database extends Dexie {
             .then(() => {
               this.bazaars.bulkAdd(bazaars);
               resolve();
-              this.ctx.postMessage({ command: 'message', message: 'Bazaar data has been updated' });
+              this.sendMessage('Bazaar data has been updated');
             });
         });
       });
     });
 
     const refreshPromiseAuctionsAndBins = getAuctionData().then((auctionsAndBins) => {
-      this.transaction('rw', this.auctions, this.bins, async () => {
+      return this.transaction('rw', this.auctions, this.bins, async () => {
         const auctions = auctionsAndBins.filter((auction) => !auction.bin);
         const bins = auctionsAndBins.filter((auction) => auction.bin);
 
@@ -141,24 +152,25 @@ export class Database extends Dexie {
         const minBins = this._findMinPrice(bins);
 
         const refreshPromiseAuctions = new Promise<void>((resolve) => {
-          this.auctions
+          return this.auctions
             .toCollection()
             .delete()
             .then(() => {
               this.auctions.bulkAdd(minAuctions);
               resolve();
-              this.ctx.postMessage({ command: 'message', message: 'Auctions data has been updated' });
+              this.sendMessage('Auctions data has been updated');
             });
         });
 
         const refreshPromiseBins = new Promise<void>((resolve) => {
-          this.bins
+          return this.bins
             .toCollection()
             .delete()
             .then(() => {
               this.bins.bulkAdd(minBins);
               resolve();
-              this.ctx.postMessage({ command: 'message', message: 'BINs data has been updated' });
+
+              this.sendMessage('BINs data has been updated');
             });
         });
 
@@ -168,13 +180,14 @@ export class Database extends Dexie {
 
     Promise.all([refreshPromiseBazaar, refreshPromiseAuctionsAndBins])
       .then(() => {
-        this.ctx.postMessage({ command: 'message', message: 'All data has been updated' });
-        this.ctx.postMessage({ command: 'loading', loading: false });
+        this.sendMessage('All data has been updated');
+        this.ctx.postMessage(commandLoadingFalse);
         this.postRefresh();
       })
       .catch((err) => {
-        this.ctx.postMessage({ command: 'message', message: JSON.stringify({ err, message: 'An error occurred' }) });
-        this.ctx.postMessage({ command: 'loading', loading: false });
+        this.sendMessage(JSON.stringify({ err, message: 'An error occurred' }));
+
+        this.ctx.postMessage(commandLoadingFalse);
         this.postRefresh();
       });
   }

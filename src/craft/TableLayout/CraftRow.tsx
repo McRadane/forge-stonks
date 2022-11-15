@@ -20,9 +20,11 @@ import { TimerButton } from '../../timers/TimerButton';
 
 import { DetailsTable } from './DetailsTable';
 
-export const CraftRow: FC<{
+interface ICraftRowProps {
   craft: ICraftWithCosts;
-}> = ({ craft }) => {
+}
+
+export const CraftRow: FC<ICraftRowProps> = ({ craft }) => {
   const [open, setOpen] = useState(false);
 
   const { ui } = useLanguage();

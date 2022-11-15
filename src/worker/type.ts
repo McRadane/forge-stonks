@@ -119,14 +119,14 @@ export interface IWorkerResponseTimerEnded {
   itemId: ICraft['itemId'];
 }
 
-export type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
-export type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
-export type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
-export type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
-export type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
-export type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
-export type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
-export type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
+type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
+type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
+type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
+type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
+type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
+type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
+type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
+type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
 
 export type WorkerCommandEvents =
   | WorkerCommandEventForceRefresh
@@ -138,14 +138,14 @@ export type WorkerCommandEvents =
   | WorkerCommandEventStartTimer
   | WorkerCommandEventStopTimer;
 
-export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
-export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
-export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
-export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
-export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
-export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
-export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
-export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
+type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
+type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
+type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
+type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
+type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
+type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEvents =
   | WorkerResponseEventGetLanguage

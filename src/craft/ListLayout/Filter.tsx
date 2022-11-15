@@ -12,6 +12,7 @@ interface IFilterProps {
   setOrder: (order: Order) => void;
   setOrderBy: (property: string) => void;
 }
+
 export const Filter: FC<IFilterProps> = ({ children, property, setOrder, setOrderBy }) => {
   const handleAsc = useCallback(() => {
     setOrder('asc');

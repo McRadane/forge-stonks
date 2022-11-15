@@ -20,7 +20,12 @@ const getStyles = (theme: Theme) => ({
   }
 });
 
-export const GridRow: FC<{ left: ReactNode; right: ReactNode }> = ({ left, right }) => {
+interface IGridRowProps {
+  left: ReactNode;
+  right: ReactNode;
+}
+
+export const GridRow: FC<IGridRowProps> = ({ left, right }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   return (

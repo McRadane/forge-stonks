@@ -24,7 +24,12 @@ import type { IOptionsState } from '../services/options';
 import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
-export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ open, toggle }) => {
+interface IOptionsSwitcherProps {
+  open: boolean;
+  toggle: () => void;
+}
+
+export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => {
   const {
     ui: { options }
   } = useLanguage();

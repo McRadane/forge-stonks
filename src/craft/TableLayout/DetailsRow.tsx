@@ -9,9 +9,11 @@ import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftMaterial } from '../../resources/types';
 import { useItemCraftPrice } from '../functions';
 
-export const DetailsRow: FC<{
+interface IDetailsRowProps {
   material: ICraftMaterial;
-}> = ({ material }) => {
+}
+
+export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
   const cost = useItemCraftPrice(material.itemId);
 
   const { ui } = useLanguage();

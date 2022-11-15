@@ -15,14 +15,14 @@ interface HeadCell {
   numeric: boolean;
 }
 
-interface EnhancedTableProps {
+interface IEnhancedTableProps {
   headCells: HeadCell[];
   order: Order;
   orderBy: string;
   onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
 }
 
-export const EnhancedTableHead: FC<EnhancedTableProps> = (props) => {
+export const EnhancedTableHead: FC<IEnhancedTableProps> = (props) => {
   const { headCells, onRequestSort, order, orderBy } = props;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {

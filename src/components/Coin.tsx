@@ -1,5 +1,9 @@
 import type { FC } from 'react';
 
-export const Coin: FC<{ amount: number }> = ({ amount }) => {
+interface ICoinProps {
+  amount: number;
+}
+
+export const Coin: FC<ICoinProps> = ({ amount }) => {
   return <>{Math.ceil(amount).toLocaleString()}</>;
 };

@@ -9,9 +9,11 @@ import type { ICraft } from '../../resources/types';
 
 import { DetailsRow } from './DetailsRow';
 
-export const DetailsList: FC<{
+interface IDetailsListProps {
   item: ICraft;
-}> = ({ item }) => {
+}
+
+export const DetailsList: FC<IDetailsListProps> = ({ item }) => {
   const { ui } = useLanguage();
 
   return (

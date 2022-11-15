@@ -20,7 +20,11 @@ export const NotificationContext = createContext<INotificationContextDefinition>
   }
 });
 
-export const NotificationProvider: FC<{ children: ReactNode }> = ({ children }) => {
+interface INotificationProviderProps {
+  children: ReactNode;
+}
+
+export const NotificationProvider: FC<INotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<{ id: number; message: string; type: AlertColor }[]>([]);
 
   const handleCloses = useCallback(

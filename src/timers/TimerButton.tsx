@@ -11,7 +11,11 @@ import { setTimerPressed } from '../services/worker';
 import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
-export const TimerButton: FC<{ itemId: ICraft['itemId'] }> = ({ itemId }) => {
+interface ITimerButtonProps {
+  itemId: ICraft['itemId'];
+}
+
+export const TimerButton: FC<ITimerButtonProps> = ({ itemId }) => {
   const timerActive = useSelector((state: RootState) => state.worker.timerLaunched.some((timer) => timer === itemId));
   const dispatch = useDispatch();
   const theme = useTheme();
