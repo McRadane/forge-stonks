@@ -69,7 +69,15 @@ export const App = () => {
       <Box component="main" sx={{ width: '100%' }}>
         <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
         <Timers />
-        <CraftsContainer />
+        <Box
+          sx={
+            {
+              /*height: 'calc(100vh - 110px)', overflow: 'scroll' */
+            }
+          }
+        >
+          <CraftsContainer />
+        </Box>
       </Box>
     </Box>
   );

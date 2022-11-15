@@ -15,8 +15,8 @@ import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { RootState } from '../../store';
-import { ICraftWithCosts } from '../functions';
 import { TimerButton } from '../../timers/TimerButton';
+import { ICraftWithCosts } from '../functions';
 
 import { DetailsTable } from './DetailsTable';
 
@@ -40,7 +40,7 @@ export const CraftRow: FC<{
     <>
       <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
         <TableCell>
-          <IconButton aria-label="expand row" onClick={toggle} size="small">
+          <IconButton aria-label="expand row" onClick={toggle} size="small" sx={{ height: theme.typography.fontSize }}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>

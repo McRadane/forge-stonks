@@ -117,6 +117,7 @@ export interface IWorkerResponseTimerSet {
 
 export interface IWorkerResponseTimerEnded {
   command: 'Response-TimerEnded';
+  itemId: ICraft['itemId'];
 }
 
 export type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;

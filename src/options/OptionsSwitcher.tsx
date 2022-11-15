@@ -14,6 +14,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import { FC, useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -33,6 +34,7 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
   );
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
+  const theme = useTheme();
 
   const handlPlayFrequency = useCallback(
     (event: SelectChangeEvent) => {
@@ -109,11 +111,16 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
           <Typography component="div" gutterBottom variant="h6">
             {options.title}
           </Typography>
-          <IconButton onClick={toggle} size="small">
+          <IconButton onClick={toggle} size="small" sx={{ height: theme.typography.fontSize }}>
             <CloseIcon />
           </IconButton>
         </Box>
-        <List>
+        <List
+          sx={{
+            height: 'calc(100vh - 100px)',
+            overflow: 'scroll'
+          }}
+        >
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>

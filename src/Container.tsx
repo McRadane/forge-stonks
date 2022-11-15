@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { Provider } from 'react-redux';
 
 import { App } from './App';
+import { NotificationProvider } from './notification/NotificationContext';
 import { LanguageProvider } from './resources/lang/LanguageProvider';
 import { store } from './store';
 import { WorkerProvider } from './worker/WorkerContext';
@@ -21,7 +22,7 @@ export const Container = () => {
             lg: 1200,
             md: 800,
             sm: 400,
-            xl: 1536,
+            xl: 1350,
             xs: 0
           }
         },
@@ -38,12 +39,14 @@ export const Container = () => {
   return (
     <LanguageProvider>
       <Provider store={store}>
-        <WorkerProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <App />
-          </ThemeProvider>
-        </WorkerProvider>
+        <NotificationProvider>
+          <WorkerProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <App />
+            </ThemeProvider>
+          </WorkerProvider>
+        </NotificationProvider>
       </Provider>
     </LanguageProvider>
   );

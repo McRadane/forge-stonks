@@ -113,7 +113,8 @@ export const enUs: ILanguage = {
     coins: 'Coins'
   },
   notification: {
-    timerEnded: 'Your {0} timer has ended'
+    timerEnded: 'Your {0} timer has ended',
+    timerStarted: 'Starting timer for {0}'
   },
   ui: {
     amount: 'Amount',

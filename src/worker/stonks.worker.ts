@@ -213,7 +213,7 @@ class ComputationWorker {
         this.notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]));
         this.database.timers.delete(timer.id);
         this.getTimers();
-        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded' };
+        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId };
         ctx.postMessage(command);
       }
     });

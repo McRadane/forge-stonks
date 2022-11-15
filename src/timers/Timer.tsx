@@ -2,15 +2,26 @@ import AlarmOffIcon from '@mui/icons-material/AlarmOff';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import { Theme, useTheme } from '@mui/material/styles';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
 import { useWorker } from '../worker/WorkerContext';
 import { ITimer } from '../worker/type';
 
-const getStyles = () => ({
-  container: { display: 'grid', flex: 1, gridTemplateAreas: '"item timer" "progress progress"' },
+const getStyles = (theme: Theme) => ({
+  container: {
+    [theme.breakpoints.down('xl')]: {
+      gridTemplateAreas: '"item" "timer" "progress"'
+    },
+    display: 'grid',
+    flex: 1,
+    gridTemplateAreas: '"item timer" "progress progress"'
+  },
   item: {
+    alignItems: 'center',
+    display: 'flex',
     gridArea: 'item',
     paddingLeft: 1
   },
@@ -18,10 +29,12 @@ const getStyles = () => ({
     gridArea: 'progress'
   },
   timer: {
-    alignSelf: 'self-end',
-    gridArea: 'timer',
-    justifySelf: 'self-end',
-    paddingRight: 1
+    [theme.breakpoints.up('xl')]: {
+      alignSelf: 'self-end',
+      gridArea: 'timer',
+      justifySelf: 'self-end'
+    },
+    padding: 1
   }
 });
 
@@ -31,7 +44,8 @@ export const Timer: FC<ITimer> = ({ endTime, id, itemId, startTime }) => {
   const [currentTime, setCurrentTime] = useState(Date.now);
 
   const progress = useMemo(() => calculateTime(currentTime), [calculateTime, currentTime]);
-  const styles = useMemo(() => getStyles(), []);
+  const theme = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const previousLabel = useRef<string>();
   const worker = useWorker();
 
@@ -81,10 +95,10 @@ export const Timer: FC<ITimer> = ({ endTime, id, itemId, startTime }) => {
   return (
     <Box sx={styles.container}>
       <Box sx={styles.item}>
-        <IconButton color="secondary" onClick={handleStopTimer} size="small">
+        <IconButton color="secondary" onClick={handleStopTimer} size="small" sx={{ height: theme.typography.fontSize }}>
           <AlarmOffIcon />
         </IconButton>
-        {items[itemId]}
+        <Typography>{items[itemId]}</Typography>
       </Box>
       <Box sx={styles.timer}>{previousLabel.current}</Box>
       <Box sx={styles.progress}>

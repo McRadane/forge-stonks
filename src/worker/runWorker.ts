@@ -1,6 +1,7 @@
 import { AnyAction, Dispatch } from '@reduxjs/toolkit';
 
 import { Logger } from '../logger';
+import { INotificationContextDefinition } from '../notification/NotificationContext';
 import { ICraft } from '../resources/crafts';
 import { KeysLanguageType, ILanguageContextDefinition } from '../resources/lang/type';
 import { setOptions, IOptionsState } from '../services/options';
@@ -23,18 +24,24 @@ import {
 const audio = new Audio('/forge-stonks/orb.mp3');
 audio.volume = 0.3;
 
+interface WorkerContexts {
+  dispatch: Dispatch<AnyAction>;
+  language: ILanguageContextDefinition;
+  notification: INotificationContextDefinition;
+}
+
 export class WorkerRunner {
-  private dispatch!: Dispatch<AnyAction>;
+  //private dispatch!: Dispatch<AnyAction>;
   private worker!: Worker;
   private timeGetPrices!: undefined | number;
   private languageKeyResponse: undefined | KeysLanguageType;
+  private contexts: WorkerContexts;
 
-  private languageContext!: ILanguageContextDefinition;
+  //private languageContext!: ILanguageContextDefinition;
 
-  constructor(languageContext: ILanguageContextDefinition, dispatch: Dispatch<AnyAction>) {
+  constructor(contexts: WorkerContexts) {
     this.worker = new Worker();
-    this.dispatch = dispatch;
-    this.languageContext = languageContext;
+    this.contexts = contexts;
 
     this.listener();
   }
@@ -54,7 +61,7 @@ export class WorkerRunner {
       language
     };
     this.worker.postMessage(command);
-    this.languageContext.userLanguageChange(language);
+    this.contexts.language.userLanguageChange(language);
     this.logCommand(`set language to ${language}`);
   }
 
@@ -146,15 +153,15 @@ export class WorkerRunner {
             this.timeGetPrices = undefined;
           }
 
-          this.dispatch(setPrices(event.data.results));
+          this.contexts.dispatch(setPrices(event.data.results));
           break;
         case 'Response-Loading':
           if (event.data.loading) {
             this.logResponse('Set Loading');
-            this.dispatch(setLoading());
+            this.contexts.dispatch(setLoading());
           } else {
             this.logResponse('End Loading');
-            this.dispatch(setNotLoading());
+            this.contexts.dispatch(setNotLoading());
           }
           break;
         case 'Response-Message':
@@ -165,20 +172,26 @@ export class WorkerRunner {
           }
           break;
         case 'Response-Options':
-          this.dispatch(setOptions(event.data));
+          this.contexts.dispatch(setOptions(event.data));
           break;
         case 'Response-TimerEnded':
-          this.logResponse(`A timer has ended`);
-
-          audio.play();
+          {
+            this.logResponse(`A timer has ended`);
+            const message = this.contexts.language.dictionary.notification.timerEnded.replace(
+              '{0}',
+              this.contexts.language.dictionary.items[event.data.itemId]
+            );
+            this.contexts.notification.triggerSuccess(message);
+            audio.play();
+          }
           break;
         case 'Response-TimerSet':
           this.logResponse('Timer has been set');
-          this.dispatch(setTimerLaunched(event.data.itemId));
+          this.contexts.dispatch(setTimerLaunched(event.data.itemId));
           break;
         case 'Response-Timers':
           this.logResponse('Get Timers');
-          this.dispatch(setTimers(event.data.timers));
+          this.contexts.dispatch(setTimers(event.data.timers));
           break;
       }
     });

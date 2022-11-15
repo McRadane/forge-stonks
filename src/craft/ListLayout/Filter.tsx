@@ -28,12 +28,12 @@ export const Filter: FC<IFilterProps> = ({ children, property, setOrder, setOrde
       <Grid item sm={4} xs={12}>
         {children}
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid item sm={4} xs={6}>
         <Button onClick={handleAsc}>
           <KeyboardArrowUpIcon />
         </Button>
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid item sm={4} xs={6}>
         <Button onClick={handleDesc}>
           <KeyboardArrowDownIcon />
         </Button>
