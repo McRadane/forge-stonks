@@ -12,7 +12,7 @@ import { CraftsContainer } from './craft/CraftsContainer';
 import { Logger } from './logger';
 import { OptionsSwitcher } from './options/OptionsSwitcher';
 import { LanguageContext } from './resources/lang/LanguageContext';
-import { RootState } from './store';
+import type { RootState } from './store';
 import { Timers } from './timers/Timers';
 import { useWorker } from './worker/WorkerContext';
 

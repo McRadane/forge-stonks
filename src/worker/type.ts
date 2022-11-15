@@ -1,7 +1,6 @@
-import { ICraftWithCosts } from '../craft/functions';
-import { ICraft } from '../resources/crafts';
-import { KeysLanguageType } from '../resources/lang/type';
-import { IOptionsState } from '../services/options';
+import type { KeysLanguageType } from '../resources/lang/type';
+import type { ICraft, ICraftWithCosts } from '../resources/types';
+import type { IOptionsState } from '../services/options';
 
 type WorkerEvent<T> = {
   data: T;

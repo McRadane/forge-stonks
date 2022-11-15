@@ -1,12 +1,12 @@
 import Chip from '@mui/material/Chip';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
-import { ICraftMaterial } from '../../resources/crafts';
 import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ICraftMaterial } from '../../resources/types';
 import { useItemCraftPrice } from '../functions';
 
 export const DetailsRow: FC<{

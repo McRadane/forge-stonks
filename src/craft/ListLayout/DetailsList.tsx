@@ -2,10 +2,10 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import { FC } from 'react';
+import type { FC } from 'react';
 
-import { ICraft } from '../../resources/crafts';
 import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ICraft } from '../../resources/types';
 
 import { DetailsRow } from './DetailsRow';
 

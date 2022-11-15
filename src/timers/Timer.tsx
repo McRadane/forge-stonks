@@ -8,7 +8,7 @@ import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState 
 
 import { useLanguage } from '../resources/lang/LanguageContext';
 import { useWorker } from '../worker/WorkerContext';
-import { ITimer } from '../worker/type';
+import type { ITimer } from '../worker/type';
 
 const getStyles = (theme: Theme) => ({
   container: {

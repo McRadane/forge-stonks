@@ -4,9 +4,9 @@ import { defineConfig } from 'vite';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/forge-stonks/',
-  define: {
+  /* define: {
     global: {},
     'process.env': {}
-  },
+  }, */
   plugins: [react()]
 });

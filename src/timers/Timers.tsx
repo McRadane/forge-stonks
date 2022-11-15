@@ -9,7 +9,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useSelector } from 'react-redux';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 
 import { Timer } from './Timer';
 

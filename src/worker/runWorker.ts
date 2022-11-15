@@ -1,15 +1,15 @@
-import { AnyAction, Dispatch } from '@reduxjs/toolkit';
+import type { AnyAction, Dispatch } from '@reduxjs/toolkit';
 
 import { Logger } from '../logger';
-import { INotificationContextDefinition } from '../notification/NotificationContext';
-import { ICraft } from '../resources/crafts';
-import { KeysLanguageType, ILanguageContextDefinition } from '../resources/lang/type';
+import type { INotificationContextDefinition } from '../notification/NotificationContext';
+import type { KeysLanguageType, ILanguageContextDefinition } from '../resources/lang/type';
+import type { ICraft } from '../resources/types';
 import { setOptions, IOptionsState } from '../services/options';
 import { setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
 
 // eslint-disable-next-line import/no-unresolved
 import Worker from './stonks.worker?worker';
-import {
+import type {
   WorkerResponseEvents,
   IWorkerCommandForceRefresh,
   IWorkerCommandGetLanguage,

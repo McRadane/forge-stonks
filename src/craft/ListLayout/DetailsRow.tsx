@@ -1,12 +1,12 @@
 import Grid from '@mui/material/Grid';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
-import { ICraftMaterial } from '../../resources/crafts';
 import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ICraftMaterial } from '../../resources/types';
 import { useItemCraftPrice } from '../functions';
 
 import { GridRow } from './GridRow';

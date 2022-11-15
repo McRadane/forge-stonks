@@ -1,12 +1,12 @@
-import { ICraftWithCosts } from '../craft/functions';
-import { crafts, itemsSource, itemsVendorPrice, ICraft } from '../resources/crafts';
+import { crafts, itemsSource, itemsVendorPrice } from '../resources/crafts';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
-import { KeysLanguageType, ILanguage } from '../resources/lang/type';
+import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
+import type { ICraft, ICraftWithCosts } from '../resources/types';
 import { initialState, IOptionsState } from '../services/options';
 
 import { Database } from './database';
-import {
+import type {
   WorkerCommandEvents,
   ITimer,
   IWorkerCommandStartTimer,

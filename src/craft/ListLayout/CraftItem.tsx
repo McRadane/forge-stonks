@@ -12,9 +12,10 @@ import { useSelector } from 'react-redux';
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import { RootState } from '../../store';
+import type { ICraftWithCosts } from '../../resources/types';
+import type { RootState } from '../../store';
 import { TimerButton } from '../../timers/TimerButton';
-import { getProfitByTimeLabel, ICraftWithCosts } from '../functions';
+import { getProfitByTimeLabel } from '../functions';
 
 import { DetailsList } from './DetailsList';
 import { GridRow } from './GridRow';

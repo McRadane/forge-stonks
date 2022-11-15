@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { ICraft } from '../resources/crafts';
-import { ILanguage } from '../resources/lang/type';
-import { IOptionsState } from '../services/options';
-import { RootState } from '../store';
+import type { ILanguage } from '../resources/lang/type';
+import type { IOptionsState } from '../services/options';
+import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
 export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
@@ -12,13 +11,6 @@ export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
 
   return costs[id]?.craft ?? 0;
 };
-
-export interface ICraftWithCosts extends ICraft {
-  craft: number;
-  profit: number;
-  profitHourly: number;
-  sell: number;
-}
 
 export const useItemsWithCraftPrice = () => {
   const costs = useSelector((state: RootState) => state.worker.prices);

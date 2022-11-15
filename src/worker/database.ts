@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 import { getAuctionData, getBazaarData } from './axios';
-import { IAuctions, IBazaar, ITimer } from './type';
+import type { IAuctions, IBazaar, ITimer } from './type';
 
 interface ICache {
   key: string;

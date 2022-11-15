@@ -19,9 +19,9 @@ import { FC, useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
-import { KeysLanguageType } from '../resources/lang/type';
-import { IOptionsState } from '../services/options';
-import { RootState } from '../store';
+import type { KeysLanguageType } from '../resources/lang/type';
+import type { IOptionsState } from '../services/options';
+import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
 export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ open, toggle }) => {

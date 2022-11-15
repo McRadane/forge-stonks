@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { FC, ReactNode, useCallback } from 'react';
 
-import { Order } from '../../components/EnhancedTableHead';
+import type { Order } from '../../components/EnhancedTableHead';
 
 interface IFilterProps {
   children: ReactNode;

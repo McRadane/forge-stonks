@@ -1,4 +1,4 @@
-import { ILanguage } from './type';
+import type { ILanguage } from './type';
 
 export const frFr: ILanguage = {
   items: {

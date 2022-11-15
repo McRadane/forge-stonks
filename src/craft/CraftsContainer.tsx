@@ -3,7 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { RootState } from '../store';
+import type { RootState } from '../store';
 
 import { CraftsList } from './ListLayout/CraftsList';
 import { CraftsTable } from './TableLayout/CraftsTable';

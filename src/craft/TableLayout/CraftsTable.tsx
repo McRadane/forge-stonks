@@ -7,8 +7,8 @@ import { useSelector } from 'react-redux';
 
 import { EnhancedTableHead, Order, getComparator } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import { RootState } from '../../store';
-import { ICraftWithCosts } from '../functions';
+import type { ICraftWithCosts } from '../../resources/types';
+import type { RootState } from '../../store';
 
 import { CraftRow } from './CraftRow';
 

@@ -5,10 +5,10 @@ import { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useNotifications } from '../notification/NotificationContext';
-import { ICraft } from '../resources/crafts';
 import { useLanguage } from '../resources/lang/LanguageContext';
+import type { ICraft } from '../resources/types';
 import { setTimerPressed } from '../services/worker';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
 export const TimerButton: FC<{ itemId: ICraft['itemId'] }> = ({ itemId }) => {

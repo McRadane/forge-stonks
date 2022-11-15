@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { IAuctions, IBazaar } from './type';
+import type { IAuctions, IBazaar } from './type';
 
 interface IBazaarAPIResponse {
   products: Record<

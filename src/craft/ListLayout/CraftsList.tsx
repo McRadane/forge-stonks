@@ -13,8 +13,9 @@ import { useSelector } from 'react-redux';
 
 import { Order, getComparator } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import { RootState } from '../../store';
-import { getProfitByTimeLabel, ICraftWithCosts } from '../functions';
+import type { ICraftWithCosts } from '../../resources/types';
+import type { RootState } from '../../store';
+import { getProfitByTimeLabel } from '../functions';
 
 import { CraftItem } from './CraftItem';
 import { Filter } from './Filter';
