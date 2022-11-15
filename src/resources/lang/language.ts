@@ -1,10 +1,10 @@
-import type { KeysLanguageType, ILanguage } from './type';
+import { enUs } from './enUs';
+import { frFr } from './frFr';
+import type { KeysLanguageType } from './type';
 
 export const dictionaryList = {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-commonjs
-  'en-US': require('./enUs.json') as ILanguage,
-  // eslint-disable-next-line import/no-commonjs, @typescript-eslint/no-var-requires
-  'fr-FR': require('./frFr.json') as ILanguage
+  'en-US': enUs,
+  'fr-FR': frFr
 };
 
 const keyLanguages = Object.keys(dictionaryList) as KeysLanguageType[];

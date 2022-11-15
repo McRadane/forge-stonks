@@ -1,7 +1,5 @@
 import { render } from '@testing-library/react';
 
-// eslint-disable-next-line import/no-unassigned-import
-import '@testing-library/jest-dom';
 import { Coin } from './Coin';
 import { Item } from './Item';
 

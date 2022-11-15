@@ -1,7 +1,7 @@
 import { ICraftWithCosts } from '../craft/functions';
 import { crafts, itemsSource, itemsVendorPrice, ICraft } from '../resources/crafts';
-import enUs from '../resources/lang/enUs.json';
-import frFr from '../resources/lang/frFr.json';
+import { enUs } from '../resources/lang/enUs';
+import { frFr } from '../resources/lang/frFr';
 import { KeysLanguageType, ILanguage } from '../resources/lang/type';
 import { IOptionsState } from '../services/options';
 
@@ -367,10 +367,10 @@ class ComputationWorker {
   private getLang(): ILanguage {
     switch (this.languageKey) {
       case 'fr-FR':
-        return frFr as ILanguage;
+        return frFr;
       case 'en-US':
       default:
-        return enUs as ILanguage;
+        return enUs;
     }
   }
 }
