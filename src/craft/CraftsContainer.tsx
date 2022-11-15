@@ -3,35 +3,18 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { crafts } from '../resources/crafts';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 
 import { CraftsList } from './ListLayout/CraftsList';
 import { CraftsTable } from './TableLayout/CraftsTable';
 import { useItemsWithCraftPrice } from './functions';
 
 export const CraftsContainer: FC = () => {
-  const { hotm, includeAuctionsFlip, maxCraftingCost } = useSelector((state: RootState) => state.options);
+  const { maxCraftingCost } = useSelector((state: RootState) => state.options);
 
-  const preFiltered = useMemo(() => {
-    //if (Object.keys(prices).length === 0) {
-    //return [];
-    // }
-
-    let filtersCraft = crafts;
-    if (!includeAuctionsFlip) {
-      filtersCraft = filtersCraft.filter((craft) => craft.bazaarItem);
-    }
-
-    filtersCraft = filtersCraft.filter((craft) => craft.hotm <= hotm);
-
-    return filtersCraft;
-  }, [includeAuctionsFlip, hotm]);
-
-  const allCrafts = useItemsWithCraftPrice(preFiltered);
+  const allCrafts = useItemsWithCraftPrice();
 
   const postFiltered = useMemo(() => {
-    //let filtered = allCrafts.filter((craft) => craft.profit >= 0 && craft.sell >= 0);
     let filtered = allCrafts.filter((craft) => craft.sell > 0);
 
     if (maxCraftingCost !== undefined && maxCraftingCost !== 0) {

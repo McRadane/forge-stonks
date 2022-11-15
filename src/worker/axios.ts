@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { IAuctions, IBazaar } from './type';
+import type { IAuctions, IBazaar } from './type';
 
 interface IBazaarAPIResponse {
   products: Record<
@@ -64,6 +64,23 @@ const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPagina
   return Promise.reject();
 };
 
+const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
+  const auctions: Map<string, IAuctions & { bin: boolean }> = new Map();
+
+  data.auctions
+    .filter((auction) => !auction.claimed)
+    .forEach(({ bin, highest_bid_amount, item_name, starting_bid, uuid }) => {
+      auctions.set(uuid, {
+        bin,
+        buyPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
+        item_name,
+        sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount
+      });
+    });
+
+  return auctions;
+};
+
 export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
   return axios
     .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
@@ -73,18 +90,7 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
         throw new Error('Invalid query');
       }
 
-      const auctions: Map<string, IAuctions & { bin: boolean }> = new Map();
-
-      data.auctions
-        .filter((auction) => !auction.claimed)
-        .forEach(({ bin, highest_bid_amount, item_name, starting_bid, uuid }) => {
-          auctions.set(uuid, {
-            bin,
-            buyPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
-            item_name,
-            sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount
-          });
-        });
+      const auctions = filterAuctions(data);
 
       const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
 

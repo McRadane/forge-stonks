@@ -172,6 +172,7 @@ export interface ILanguage {
   items: ILanguageItems;
   notification: {
     timerEnded: string;
+    timerStarted: string;
   };
   ui: ILanguageUI;
 }

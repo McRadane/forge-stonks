@@ -1,39 +1,53 @@
-import Box from '@mui/material/Box';
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import LinearProgress from '@mui/material/LinearProgress';
 import AlarmOffIcon from '@mui/icons-material/AlarmOff';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import { Theme, useTheme } from '@mui/material/styles';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
-import { ITimer } from '../worker/type';
-import { useWorker } from '../worker/runWorker';
+import { useWorker } from '../worker/WorkerContext';
+import type { ITimer } from '../worker/type';
 
-const getStyles = () => ({
-  container: { flex: 1, display: 'grid', gridTemplateAreas: '"item timer" "progress progress"' },
+const getStyles = (theme: Theme) => ({
+  container: {
+    [theme.breakpoints.down('xl')]: {
+      gridTemplateAreas: '"item" "timer" "progress"'
+    },
+    display: 'grid',
+    flex: 1,
+    gridTemplateAreas: '"item timer" "progress progress"'
+  },
   item: {
+    alignItems: 'center',
+    display: 'flex',
     gridArea: 'item',
     paddingLeft: 1
   },
-  timer: {
-    gridArea: 'timer',
-    justifySelf: 'self-end',
-    alignSelf: 'self-end',
-    paddingRight: 1
-  },
   progress: {
     gridArea: 'progress'
+  },
+  timer: {
+    [theme.breakpoints.up('xl')]: {
+      alignSelf: 'self-end',
+      gridArea: 'timer',
+      justifySelf: 'self-end'
+    },
+    padding: 1
   }
 });
 
-export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
+type ITimerProps = ITimer;
+
+export const Timer: FC<ITimerProps> = ({ endTime, id, itemId, startTime }) => {
   const calculateTime = useCallback((now: number) => ((now - startTime) * 100) / (endTime - startTime), [endTime, startTime]);
 
   const [currentTime, setCurrentTime] = useState(Date.now);
-  // const [progress, setProgress] = useState(calculateTime(currentTime));
-  // const [label, setLabel] = useState<string>();
 
   const progress = useMemo(() => calculateTime(currentTime), [calculateTime, currentTime]);
-  const styles = useMemo(() => getStyles(), []);
+  const theme = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
   const previousLabel = useRef<string>();
   const worker = useWorker();
 
@@ -54,7 +68,6 @@ export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
   }, []);
 
   useEffect(() => {
-    // const newLabel = prettyPrint(endTime - currentTime);
     let seconds = Math.floor((endTime - currentTime) / 1000);
     let minutes;
     let hours;
@@ -69,26 +82,29 @@ export const Timer: FC<ITimer> = ({ itemId, startTime, endTime, id }) => {
       }
     }
 
+    if (seconds < 0) {
+      seconds = 0;
+    }
+
     const newLabel =
       hours !== undefined ? `${hours}h ${minutes}m ${seconds}s` : minutes !== undefined ? `${minutes}m ${seconds}s` : `${seconds}s`;
 
     if (newLabel !== previousLabel.current) {
       previousLabel.current = newLabel;
-      //setLabel(newLabel);
     }
   }, [currentTime, endTime]);
 
   return (
     <Box sx={styles.container}>
       <Box sx={styles.item}>
-        <IconButton color="secondary" onClick={handleStopTimer} size="small">
+        <IconButton color="secondary" onClick={handleStopTimer} size="small" sx={{ height: theme.typography.fontSize }}>
           <AlarmOffIcon />
         </IconButton>
-        {items[itemId]}
+        <Typography>{items[itemId]}</Typography>
       </Box>
       <Box sx={styles.timer}>{previousLabel.current}</Box>
       <Box sx={styles.progress}>
-        <LinearProgress variant="determinate" value={progress} />
+        <LinearProgress value={progress} variant="determinate" />
       </Box>
     </Box>
   );

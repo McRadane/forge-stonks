@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -13,65 +14,60 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import { FC, useCallback, useContext, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
-import { KeysLanguageType } from '../resources/lang/type';
-import {
-  setHOTM,
-  setMaxCraftingCost,
-  setPlayFrequency,
-  setQuickForge,
-  toggleAuctionsBINOnly,
-  toggleIncludeAuctionsFlip,
-  toggleIntermediateCraft,
-  IOptionsState
-} from '../services/options';
-import { RootState } from '../store';
-import { useWorker } from '../worker/runWorker';
+import type { KeysLanguageType } from '../resources/lang/type';
+import type { IOptionsState } from '../services/options';
+import type { RootState } from '../store';
+import { useWorker } from '../worker/WorkerContext';
 
-export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ open, toggle }) => {
+interface IOptionsSwitcherProps {
+  open: boolean;
+  toggle: () => void;
+}
+
+export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => {
   const {
     ui: { options }
   } = useLanguage();
-
-  const dispatch = useDispatch();
 
   const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, maxCraftingCost, playFrequency, quickForge } = useSelector(
     (state: RootState) => state.options
   );
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
+  const theme = useTheme();
 
   const handlPlayFrequency = useCallback(
     (event: SelectChangeEvent) => {
-      dispatch(setPlayFrequency(event.target.value as IOptionsState['playFrequency']));
+      const value = event.target.value as IOptionsState['playFrequency'];
+      worker.setOption('playFrequency', value);
     },
-    [dispatch]
+    [worker]
   );
 
   const handleIncludeAuctionsFlip = useCallback(() => {
-    dispatch(toggleIncludeAuctionsFlip());
-  }, [dispatch]);
+    worker.setOption('includeAuctionsFlip', !includeAuctionsFlip);
+  }, [includeAuctionsFlip, worker]);
 
   const handleAuctionsBINOnly = useCallback(() => {
-    dispatch(toggleAuctionsBINOnly());
-  }, [dispatch]);
+    worker.setOption('auctionsBINOnly', !auctionsBINOnly);
+  }, [auctionsBINOnly, worker]);
 
   const handleIntermediateCraft = useCallback(() => {
-    dispatch(toggleIntermediateCraft());
-  }, [dispatch]);
+    worker.setOption('intermediateCraft', !intermediateCraft);
+  }, [intermediateCraft, worker]);
 
   const handleHOTMValue = useCallback(
     (_e: Event, num: number | number[]) => {
-      if (Array.isArray(num)) {
-        dispatch(setHOTM(num[0]));
-      } else {
-        dispatch(setHOTM(num));
-      }
+      const value = Array.isArray(num) ? num[0] : num;
+
+      worker.setOption('hotm', value);
     },
-    [dispatch]
+    [worker]
   );
 
   const handleLanguage = useCallback(
@@ -83,27 +79,19 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
 
   const handleMaxCraftingCost = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch(setMaxCraftingCost(event.target.value === '' ? 0 : Number(event.target.value)));
+      const value = event.target.value === '' ? 0 : Number(event.target.value);
+      worker.setOption('maxCraftingCost', value);
     },
-    [dispatch]
+    [worker]
   );
 
   const handleQuickForge = useCallback(
     (_e: Event, num: number | number[]) => {
-      if (Array.isArray(num)) {
-        dispatch(setQuickForge(num[0]));
-      } else {
-        dispatch(setQuickForge(num));
-      }
+      const value = Array.isArray(num) ? num[0] : num;
+      worker.setOption('quickForge', value);
     },
-    [dispatch]
+    [worker]
   );
-
-  /*
-  const handleForceRefresh = useCallback(() => {
-    worker.forceRefresh();
-  }, [worker]);
-  */
 
   const quickForgeLevel = useMemo(() => {
     if (quickForge >= 2 && quickForge <= 10) {
@@ -128,11 +116,16 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
           <Typography component="div" gutterBottom variant="h6">
             {options.title}
           </Typography>
-          <IconButton onClick={toggle} size="small">
+          <IconButton onClick={toggle} size="small" sx={{ height: theme.typography.fontSize }}>
             <CloseIcon />
           </IconButton>
         </Box>
-        <List>
+        <List
+          sx={{
+            height: 'calc(100vh - 100px)',
+            overflow: 'scroll'
+          }}
+        >
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>
@@ -303,9 +296,6 @@ export const OptionsSwitcher: FC<{ open: boolean; toggle: () => void }> = ({ ope
               </FormHelperText>
             </FormControl>
           </ListItem>
-          {/*<ListItem divider>
-            <Button onClick={handleForceRefresh}>{options.forceRefresh}</Button>
-              </ListItem>*/}
         </List>
       </Box>
     </Drawer>

@@ -1,34 +1,47 @@
+import AlarmOnIcon from '@mui/icons-material/AlarmOn';
 import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AlarmOnIcon from '@mui/icons-material/AlarmOn';
 
-import { ICraft } from '../resources/crafts';
-import { setTimerPressed } from '../services/worker';
-import { RootState } from '../store';
-import { useWorker } from '../worker/runWorker';
+import { useNotifications } from '../notification/NotificationContext';
 import { useLanguage } from '../resources/lang/LanguageContext';
+import type { ICraft } from '../resources/types';
+import { setTimerPressed } from '../services/worker';
+import type { RootState } from '../store';
+import { useWorker } from '../worker/WorkerContext';
 
-export const TimerButton: FC<{ itemId: ICraft['itemId'] }> = ({ itemId }) => {
+interface ITimerButtonProps {
+  itemId: ICraft['itemId'];
+}
+
+export const TimerButton: FC<ITimerButtonProps> = ({ itemId }) => {
   const timerActive = useSelector((state: RootState) => state.worker.timerLaunched.some((timer) => timer === itemId));
   const dispatch = useDispatch();
+  const theme = useTheme();
   const worker = useWorker();
-  const { ui } = useLanguage();
+  const { items, notification, ui } = useLanguage();
+  const { triggerInfo } = useNotifications();
 
   const handleTimer = useCallback(() => {
-    if ('Notification' in window) {
-      if (Notification.permission !== 'denied') {
-        // We need to ask the user for permission
-        Notification.requestPermission();
-      }
+    if ('Notification' in window && Notification.permission !== 'denied') {
+      // We need to ask the user for permission
+      Notification.requestPermission();
     }
 
+    triggerInfo(notification.timerStarted.replace('{0}', items[itemId]));
     dispatch(setTimerPressed(itemId));
     worker.startTimer(itemId);
-  }, [dispatch, itemId, worker]);
+  }, [dispatch, itemId, items, notification.timerStarted, triggerInfo, worker]);
 
   return (
-    <IconButton color="primary" aria-label={ui.timerButton} disabled={timerActive} onClick={handleTimer}>
+    <IconButton
+      aria-label={ui.timerButton}
+      color="primary"
+      disabled={timerActive}
+      onClick={handleTimer}
+      sx={{ height: theme.typography.fontSize }}
+    >
       <AlarmOnIcon />
     </IconButton>
   );

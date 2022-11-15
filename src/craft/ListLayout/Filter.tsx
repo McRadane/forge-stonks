@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { FC, ReactNode, useCallback } from 'react';
 
-import { Order } from '../../components/EnhancedTableHead';
+import type { Order } from '../../components/EnhancedTableHead';
 
 interface IFilterProps {
   children: ReactNode;
@@ -12,6 +12,7 @@ interface IFilterProps {
   setOrder: (order: Order) => void;
   setOrderBy: (property: string) => void;
 }
+
 export const Filter: FC<IFilterProps> = ({ children, property, setOrder, setOrderBy }) => {
   const handleAsc = useCallback(() => {
     setOrder('asc');
@@ -28,12 +29,12 @@ export const Filter: FC<IFilterProps> = ({ children, property, setOrder, setOrde
       <Grid item sm={4} xs={12}>
         {children}
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid item sm={4} xs={6}>
         <Button onClick={handleAsc}>
           <KeyboardArrowUpIcon />
         </Button>
       </Grid>
-      <Grid item sm={4} xs={12}>
+      <Grid item sm={4} xs={6}>
         <Button onClick={handleDesc}>
           <KeyboardArrowDownIcon />
         </Button>

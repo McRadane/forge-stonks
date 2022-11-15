@@ -1,24 +1,7 @@
-import { ILanguage } from './lang/type';
+/* eslint-disable sonarjs/no-duplicate-string */
 
-export interface ICraftMaterial {
-  itemId: keyof ILanguage['items'];
-  intermediaryCraft: boolean;
-  quantity: number;
-  source: 'auction' | 'bazaar' | 'vendor';
-}
-
-export interface IPartialCraft {
-  bazaarItem: boolean;
-  craftMaterial: ICraftMaterial[];
-  hotm: number;
-  itemId: keyof ILanguage['items'];
-  time: number;
-}
-
-export interface ICraft extends IPartialCraft {
-  category: 'casting' | 'refine';
-  id: number;
-}
+import type { ILanguage } from './lang/type';
+import type { ICraft, IPartialCraft } from './types';
 
 export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' | 'vendor'> = {
   'Amber Material': 'auction',
@@ -83,6 +66,7 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   'Jasper Drill X': 'auction',
   'Leggings Of Divan': 'auction',
   MITHRIL_ORE: 'bazaar',
+  'Magma Core': 'vendor',
   'Mithril Drill SX-R226': 'auction',
   'Mithril Drill SX-R326': 'auction',
   'Mithril Pickaxe': 'auction',
@@ -104,7 +88,6 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   'Robotron Reflector': 'auction',
   'Rock Gemstone': 'auction',
   'Ruby Drill TX-15': 'auction',
-  'Magma Core': 'vendor',
   'Ruby-polished Drill Engine': 'auction',
   SLUDGE_JUICE: 'bazaar',
   STARFALL: 'bazaar',
@@ -140,35 +123,35 @@ export const itemsVendorPrice: Partial<Record<keyof ILanguage['items'], number>>
 const craftsRefine: IPartialCraft[] = [
   {
     bazaarItem: true,
-    craftMaterial: [{ itemId: 'ENCHANTED_DIAMOND_BLOCK', intermediaryCraft: false, quantity: 2, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_DIAMOND_BLOCK', quantity: 2, source: 'bazaar' }],
     hotm: 2,
     itemId: 'REFINED_DIAMOND',
     time: 8
   },
   {
     bazaarItem: true,
-    craftMaterial: [{ itemId: 'ENCHANTED_MITHRIL', intermediaryCraft: false, quantity: 160, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_MITHRIL', quantity: 160, source: 'bazaar' }],
     hotm: 2,
     itemId: 'REFINED_MITHRIL',
     time: 6
   },
   {
     bazaarItem: true,
-    craftMaterial: [{ itemId: 'ENCHANTED_TITANIUM', intermediaryCraft: false, quantity: 16, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_TITANIUM', quantity: 16, source: 'bazaar' }],
     hotm: 2,
     itemId: 'REFINED_TITANIUM',
     time: 12
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'ENCHANTED_COAL_BLOCK', intermediaryCraft: false, quantity: 2, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_COAL_BLOCK', quantity: 2, source: 'bazaar' }],
     hotm: 2,
     itemId: 'Fuel Tank',
     time: 10
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'Glacite Jewel', intermediaryCraft: false, quantity: 3, source: 'auction' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'Glacite Jewel', quantity: 3, source: 'auction' }],
     hotm: 2,
     itemId: 'Bejeweled Handle',
     time: 0.5
@@ -176,11 +159,11 @@ const craftsRefine: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'ENCHANTED_IRON_BLOCK', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'ENCHANTED_REDSTONE_BLOCK', intermediaryCraft: false, quantity: 3, source: 'bazaar' },
-      { itemId: 'Golden Plate', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'TREASURITE', intermediaryCraft: false, quantity: 10, source: 'bazaar' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'ENCHANTED_IRON_BLOCK', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_REDSTONE_BLOCK', quantity: 3, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'TREASURITE', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 1, source: 'bazaar' }
     ],
     hotm: 4,
     itemId: 'Drill Engine',
@@ -189,9 +172,9 @@ const craftsRefine: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'ENCHANTED_GOLD_BLOCK', intermediaryCraft: false, quantity: 2, source: 'bazaar' },
-      { itemId: 'Glacite Jewel', intermediaryCraft: false, quantity: 5, source: 'auction' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'ENCHANTED_GOLD_BLOCK', quantity: 2, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'Glacite Jewel', quantity: 5, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 1, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Golden Plate',
@@ -200,10 +183,10 @@ const craftsRefine: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 5, source: 'bazaar' },
-      { itemId: 'Golden Plate', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'ENCHANTED_IRON_BLOCK', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 5, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_IRON_BLOCK', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Mithril Plate',
@@ -212,11 +195,11 @@ const craftsRefine: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'FINE_JADE_GEM', intermediaryCraft: false, quantity: 4, source: 'bazaar' },
-      { itemId: 'FINE_AMBER_GEM', intermediaryCraft: false, quantity: 4, source: 'bazaar' },
-      { itemId: 'FINE_AMETHYST_GEM', intermediaryCraft: false, quantity: 4, source: 'bazaar' },
-      { itemId: 'FINE_SAPPHIRE_GEM', intermediaryCraft: false, quantity: 4, source: 'bazaar' },
-      { itemId: 'SLUDGE_JUICE', intermediaryCraft: false, quantity: 320, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'FINE_JADE_GEM', quantity: 4, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_AMBER_GEM', quantity: 4, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_AMETHYST_GEM', quantity: 4, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_SAPPHIRE_GEM', quantity: 4, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'SLUDGE_JUICE', quantity: 320, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Gemstone Mixture',
@@ -228,9 +211,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'ENCHANTED_MITHRIL', intermediaryCraft: false, quantity: 30, source: 'bazaar' },
-      { itemId: 'Bejeweled Handle', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'ENCHANTED_GOLD', intermediaryCraft: false, quantity: 10, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'ENCHANTED_MITHRIL', quantity: 30, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Bejeweled Handle', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_GOLD', quantity: 10, source: 'bazaar' }
     ],
     hotm: 2,
     itemId: 'Mithril Pickaxe',
@@ -239,8 +222,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Beacon I', intermediaryCraft: false, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 5, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'Beacon I', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 5, source: 'bazaar' }
     ],
     hotm: 2,
     itemId: 'Beacon II',
@@ -248,21 +231,21 @@ const craftsCasting: IPartialCraft[] = [
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 2, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 2, source: 'bazaar' }],
     hotm: 2,
     itemId: 'Titanium Talisman',
     time: 14
   },
   {
     bazaarItem: true,
-    craftMaterial: [{ itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 3, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 3, source: 'bazaar' }],
     hotm: 2,
     itemId: 'DIAMONITE',
     time: 6
   },
   {
     bazaarItem: true,
-    craftMaterial: [{ itemId: 'STARFALL', intermediaryCraft: false, quantity: 256, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'STARFALL', quantity: 256, source: 'bazaar' }],
     hotm: 2,
     itemId: 'POWER_CRYSTAL',
     time: 2
@@ -270,10 +253,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'MITHRIL_ORE', intermediaryCraft: false, quantity: 48, source: 'bazaar' },
-      { itemId: 'TITANIUM_ORE', intermediaryCraft: false, quantity: 80, source: 'bazaar' },
-      { itemId: 'ENCHANTED_ENDER_PEARL', intermediaryCraft: false, quantity: 16, source: 'bazaar' },
-      { itemId: 'coins', intermediaryCraft: false, quantity: 25_000, source: 'vendor' }
+      { intermediaryCraft: false, itemId: 'MITHRIL_ORE', quantity: 48, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'TITANIUM_ORE', quantity: 80, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_ENDER_PEARL', quantity: 16, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'coins', quantity: 25_000, source: 'vendor' }
     ],
     hotm: 2,
     itemId: 'Travel Scroll to the Dwarven Forge',
@@ -282,10 +265,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 3, source: 'bazaar' },
-      { itemId: 'Bejeweled Handle', intermediaryCraft: true, quantity: 2, source: 'auction' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 1, source: 'bazaar' },
-      { itemId: 'ENCHANTED_GOLD', intermediaryCraft: false, quantity: 30, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 3, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Bejeweled Handle', quantity: 2, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_GOLD', quantity: 30, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Refined Mithril Pickaxe',
@@ -294,9 +277,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 3, source: 'bazaar' },
-      { itemId: 'Fuel Tank', intermediaryCraft: true, quantity: 1, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 3, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Fuel Tank', quantity: 1, source: 'auction' }
     ],
     hotm: 3,
     itemId: 'Mithril Drill SX-R226',
@@ -305,8 +288,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 3, source: 'auction' },
-      { itemId: 'Fuel Tank', intermediaryCraft: true, quantity: 5, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 3, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Fuel Tank', quantity: 5, source: 'auction' }
     ],
     hotm: 3,
     itemId: 'Mithril-Infused Fuel Tank',
@@ -315,8 +298,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Drill Engine', intermediaryCraft: true, quantity: 2, source: 'auction' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 3, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Drill Engine', quantity: 2, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 3, source: 'auction' }
     ],
     hotm: 3,
     itemId: 'Mithril-Plated Drill Engine',
@@ -325,8 +308,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Beacon II', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 10, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Beacon II', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 10, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Beacon III',
@@ -335,8 +318,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 6, source: 'bazaar' },
-      { itemId: 'Titanium Talisman', intermediaryCraft: true, quantity: 1, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 6, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Titanium Talisman', quantity: 1, source: 'auction' }
     ],
     hotm: 3,
     itemId: 'Titanium Ring',
@@ -344,7 +327,7 @@ const craftsCasting: IPartialCraft[] = [
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 2, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 2, source: 'bazaar' }],
     hotm: 3,
     itemId: 'Pure Mithril',
     time: 12
@@ -352,8 +335,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'ENCHANTED_COBBLESTONE', intermediaryCraft: false, quantity: 128, source: 'bazaar' },
-      { itemId: 'TREASURITE', intermediaryCraft: false, quantity: 64, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'ENCHANTED_COBBLESTONE', quantity: 128, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'TREASURITE', quantity: 64, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Rock Gemstone',
@@ -361,7 +344,7 @@ const craftsCasting: IPartialCraft[] = [
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'STARFALL', intermediaryCraft: false, quantity: 512, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'STARFALL', quantity: 512, source: 'bazaar' }],
     hotm: 3,
     itemId: 'Petrified Starfall',
     time: 14
@@ -369,8 +352,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'GOBLIN_EGG_GREEN', intermediaryCraft: false, quantity: 99, source: 'bazaar' },
-      { itemId: 'FINE_JADE_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'GOBLIN_EGG_GREEN', quantity: 99, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_JADE_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 4,
     itemId: 'Pesto Goblin Omelette',
@@ -379,8 +362,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Helix', intermediaryCraft: false, quantity: 1, source: 'auction' },
-      { itemId: 'coins', intermediaryCraft: false, quantity: 300_000, source: 'vendor' }
+      { intermediaryCraft: false, itemId: 'Helix', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'coins', quantity: 300_000, source: 'vendor' }
     ],
     hotm: 3,
     itemId: 'Ammonite Pet',
@@ -389,9 +372,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Fuel Tank', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'FINE_RUBY_GEM', intermediaryCraft: false, quantity: 6, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Fuel Tank', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FINE_RUBY_GEM', quantity: 6, source: 'bazaar' }
     ],
     hotm: 3,
     itemId: 'Ruby Drill TX-15',
@@ -400,10 +383,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'FLAWED_RUBY_GEM', intermediaryCraft: false, quantity: 48, source: 'bazaar' },
-      { itemId: 'FINE_RUBY_GEM', intermediaryCraft: false, quantity: 80, source: 'bazaar' },
-      { itemId: 'ENCHANTED_ENDER_PEARL', intermediaryCraft: false, quantity: 16, source: 'bazaar' },
-      { itemId: 'coins', intermediaryCraft: false, quantity: 50_000, source: 'vendor' }
+      { intermediaryCraft: false, itemId: 'FLAWED_RUBY_GEM', quantity: 48, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_RUBY_GEM', quantity: 80, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_ENDER_PEARL', quantity: 16, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'coins', quantity: 50_000, source: 'vendor' }
     ],
     hotm: 3,
     itemId: 'Travel Scroll to the Crystal Hollows',
@@ -412,9 +395,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Mithril Drill SX-R226', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Golden Plate', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 2, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Mithril Drill SX-R226', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 10, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 2, source: 'auction' }
     ],
     hotm: 4,
     itemId: 'Mithril Drill SX-R326',
@@ -423,10 +406,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Drill Engine', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'PLASMA_BUCKET', intermediaryCraft: false, quantity: 5, source: 'bazaar' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 4, source: 'auction' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 5, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Drill Engine', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'PLASMA_BUCKET', quantity: 5, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 4, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 5, source: 'bazaar' }
     ],
     hotm: 4,
     itemId: 'Titanium-Plated Drill Engine',
@@ -434,7 +417,7 @@ const craftsCasting: IPartialCraft[] = [
   },
   {
     bazaarItem: false,
-    craftMaterial: [{ itemId: 'GOBLIN_EGG', intermediaryCraft: false, quantity: 99, source: 'bazaar' }],
+    craftMaterial: [{ intermediaryCraft: false, itemId: 'GOBLIN_EGG', quantity: 99, source: 'bazaar' }],
     hotm: 4,
     itemId: 'Goblin Omelette',
     time: 18
@@ -442,9 +425,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Beacon III', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 20, source: 'bazaar' },
-      { itemId: 'PLASMA_BUCKET', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Beacon III', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 20, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'PLASMA_BUCKET', quantity: 1, source: 'bazaar' }
     ],
     hotm: 4,
     itemId: 'Beacon IV',
@@ -453,8 +436,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 12, source: 'bazaar' },
-      { itemId: 'Titanium Ring', intermediaryCraft: true, quantity: 1, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 12, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Titanium Ring', quantity: 1, source: 'auction' }
     ],
     hotm: 4,
     itemId: 'Titanium Artifact',
@@ -463,8 +446,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'HARD_STONE', intermediaryCraft: false, quantity: 128, source: 'bazaar' },
-      { itemId: 'ROUGH_AMBER_GEM', intermediaryCraft: false, quantity: 64, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'HARD_STONE', quantity: 128, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ROUGH_AMBER_GEM', quantity: 64, source: 'bazaar' }
     ],
     hotm: 4,
     itemId: 'Hot Stuff',
@@ -473,8 +456,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'GOBLIN_EGG_YELLOW', intermediaryCraft: false, quantity: 99, source: 'bazaar' },
-      { itemId: 'FINE_TOPAZ_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'GOBLIN_EGG_YELLOW', quantity: 99, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FINE_TOPAZ_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Sunny Side Goblin Omelette',
@@ -483,8 +466,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Ruby Drill TX-15', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 3, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Ruby Drill TX-15', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 3, source: 'auction' }
     ],
     hotm: 4,
     itemId: 'Gemstone Drill LT-522',
@@ -493,11 +476,11 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Fuel Tank', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Golden Plate', intermediaryCraft: true, quantity: 6, source: 'auction' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 10, source: 'bazaar' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 10, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Fuel Tank', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 6, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 10, source: 'bazaar' }
     ],
     hotm: 5,
     itemId: 'Titanium Drill DR-X355',
@@ -506,10 +489,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Titanium Drill DR-X355', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 10, source: 'bazaar' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 16, source: 'bazaar' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 6, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Titanium Drill DR-X355', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 16, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 6, source: 'auction' }
     ],
     hotm: 5,
     itemId: 'Titanium Drill DR-X455',
@@ -518,12 +501,12 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Titanium Drill DR-X455', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 20, source: 'bazaar' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 32, source: 'bazaar' },
-      { itemId: 'ENCHANTED_IRON_BLOCK', intermediaryCraft: false, quantity: 2, source: 'bazaar' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 15, source: 'auction' },
-      { itemId: 'PLASMA_BUCKET', intermediaryCraft: false, quantity: 20, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Titanium Drill DR-X455', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 20, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 32, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'ENCHANTED_IRON_BLOCK', quantity: 2, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 15, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'PLASMA_BUCKET', quantity: 20, source: 'bazaar' }
     ],
     hotm: 5,
     itemId: 'Titanium Drill DR-X555',
@@ -532,10 +515,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 10, source: 'bazaar' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 10, source: 'bazaar' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 10, source: 'bazaar' },
-      { itemId: 'Fuel Tank', intermediaryCraft: true, quantity: 10, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 10, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Fuel Tank', quantity: 10, source: 'auction' }
     ],
     hotm: 5,
     itemId: 'Titanium-Infused Fuel Tank',
@@ -544,9 +527,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Beacon IV', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'REFINED_MITHRIL', intermediaryCraft: true, quantity: 40, source: 'bazaar' },
-      { itemId: 'PLASMA_BUCKET', intermediaryCraft: false, quantity: 5, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Beacon IV', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_MITHRIL', quantity: 40, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'PLASMA_BUCKET', quantity: 5, source: 'bazaar' }
     ],
     hotm: 5,
     itemId: 'Beacon V',
@@ -555,8 +538,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 20, source: 'bazaar' },
-      { itemId: 'Titanium Artifact', intermediaryCraft: true, quantity: 1, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 20, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Titanium Artifact', quantity: 1, source: 'auction' }
     ],
     hotm: 5,
     itemId: 'Titanium Relic',
@@ -565,8 +548,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'GOBLIN_EGG_RED', intermediaryCraft: false, quantity: 99, source: 'bazaar' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'GOBLIN_EGG_RED', quantity: 99, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 5,
     itemId: 'Spicy Goblin Omelette',
@@ -575,9 +558,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'WORM_MEMBRANE', intermediaryCraft: false, quantity: 100, source: 'bazaar' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'coins', intermediaryCraft: false, quantity: 25_000, source: 'vendor' }
+      { intermediaryCraft: false, itemId: 'WORM_MEMBRANE', quantity: 100, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'coins', quantity: 25_000, source: 'vendor' }
     ],
     hotm: 5,
     itemId: 'Gemstone Chamber',
@@ -586,10 +569,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Gemstone Drill LT-522', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'FLAWLESS_TOPAZ_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 3, source: 'auction' },
-      { itemId: 'Magma Core', intermediaryCraft: false, quantity: 5, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Gemstone Drill LT-522', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_TOPAZ_GEM', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 3, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Magma Core', quantity: 5, source: 'auction' }
     ],
     hotm: 5,
     itemId: 'Topaz Drill KGR-12',
@@ -598,9 +581,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Mithril-Plated Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Superlite Motor', intermediaryCraft: false, quantity: 10, source: 'auction' },
-      { itemId: 'FINE_RUBY_GEM', intermediaryCraft: false, quantity: 10, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Mithril-Plated Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Superlite Motor', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FINE_RUBY_GEM', quantity: 10, source: 'bazaar' }
     ],
     hotm: 5,
     itemId: 'Ruby-polished Drill Engine',
@@ -609,9 +592,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Titanium-Infused Fuel Tank', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Control Switch', intermediaryCraft: false, quantity: 30, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 10, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Titanium-Infused Fuel Tank', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Control Switch', quantity: 30, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 10, source: 'auction' }
     ],
     hotm: 5,
     itemId: 'Gemstone Fuel Tank',
@@ -620,8 +603,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'PERFECT_SAPPHIRE_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'GOBLIN_EGG_BLUE', intermediaryCraft: false, quantity: 99, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'PERFECT_SAPPHIRE_GEM', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'GOBLIN_EGG_BLUE', quantity: 99, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Blue Cheese Goblin Omelette',
@@ -630,13 +613,13 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Titanium Drill DR-X555', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Corleonite', intermediaryCraft: false, quantity: 30, source: 'auction' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'REFINED_DIAMOND', intermediaryCraft: true, quantity: 5, source: 'bazaar' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 16, source: 'auction' },
-      { itemId: 'REFINED_TITANIUM', intermediaryCraft: true, quantity: 12, source: 'bazaar' },
-      { itemId: 'Mithril Plate', intermediaryCraft: true, quantity: 5, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Titanium Drill DR-X555', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Corleonite', quantity: 30, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 5, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 16, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'REFINED_TITANIUM', quantity: 12, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 5, source: 'auction' }
     ],
     hotm: 6,
     itemId: 'Titanium Drill DR-X655',
@@ -645,9 +628,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Topaz Drill KGR-12', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'FLAWLESS_JASPER_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'TREASURITE', intermediaryCraft: false, quantity: 100, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Topaz Drill KGR-12', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_JASPER_GEM', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'TREASURITE', quantity: 100, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Jasper Drill X',
@@ -656,10 +639,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Titanium-Plated Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Electron Transmitter', intermediaryCraft: false, quantity: 25, source: 'auction' },
-      { itemId: 'FTX 3070', intermediaryCraft: false, quantity: 25, source: 'auction' },
-      { itemId: 'FINE_SAPPHIRE_GEM', intermediaryCraft: false, quantity: 20, source: 'bazaar' }
+      { intermediaryCraft: true, itemId: 'Titanium-Plated Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Electron Transmitter', quantity: 25, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FTX 3070', quantity: 25, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FINE_SAPPHIRE_GEM', quantity: 20, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Sapphire-polished Drill Engine',
@@ -668,8 +651,8 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'FINE_AMBER_GEM', intermediaryCraft: false, quantity: 12, source: 'bazaar' },
-      { itemId: 'Golden Plate', intermediaryCraft: true, quantity: 1, source: 'auction' }
+      { intermediaryCraft: false, itemId: 'FINE_AMBER_GEM', quantity: 12, source: 'bazaar' },
+      { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 1, source: 'auction' }
     ],
     hotm: 6,
     itemId: 'Amber Material',
@@ -678,9 +661,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Divan Fragment', intermediaryCraft: false, quantity: 5, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'Divan Fragment', quantity: 5, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Helmet Of Divan',
@@ -689,9 +672,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Divan Fragment', intermediaryCraft: false, quantity: 8, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'Divan Fragment', quantity: 8, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Chestplate Of Divan',
@@ -700,9 +683,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Divan Fragment', intermediaryCraft: false, quantity: 7, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'Divan Fragment', quantity: 7, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Leggings Of Divan',
@@ -711,9 +694,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Divan Fragment', intermediaryCraft: false, quantity: 4, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 10, source: 'auction' },
-      { itemId: 'FLAWLESS_RUBY_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' }
+      { intermediaryCraft: false, itemId: 'Divan Fragment', quantity: 4, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 10, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_RUBY_GEM', quantity: 1, source: 'bazaar' }
     ],
     hotm: 6,
     itemId: 'Boots Of Divan',
@@ -722,10 +705,10 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Ruby-polished Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Sapphire-polished Drill Engine', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'FLAWLESS_AMBER_GEM', intermediaryCraft: false, quantity: 1, source: 'bazaar' },
-      { itemId: 'Robotron Reflector', intermediaryCraft: false, quantity: 50, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Ruby-polished Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Sapphire-polished Drill Engine', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'FLAWLESS_AMBER_GEM', quantity: 1, source: 'bazaar' },
+      { intermediaryCraft: false, itemId: 'Robotron Reflector', quantity: 50, source: 'auction' }
     ],
     hotm: 7,
     itemId: 'Amber-polished Drill Engine',
@@ -734,9 +717,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: 'Gemstone Fuel Tank', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'Gemstone Mixture', intermediaryCraft: true, quantity: 25, source: 'auction' },
-      { itemId: 'Synthetic Heart', intermediaryCraft: false, quantity: 70, source: 'auction' }
+      { intermediaryCraft: true, itemId: 'Gemstone Fuel Tank', quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Gemstone Mixture', quantity: 25, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'Synthetic Heart', quantity: 70, source: 'auction' }
     ],
     hotm: 7,
     itemId: 'Perfectly-Cut Fuel Tank',
@@ -745,9 +728,9 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { itemId: "Divan's Alloy", intermediaryCraft: false, quantity: 1, source: 'auction' },
-      { itemId: 'Titanium Drill DR-X655', intermediaryCraft: true, quantity: 1, source: 'auction' },
-      { itemId: 'coins', intermediaryCraft: false, quantity: 50_000_000, source: 'vendor' }
+      { intermediaryCraft: false, itemId: "Divan's Alloy", quantity: 1, source: 'auction' },
+      { intermediaryCraft: true, itemId: 'Titanium Drill DR-X655', quantity: 1, source: 'auction' },
+      { intermediaryCraft: false, itemId: 'coins', quantity: 50_000_000, source: 'vendor' }
     ],
     hotm: 7,
     itemId: "Divan's Drill",

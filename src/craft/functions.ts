@@ -1,11 +1,10 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { ICraft } from '../resources/crafts';
-import { ILanguage } from '../resources/lang/type';
-import { IOptionsState } from '../services/options';
-import { RootState } from '../store';
-import { useWorker } from '../worker/runWorker';
+import type { ILanguage } from '../resources/lang/type';
+import type { IOptionsState } from '../services/options';
+import type { RootState } from '../store';
+import { useWorker } from '../worker/WorkerContext';
 
 export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
   const costs = useSelector((state: RootState) => state.worker.prices);
@@ -13,20 +12,13 @@ export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
   return costs[id]?.craft ?? 0;
 };
 
-export interface ICraftWithCosts extends ICraft {
-  craft: number;
-  profit: number;
-  profitHourly: number;
-  sell: number;
-}
-
-export const useItemsWithCraftPrice = (crafts: ICraft[]) => {
+export const useItemsWithCraftPrice = () => {
   const costs = useSelector((state: RootState) => state.worker.prices);
   const workerRunner = useWorker();
 
   useEffect(() => {
-    workerRunner.getPrices({ crafts });
-  }, [crafts, workerRunner]);
+    workerRunner.getPrices();
+  }, [workerRunner]);
 
   return Object.values(costs);
 };
@@ -35,21 +27,15 @@ export const getProfitByTimeLabel = (playFrequency: IOptionsState['playFrequency
   switch (playFrequency) {
     case 'everyday':
       return ui.profitByTimeEveryday;
-      break;
     case 'less':
       // Hide the column
       break;
 
     case 'nonstop':
       return ui.profitByTimeNonStop;
-      break;
     case 'three-time':
       return ui.profitByTimeThreeTime;
-      break;
     case 'twice':
       return ui.profitByTimeTwice;
-      break;
   }
-
-  return;
 };

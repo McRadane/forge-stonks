@@ -12,7 +12,7 @@ export interface IOptionsState {
   quickForge: number;
 }
 
-const initialState: IOptionsState = {
+export const initialState: IOptionsState = {
   auctionsBINOnly: true,
   cacheDuration: 60,
   hotm: 2,
@@ -23,46 +23,16 @@ const initialState: IOptionsState = {
   quickForge: 0
 };
 
-export const optionsSlice = createSlice({
+const optionsSlice = createSlice({
   initialState,
-  name: 'options',
+  name: 'Response-Options',
   reducers: {
-    setCacheDuration: (state, action: PayloadAction<number>) => {
-      state.cacheDuration = action.payload;
-    },
-    setHOTM: (state, action: PayloadAction<number>) => {
-      state.hotm = action.payload;
-    },
-    setMaxCraftingCost: (state, action: PayloadAction<number>) => {
-      state.maxCraftingCost = action.payload;
-    },
-    setPlayFrequency: (state, action: PayloadAction<IOptionsState['playFrequency']>) => {
-      state.playFrequency = action.payload;
-    },
-    setQuickForge: (state, action: PayloadAction<number>) => {
-      state.quickForge = action.payload;
-    },
-    toggleAuctionsBINOnly: (state) => {
-      state.auctionsBINOnly = !state.auctionsBINOnly;
-    },
-    toggleIncludeAuctionsFlip: (state) => {
-      state.includeAuctionsFlip = !state.includeAuctionsFlip;
-    },
-    toggleIntermediateCraft: (state) => {
-      state.intermediateCraft = !state.intermediateCraft;
+    setOptions: (state, action: PayloadAction<Partial<IOptionsState>>) => {
+      return { ...state, ...action.payload };
     }
   }
 });
 
-export const {
-  setCacheDuration,
-  setHOTM,
-  setMaxCraftingCost,
-  setPlayFrequency,
-  setQuickForge,
-  toggleAuctionsBINOnly,
-  toggleIncludeAuctionsFlip,
-  toggleIntermediateCraft
-} = optionsSlice.actions;
+export const { setOptions } = optionsSlice.actions;
 
 export const { reducer: optionsReducer } = optionsSlice;

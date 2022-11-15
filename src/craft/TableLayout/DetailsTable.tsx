@@ -5,16 +5,18 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { FC } from 'react';
+import type { FC } from 'react';
 
-import { ICraft } from '../../resources/crafts';
 import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ICraft } from '../../resources/types';
 
 import { DetailsRow } from './DetailsRow';
 
-export const DetailsTable: FC<{
+interface IDetailsTableProps {
   item: ICraft;
-}> = ({ item }) => {
+}
+
+export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
   const { ui } = useLanguage();
 
   return (

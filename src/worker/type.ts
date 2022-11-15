@@ -1,6 +1,6 @@
-import { ICraftWithCosts } from '../craft/functions';
-import { ICraft } from '../resources/crafts';
-import { KeysLanguageType } from '../resources/lang/type';
+import type { KeysLanguageType } from '../resources/lang/type';
+import type { ICraft, ICraftWithCosts } from '../resources/types';
+import type { IOptionsState } from '../services/options';
 
 type WorkerEvent<T> = {
   data: T;
@@ -10,7 +10,7 @@ type WorkerEvent<T> = {
  * Initialize
  */
 export interface IWorkerCommandInitialize {
-  command: 'initialize';
+  command: 'Command-Initialize';
   withNotification: boolean;
 }
 
@@ -18,165 +18,144 @@ export interface IWorkerCommandInitialize {
  * Set the language
  */
 export interface IWorkerCommandSetLanguage {
+  command: 'Command-SetLanguage';
   language: KeysLanguageType;
-  command: 'setLanguage';
 }
 
 export interface IWorkerCommandGetLanguage {
-  command: 'getLanguage';
+  command: 'Command-GetLanguage';
+}
+
+export interface IWorkerCommandSetOptions {
+  command: 'Command-SetOptions';
+  options: Partial<IOptionsState>;
 }
 
 /**
  * Ask to create a new timer
  */
 export interface IWorkerCommandStartTimer {
+  command: 'Command-StartTimer';
   itemId: ICraft['itemId'];
-  command: 'startTimer';
 }
 
 /**
  * Ask to stop a timer
  */
 export interface IWorkerCommandStopTimer {
+  command: 'Command-StopTimer';
   id: number;
-  command: 'stopTimer';
 }
 
 /**
  * Ask for the items prices
  */
 export interface IWorkerCommandGetPrices {
-  crafts: ICraft[];
-  command: 'getPrices';
+  command: 'Command-GetPrices';
+  // crafts: ICraft[];
 }
 
 /**
  * Ask for a fll refresh
  */
 export interface IWorkerCommandForceRefresh {
-  command: 'forceRefresh';
-}
-
-export interface IWorkerCommandSetCacheItem {
-  command: 'setCacheItem';
-  key: string;
-  value: string | number;
-}
-
-export interface IWorkerCommandGetCacheItem {
-  command: 'getCacheItem';
-  key: string;
-}
-
-export interface IWorkerCommandDeleteCacheItem {
-  command: 'deleteCacheItem';
-  key: string;
+  command: 'Command-ForceRefresh';
 }
 
 export interface IWorkerResponseGetLanguage {
+  command: 'Response-GetLanguage';
   language?: KeysLanguageType;
-  command: 'getLanguageResponse';
 }
 
 /**
  * Return the items prices
  */
 export interface IWorkerResponseGetPrices {
+  command: 'Response-GetPrices';
   results: Record<ICraft['itemId'], ICraftWithCosts>;
-  command: 'resultGetPrices';
 }
 
 /**
  * Return a message for the Logger
  */
 export interface IWorkerResponseMessage {
+  command: 'Response-Message';
   message: string;
-  command: 'message';
 }
 
 /**
  * Return the loading state
  */
 export interface IWorkerResponseLoading {
+  command: 'Response-Loading';
   loading: boolean;
-  command: 'loading';
+}
+
+/**
+ * Return the options
+ */
+export interface IWorkerResponseOptions extends Partial<IOptionsState> {
+  command: 'Response-Options';
 }
 
 /**
  * Return the list of commands
  */
 export interface IWorkerResponseTimers {
+  command: 'Response-Timers';
   timers: ITimer[];
-  command: 'timers';
 }
 
 /**
  * Tell the UI that the timer command has been executed
  */
 export interface IWorkerResponseTimerSet {
+  command: 'Response-TimerSet';
   itemId: ICraft['itemId'];
-  command: 'timerSet';
 }
 
-export interface IWorkerResponseCacheDeleteExecuted {
-  command: 'cacheDeleteExecuted';
-  key: string;
+export interface IWorkerResponseTimerEnded {
+  command: 'Response-TimerEnded';
+  itemId: ICraft['itemId'];
 }
 
-export interface IWorkerResponseCacheSetExecuted {
-  command: 'cacheSetExecuted';
-  key: string;
-}
-
-export interface IWorkerResponseCacheGetResult {
-  command: 'cacheGetResult';
-  key: string;
-  value: string | number | undefined;
-}
-
-export type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
-export type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
-export type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
-export type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
-export type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
-export type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
-export type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
-export type WorkerCommandEventSetCacheItem = WorkerEvent<IWorkerCommandSetCacheItem>;
-export type WorkerCommandEventGetCacheItem = WorkerEvent<IWorkerCommandGetCacheItem>;
-export type WorkerCommandEventDeleteCacheItem = WorkerEvent<IWorkerCommandDeleteCacheItem>;
+type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
+type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
+type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
+type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
+type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
+type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
+type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
+type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
 
 export type WorkerCommandEvents =
+  | WorkerCommandEventForceRefresh
+  | WorkerCommandEventGetLanguage
+  | WorkerCommandEventGetPrices
   | WorkerCommandEventInitialize
   | WorkerCommandEventSetLanguage
-  | WorkerCommandEventGetLanguage
+  | WorkerCommandEventSetOptions
   | WorkerCommandEventStartTimer
-  | WorkerCommandEventStopTimer
-  | WorkerCommandEventGetPrices
-  | WorkerCommandEventForceRefresh
-  | WorkerCommandEventSetCacheItem
-  | WorkerCommandEventGetCacheItem
-  | WorkerCommandEventDeleteCacheItem;
+  | WorkerCommandEventStopTimer;
 
-export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
-export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
-export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
-export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
-export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
-export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
-export type WorkerResponseEventCacheDeleteExecuted = WorkerEvent<IWorkerResponseCacheDeleteExecuted>;
-export type WorkerResponseEventCacheSetExecuted = WorkerEvent<IWorkerResponseCacheSetExecuted>;
-export type WorkerResponseEventCacheGetResult = WorkerEvent<IWorkerResponseCacheGetResult>;
+type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
+type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
+type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
+type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
+type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
+type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEvents =
   | WorkerResponseEventGetLanguage
   | WorkerResponseEventGetPrices
-  | WorkerResponseEventMessage
-  | WorkerResponseEventTimers
   | WorkerResponseEventLoading
+  | WorkerResponseEventMessage
+  | WorkerResponseEventOptions
+  | WorkerResponseEventTimerEnded
   | WorkerResponseEventTimerSet
-  | WorkerResponseEventCacheDeleteExecuted
-  | WorkerResponseEventCacheSetExecuted
-  | WorkerResponseEventCacheGetResult;
+  | WorkerResponseEventTimers;
 
 export interface IAuctions {
   buyPrice: number;
@@ -191,8 +170,8 @@ export interface IBazaar {
 }
 
 export interface ITimer {
+  endTime: number;
   id: number;
   itemId: ICraft['itemId'];
   startTime: number;
-  endTime: number;
 }

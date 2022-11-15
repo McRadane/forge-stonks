@@ -1,20 +1,20 @@
+import SettingsIcon from '@mui/icons-material/Settings';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
 
+import { CraftsContainer } from './craft/CraftsContainer';
+import { Logger } from './logger';
 import { OptionsSwitcher } from './options/OptionsSwitcher';
 import { LanguageContext } from './resources/lang/LanguageContext';
-import { RootState } from './store';
-import { CraftsContainer } from './craft/CraftsContainer';
-import { useWorker } from './worker/runWorker';
-import { Logger } from './logger';
+import type { RootState } from './store';
 import { Timers } from './timers/Timers';
+import { useWorker } from './worker/WorkerContext';
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -35,28 +35,27 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    // initWorkerRunner(dispatch);
     if (!workerInit.current && worker) {
       Logger.log('Initializing WebWorker');
       workerInit.current = true;
-      // const worker = new WorkerRunner(dispatch, languageContext);
-      // setWorker(worker);
-      worker.setup(dispatch, languageContext);
       worker.getLanguage().then((language) => {
-        const resultLanguage = userLanguageChange(language);
-        if (resultLanguage !== language) {
-          worker.setLanguage(resultLanguage);
+        if (language) {
+          const resultLanguage = userLanguageChange(language);
+          if (resultLanguage !== language) {
+            worker.setLanguage(resultLanguage);
+          }
         }
+
         worker.initialize();
       });
     }
   }, [dispatch, languageContext, userLanguageChange, worker]);
 
   return (
-    <Box sx={{ display: 'flex', paddingTop: '64px' /*minHeight: 'calc(100vh - 84px)'*/ }}>
+    <Box sx={{ display: 'flex', paddingTop: '64px' }}>
       <AppBar component="nav">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
             {title}
           </Typography>
           <Button color="inherit" onClick={toggleDrawer}>
@@ -70,7 +69,15 @@ export const App = () => {
       <Box component="main" sx={{ width: '100%' }}>
         <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
         <Timers />
-        <CraftsContainer />
+        <Box
+          sx={
+            {
+              /*height: 'calc(100vh - 110px)', overflow: 'scroll' */
+            }
+          }
+        >
+          <CraftsContainer />
+        </Box>
       </Box>
     </Box>
   );

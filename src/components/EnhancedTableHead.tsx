@@ -4,7 +4,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 export type Order = 'asc' | 'desc';
 
@@ -15,14 +15,14 @@ interface HeadCell {
   numeric: boolean;
 }
 
-interface EnhancedTableProps {
+interface IEnhancedTableProps {
   headCells: HeadCell[];
   order: Order;
   orderBy: string;
   onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
 }
 
-export const EnhancedTableHead: FC<EnhancedTableProps> = (props) => {
+export const EnhancedTableHead: FC<IEnhancedTableProps> = (props) => {
   const { headCells, onRequestSort, order, orderBy } = props;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
