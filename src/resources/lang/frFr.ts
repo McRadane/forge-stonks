@@ -113,7 +113,7 @@ export const frFr: ILanguage = {
     coins: 'Pièces'
   },
   notification: {
-    timerEnded: 'Votre chrono pour {0} a terminé'
+    timerEnded: "Votre chrono pour {0} s'est terminé"
   },
   ui: {
     amount: 'Quantité',
