@@ -1,10 +1,13 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { UserConfigExport, defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => {
-  const baseConfig = {
+  const baseConfig: UserConfigExport = {
     base: '/forge-stonks/',
-    plugins: [react()]
+    plugins: [react()],
+    worker: {
+      format: 'es'
+    }
   };
   if (command === 'serve') {
     return {

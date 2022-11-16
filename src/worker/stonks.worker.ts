@@ -3,7 +3,7 @@ import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
 import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts } from '../resources/types';
-import { initialState, IOptionsState } from '../services/options';
+import { initialState, IOptionsState } from '../services/common';
 
 import { Database } from './database';
 import type {

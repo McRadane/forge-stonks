@@ -1,6 +1,6 @@
 import type { KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts } from '../resources/types';
-import type { IOptionsState } from '../services/options';
+import type { IOptionsState } from '../services/common';
 
 type WorkerEvent<T> = {
   data: T;
