@@ -4,7 +4,8 @@ import { Logger } from '../logger';
 import type { INotificationContextDefinition } from '../notification/NotificationContext';
 import type { KeysLanguageType, ILanguageContextDefinition } from '../resources/lang/type';
 import type { ICraft } from '../resources/types';
-import { setOptions, IOptionsState } from '../services/options';
+import type { IOptionsState } from '../services/common';
+import { setOptions } from '../services/options';
 import { setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
 
 // eslint-disable-next-line import/no-unresolved

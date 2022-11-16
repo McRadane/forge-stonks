@@ -20,7 +20,7 @@ import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
 import type { KeysLanguageType } from '../resources/lang/type';
-import type { IOptionsState } from '../services/options';
+import type { IOptionsState } from '../services/common';
 import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 

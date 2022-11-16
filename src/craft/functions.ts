@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import type { ILanguage } from '../resources/lang/type';
-import type { IOptionsState } from '../services/options';
+import type { IOptionsState } from '../services/common';
 import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
