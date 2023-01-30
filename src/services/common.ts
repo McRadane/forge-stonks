@@ -6,6 +6,8 @@ export interface IOptionsState {
   intermediateCraft: boolean;
   maxCraftingCost: number;
   playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
+  playerName?: string;
+  playerProfile?: string;
   quickForge: number;
 }
 
