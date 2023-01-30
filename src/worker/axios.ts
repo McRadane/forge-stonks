@@ -34,6 +34,48 @@ interface IAuctionsAPIPaginatedResponse {
   totalPages: number;
 }
 
+/*
+export const HOTM_XP = {
+  1: 0,
+  2: 3000,
+  3: 9000,
+  4: 25000,
+  5: 60000,
+  6: 100000,
+  7: 150000,
+};
+*/
+
+interface IProfile {
+  current: boolean;
+  cute_name: string;
+  data: {
+    mining: {
+      core: {
+        tier: {
+          level?: number;
+        };
+      };
+      forge: {
+        processes: {
+          id: string;
+          timeFinished: number;
+        }[];
+      };
+    };
+  };
+  raw: {
+    mining_core: {
+      nodes: {
+        forge_time?: number;
+      };
+    };
+  };
+}
+interface IPlayerAPIResponse {
+  profiles: Record<string, IProfile>;
+}
+
 export const getBazaarData = (): Promise<IBazaar[]> => {
   return axios
     .get<IBazaarAPIResponse>('https://api.hypixel.net/skyblock/bazaar')
@@ -115,5 +157,29 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
 
         return Array.from(auctions.values());
       });
+    });
+};
+
+export const getPlayerProfiles = async (playerName: string): Promise<undefined | string[]> => {
+  if (!playerName) {
+    return;
+  }
+
+  return axios
+    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
+    .then((response) => response.data)
+    .then((response) => Object.keys(response.profiles));
+};
+
+export const getPlayerData = async (playerName: string, profileName: string): Promise<undefined | IProfile> => {
+  if (!playerName || !profileName) {
+    return;
+  }
+
+  return axios
+    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
+    .then((response) => response.data)
+    .then((response) => {
+      return response.profiles[profileName];
     });
 };

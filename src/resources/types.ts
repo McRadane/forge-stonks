@@ -20,8 +20,11 @@ export interface ICraft extends IPartialCraft {
   id: number;
 }
 
-export interface ICraftWithCosts extends ICraft {
+export interface ICraftWithPrice extends ICraft {
   craft: number;
+}
+
+export interface ICraftWithCosts extends ICraftWithPrice {
   profit: number;
   profitHourly: number;
   sell: number;

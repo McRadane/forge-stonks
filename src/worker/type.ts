@@ -1,5 +1,5 @@
 import type { KeysLanguageType } from '../resources/lang/type';
-import type { ICraft, ICraftWithCosts } from '../resources/types';
+import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 
 type WorkerEvent<T> = {
@@ -67,12 +67,17 @@ export interface IWorkerResponseGetLanguage {
   language?: KeysLanguageType;
 }
 
+export interface IWorkerResponseGetPricesResult {
+  crafts: Record<ICraft['itemId'], ICraftWithCosts>;
+  materials: Record<ICraft['itemId'], ICraftWithPrice>;
+}
+
 /**
  * Return the items prices
  */
 export interface IWorkerResponseGetPrices {
   command: 'Response-GetPrices';
-  results: Record<ICraft['itemId'], ICraftWithCosts>;
+  results: IWorkerResponseGetPricesResult;
 }
 
 /**
