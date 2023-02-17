@@ -1,0 +1,6 @@
+html,
+body,
+#root,
+.MuiBox-root {
+  height: 100%;
+}

@@ -1,4 +1,6 @@
-import { crafts, itemsSource, itemsVendorPrice } from '../resources/crafts';
+import { crafts } from '../resources/forge';
+import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
+import { itemsSource, itemsVendorPrice } from '../resources/items';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
 import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
@@ -12,6 +14,7 @@ import type {
   ITimer,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
+  IWorkerResponseGetGardenPrices,
   IWorkerResponseGetLanguage,
   IWorkerResponseGetPrices,
   IWorkerResponseGetPricesResult,
@@ -79,6 +82,56 @@ class ComputationWorker {
       ctx.postMessage(command);
     });
   }
+
+  public async getGardenPrices(): Promise<void> {
+    // console.log('starting getPrices');
+    // this.messageResponse('Starting getPrices');
+
+    this.messageResponse('Starting getGardenPrices');
+
+    const organicMattersIds = Object.keys(itemsOrganicMatter);
+    const fuelsIds = Object.keys(itemsFuels);
+
+    const resultOrganicMatters: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>> = {};
+    const resultFuels: Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>> = {};
+
+    for await (const itemId of organicMattersIds) {
+      const source = itemsSource[itemId as keyof ILanguage['items']];
+
+      const result = await this.resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
+
+      if (!isNaN(result.buy)) {
+        resultOrganicMatters[itemId as keyof typeof itemsOrganicMatter] = {
+          price: result.buy,
+          ratio: result.buy / (itemsOrganicMatter[itemId as keyof typeof itemsOrganicMatter] as number)
+        };
+      }
+    }
+
+    for await (const itemId of fuelsIds) {
+      const source = itemsSource[itemId as keyof ILanguage['items']];
+
+      const result = await this.resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
+
+      if (!isNaN(result.buy)) {
+        resultFuels[itemId as keyof typeof itemsFuels] = {
+          price: result.buy,
+          ratio: result.buy / (itemsFuels[itemId as keyof typeof itemsFuels] as number)
+        };
+      }
+    }
+
+    this.messageResponse('Ending getGardenPrices');
+    const command: IWorkerResponseGetGardenPrices = {
+      command: 'Response-GetGardenPrices',
+      results: {
+        fuels: resultFuels,
+        organics: resultOrganicMatters
+      }
+    };
+    ctx.postMessage(command);
+  }
+
   public async initialize(withNotification: boolean) {
     this.messageResponse('Initializing');
     this.getOptions();
@@ -465,6 +518,9 @@ ctx.addEventListener('message', (event: WorkerCommandEvents) => {
   switch (event.data.command) {
     case 'Command-ForceRefresh':
       worker.forceRefresh();
+      break;
+    case 'Command-GetGardenPrices':
+      worker.getGardenPrices();
       break;
     case 'Command-GetLanguage':
       worker.getLanguage();

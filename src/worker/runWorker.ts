@@ -6,13 +6,14 @@ import type { KeysLanguageType, ILanguageContextDefinition } from '../resources/
 import type { ICraft } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 import { setOptions } from '../services/options';
-import { setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
+import { setGardenPrices, setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
 
 // eslint-disable-next-line import/no-unresolved
 import Worker from './stonks.worker?worker';
 import type {
   WorkerResponseEvents,
   IWorkerCommandForceRefresh,
+  IWorkerCommandGetGardenPrices,
   IWorkerCommandGetLanguage,
   IWorkerCommandGetPrices,
   IWorkerCommandInitialize,
@@ -122,6 +123,17 @@ export class WorkerRunner {
     }
   }
 
+  public getGardenPrices() {
+    if (this.timeGetPrices === undefined) {
+      this.timeGetPrices = performance.now();
+      const command: IWorkerCommandGetGardenPrices = {
+        command: 'Command-GetGardenPrices'
+      };
+      this.worker.postMessage(command);
+      this.logCommand(`get garden prices`);
+    }
+  }
+
   public forceRefresh() {
     const command: IWorkerCommandForceRefresh = {
       command: 'Command-ForceRefresh'
@@ -141,6 +153,9 @@ export class WorkerRunner {
   private listener() {
     this.worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
+        case 'Response-GetGardenPrices':
+          this.contexts.dispatch(setGardenPrices(event.data.results));
+          break;
         case 'Response-GetLanguage':
           this.logResponse(`Received language key ${event.data.language}`);
 

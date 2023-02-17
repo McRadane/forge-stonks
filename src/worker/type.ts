@@ -1,3 +1,4 @@
+import type { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import type { KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
@@ -56,6 +57,14 @@ export interface IWorkerCommandGetPrices {
 }
 
 /**
+ * Ask for the garden items prices
+ */
+export interface IWorkerCommandGetGardenPrices {
+  command: 'Command-GetGardenPrices';
+  // crafts: ICraft[];
+}
+
+/**
  * Ask for a fll refresh
  */
 export interface IWorkerCommandForceRefresh {
@@ -78,6 +87,19 @@ export interface IWorkerResponseGetPricesResult {
 export interface IWorkerResponseGetPrices {
   command: 'Response-GetPrices';
   results: IWorkerResponseGetPricesResult;
+}
+
+export interface IWorkerResponseGetGardenPricesResult {
+  fuels: Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>>;
+  organics: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>>;
+}
+
+/**
+ * Return the items prices
+ */
+export interface IWorkerResponseGetGardenPrices {
+  command: 'Response-GetGardenPrices';
+  results: IWorkerResponseGetGardenPricesResult;
 }
 
 /**
@@ -127,6 +149,7 @@ export interface IWorkerResponseTimerEnded {
 type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
 type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
 type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
+type WorkerCommandEventGetGardenPrices = WorkerEvent<IWorkerCommandGetGardenPrices>;
 type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
 type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
 type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
@@ -135,6 +158,7 @@ type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
 
 export type WorkerCommandEvents =
   | WorkerCommandEventForceRefresh
+  | WorkerCommandEventGetGardenPrices
   | WorkerCommandEventGetLanguage
   | WorkerCommandEventGetPrices
   | WorkerCommandEventInitialize
@@ -145,6 +169,7 @@ export type WorkerCommandEvents =
 
 type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
 type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
 type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
 type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
 type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
@@ -153,6 +178,7 @@ type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
 type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEvents =
+  | WorkerResponseEventGetGardenPrices
   | WorkerResponseEventGetLanguage
   | WorkerResponseEventGetPrices
   | WorkerResponseEventLoading
