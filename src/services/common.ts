@@ -7,7 +7,7 @@ export interface IOptionsState {
   maxCraftingCost: number;
   playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
   playerName?: string;
-  playerProfile?: string;
+  playerProfile?: { id: string; name: string };
   quickForge: number;
 }
 

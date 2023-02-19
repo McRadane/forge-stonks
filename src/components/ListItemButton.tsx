@@ -25,7 +25,6 @@ export const ListItemButton = ({ children, to, ...other }: ILinkRouterProps) => 
 
   const CustomLink = useMemo(
     () =>
-      // eslint-disable-next-line react/no-unstable-nested-components
       forwardRef<HTMLAnchorElement, Omit<LinkProps, 'to'>>(function Link2(linkProps, ref) {
         return <Link ref={ref} to={to as To} {...linkProps} />;
       }),

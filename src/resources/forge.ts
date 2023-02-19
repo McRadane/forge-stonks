@@ -265,18 +265,6 @@ const craftsCasting: IPartialCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
-      { intermediaryCraft: false, itemId: 'FLAWED_RUBY_GEM', quantity: 48, source: 'bazaar' },
-      { intermediaryCraft: false, itemId: 'FINE_RUBY_GEM', quantity: 80, source: 'bazaar' },
-      { intermediaryCraft: false, itemId: 'ENCHANTED_ENDER_PEARL', quantity: 16, source: 'bazaar' },
-      { intermediaryCraft: false, itemId: 'coins', quantity: 50_000, source: 'vendor' }
-    ],
-    hotm: 3,
-    itemId: 'Travel Scroll to the Crystal Hollows',
-    time: 10
-  },
-  {
-    bazaarItem: false,
-    craftMaterial: [
       { intermediaryCraft: true, itemId: 'Mithril Drill SX-R226', quantity: 1, source: 'auction' },
       { intermediaryCraft: true, itemId: 'Golden Plate', quantity: 10, source: 'auction' },
       { intermediaryCraft: true, itemId: 'Mithril Plate', quantity: 2, source: 'auction' }

@@ -4,7 +4,7 @@ export const itemsOrganicMatter: Partial<Record<keyof ILanguage['items'], number
   BROWN_MUSHROOM: 1,
   CACTUS: 0.5,
   CARROT_ITEM: 0.29,
-  COMPOST: 1,
+  COMPOST: 4000,
   ENCHANTED_BAKED_POTATO: 8448,
   ENCHANTED_BREAD: 60,
   ENCHANTED_BROWN_MUSHROOM: 160,
@@ -41,10 +41,8 @@ export const itemsOrganicMatter: Partial<Record<keyof ILanguage['items'], number
 };
 
 export const itemsFuels: Partial<Record<keyof ILanguage['items'], number>> = {
-  BIOFUEL: 10000,
-  Dandelion: 2,
+  BIOFUEL: 3000,
   GOBLIN_EGG: 2000,
   'Oil Barrel': 10000,
-  Poppy: 2,
   Volta: 10000
 };

@@ -8,7 +8,11 @@ const DrawerContext = createContext<{ open: null | string; setOpen: (name: null 
 });
 
 export const DrawerProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [open, setOpen] = useState<null | string>(null);
+  const [open, setOpen2] = useState<null | string>(null);
+
+  const setOpen = (value: null | string) => {
+    setOpen2(value);
+  };
 
   return <DrawerContext.Provider value={{ open, setOpen }}>{children}</DrawerContext.Provider>;
 };

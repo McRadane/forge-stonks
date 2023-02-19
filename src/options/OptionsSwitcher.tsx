@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -15,7 +16,7 @@ import Slider from '@mui/material/Slider';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
-import { FC, useCallback, useContext, useMemo } from 'react';
+import { FC, useCallback, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
@@ -23,6 +24,8 @@ import type { KeysLanguageType } from '../resources/lang/type';
 import type { IOptionsState } from '../services/common';
 import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
+
+import { PlayerSyncDialog } from './PlayerSyncDialog';
 
 interface IOptionsSwitcherProps {
   open: boolean;
@@ -34,9 +37,22 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     ui: { options }
   } = useLanguage();
 
-  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, maxCraftingCost, playFrequency, quickForge } = useSelector(
-    (state: RootState) => state.options
-  );
+  const {
+    auctionsBINOnly,
+    hotm,
+    includeAuctionsFlip,
+    intermediateCraft,
+    maxCraftingCost,
+    playFrequency,
+    playerName,
+    playerProfile,
+    quickForge
+  } = useSelector((state: RootState) => state.options);
+
+  const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
+
+  const playerSync = playerName !== undefined && playerProfile !== undefined;
+
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
   const theme = useTheme();
@@ -45,6 +61,24 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     (event: SelectChangeEvent) => {
       const value = event.target.value as IOptionsState['playFrequency'];
       worker.setOption('playFrequency', value);
+    },
+    [worker]
+  );
+
+  const handleClickOpen = useCallback(() => {
+    setPlayerSyncOpen(true);
+  }, []);
+
+  const handleClose = useCallback(
+    (value?: { playerName: string; playerProfile: { id: string; name: string } }) => {
+      setPlayerSyncOpen(false);
+      if (value) {
+        worker.setOption('playerName', value.playerName);
+        worker.setOption('playerProfile', value.playerProfile);
+      } else {
+        worker.setOption('playerName', undefined);
+        worker.setOption('playerProfile', undefined);
+      }
     },
     [worker]
   );
@@ -127,6 +161,22 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
           }}
         >
           <ListItem divider>
+            {playerSync && (
+              <Typography id="syncProfile-label">
+                Current Profile: {playerName} ({playerProfile.name})
+              </Typography>
+            )}
+            <Button onClick={handleClickOpen} variant="outlined">
+              Sync Profile
+            </Button>
+            <PlayerSyncDialog
+              currentPlayerName={playerName}
+              currentPlayerProfile={playerProfile}
+              onClose={handleClose}
+              open={playerSyncOpen}
+            />
+          </ListItem>
+          <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>
               <Select
@@ -194,6 +244,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
                     aria-describedby="hotm-description"
                     aria-label={options.hotmLabel}
                     aria-labelledby="hotm-label"
+                    disabled={playerSync}
                     id="hotm"
                     marks
                     max={7}
@@ -266,6 +317,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
                     aria-describedby="quickForge-description"
                     aria-label={options.quickForgeLabel}
                     aria-labelledby="quickForge-label"
+                    disabled={playerSync}
                     id="quickForge"
                     marks
                     max={20}

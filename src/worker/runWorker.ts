@@ -67,7 +67,10 @@ export class WorkerRunner {
     this.logCommand(`set language to ${language}`);
   }
 
-  public setOption(option: keyof IOptionsState, value: IOptionsState['playFrequency'] | boolean | number) {
+  public setOption(
+    option: keyof IOptionsState,
+    value: undefined | IOptionsState['playFrequency'] | boolean | number | string | { id: string; name: string }
+  ) {
     const command: IWorkerCommandSetOptions = {
       command: 'Command-SetOptions',
       options: {

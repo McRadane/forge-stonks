@@ -3,11 +3,11 @@ import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import { itemsSource, itemsVendorPrice } from '../resources/items';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
-import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
+import type { KeysLanguageType, ILanguage, ILanguageItems } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import { initialState, IOptionsState } from '../services/common';
 
-import { getPlayerData } from './axios';
+import { getPlayerData, IProfile } from './axios';
 import { Database } from './database';
 import type {
   WorkerCommandEvents,
@@ -103,7 +103,7 @@ class ComputationWorker {
       if (!isNaN(result.buy)) {
         resultOrganicMatters[itemId as keyof typeof itemsOrganicMatter] = {
           price: result.buy,
-          ratio: result.buy / (itemsOrganicMatter[itemId as keyof typeof itemsOrganicMatter] as number)
+          ratio: (result.buy / (itemsOrganicMatter[itemId as keyof typeof itemsOrganicMatter] as number)) * 4000
         };
       }
     }
@@ -116,7 +116,7 @@ class ComputationWorker {
       if (!isNaN(result.buy)) {
         resultFuels[itemId as keyof typeof itemsFuels] = {
           price: result.buy,
-          ratio: result.buy / (itemsFuels[itemId as keyof typeof itemsFuels] as number)
+          ratio: ((result.buy / (itemsFuels[itemId as keyof typeof itemsFuels] as number)) as number) * 2000
         };
       }
     }
@@ -145,26 +145,41 @@ class ComputationWorker {
     }
 
     const playerName = await this.database.getFromCache<string>('playerName');
-    const playerProfile = await this.database.getFromCache<string>('playerProfile');
+    const playerProfile = await this.database.getFromCache<{ id: string; name: string }>('playerProfile');
 
     if (playerName && playerProfile) {
-      const player = await getPlayerData(playerName, playerProfile);
-
+      const player = await getPlayerData(playerName, playerProfile.id);
       if (player) {
-        this.database.addToCache('hotm', player.data.mining.core.tier ?? initialState.hotm);
-        this.database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
-
-        this.database.timers.clear();
-        /* player.data.mining.forge.processes.forEach((forge) => {
-          this.database.timers.add({
-            itemId: forge.id
-          });
-        }); */
+        this.syncPlayerProfile(player);
       }
     }
 
     this.getTimers();
     this.getPrices();
+  }
+
+  public async syncPlayerProfile(player: IProfile) {
+    this.database.addToCache('hotm', player.data.mining.core.tier.level ?? initialState.hotm);
+    this.database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
+
+    this.database.timers.clear();
+    player.data.mining.forge.processes.forEach((forge) => {
+      let found = crafts.find((item) => item.itemId === forge.id);
+
+      if (!found) {
+        found = crafts.find((item) => item.itemId.toLowerCase() === forge.id.toLowerCase().replace('_', ' '));
+      }
+
+      if (found) {
+        const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
+
+        this.database.timers.add({
+          endTime: forge.timeFinished,
+          itemId: forge.id as keyof ILanguageItems,
+          startTime
+        } as ITimer);
+      }
+    });
   }
 
   public setLanguage(language: KeysLanguageType) {
@@ -274,7 +289,7 @@ class ComputationWorker {
       maxCraftingCost: (await this.database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
       playFrequency: (await this.database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
       playerName: await this.database.getFromCache<string>('playerName'),
-      playerProfile: await this.database.getFromCache<string>('playerProfile'),
+      playerProfile: await this.database.getFromCache<{ id: string; name: string }>('playerProfile'),
       quickForge: (await this.database.getFromCache<number>('quickForge')) ?? initialState.quickForge
     };
   }

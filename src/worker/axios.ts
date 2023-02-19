@@ -46,7 +46,7 @@ export const HOTM_XP = {
 };
 */
 
-interface IProfile {
+export interface IProfile {
   current: boolean;
   cute_name: string;
   data: {
@@ -160,7 +160,7 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
     });
 };
 
-export const getPlayerProfiles = async (playerName: string): Promise<undefined | string[]> => {
+export const getPlayerProfiles = async (playerName: string): Promise<undefined | { id: string; name: string }[]> => {
   if (!playerName) {
     return;
   }
@@ -168,7 +168,7 @@ export const getPlayerProfiles = async (playerName: string): Promise<undefined |
   return axios
     .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
     .then((response) => response.data)
-    .then((response) => Object.keys(response.profiles));
+    .then((response) => Object.keys(response.profiles).map((id) => ({ id, name: response.profiles[id].cute_name })));
 };
 
 export const getPlayerData = async (playerName: string, profileName: string): Promise<undefined | IProfile> => {
@@ -177,7 +177,7 @@ export const getPlayerData = async (playerName: string, profileName: string): Pr
   }
 
   return axios
-    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
+    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}?cache=${Date.now()}`)
     .then((response) => response.data)
     .then((response) => {
       return response.profiles[profileName];

@@ -4,9 +4,6 @@ name: PR
 
 # Controls when the workflow will run
 on:
-  push:
-    branches:
-      - master
   pull_request:
     types: [opened, synchronize, reopened]
 
