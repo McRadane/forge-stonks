@@ -8,8 +8,8 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useSelector } from 'react-redux';
 
-import { useLanguage } from '../resources/lang/LanguageContext';
-import type { RootState } from '../store';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { RootState } from '../../store';
 
 import { Timer } from './Timer';
 

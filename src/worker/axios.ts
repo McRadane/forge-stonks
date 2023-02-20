@@ -59,6 +59,7 @@ export interface IProfile {
       forge: {
         processes: {
           id: string;
+          slot: number;
           timeFinished: number;
         }[];
       };

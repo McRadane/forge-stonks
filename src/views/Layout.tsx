@@ -12,11 +12,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { CSSObject, Theme, styled, useTheme } from '@mui/material/styles';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { ListItemButton } from '../components/ListItemButton';
-import { LanguageContext } from '../resources/lang/LanguageContext';
+import { useLanguage } from '../resources/lang/LanguageContext';
 
 import { OptionDrawerButton } from './OptionDrawerButton';
 import { routes } from './routes';
@@ -93,12 +93,10 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export const Layout = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const languageContext = useContext(LanguageContext);
+  const language = useLanguage();
   const {
-    dictionary: {
-      ui: { title }
-    }
-  } = languageContext;
+    ui: { title }
+  } = language;
 
   const handleDrawerOpen = useCallback(() => {
     setOpen(true);

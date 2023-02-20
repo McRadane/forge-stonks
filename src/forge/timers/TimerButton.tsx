@@ -4,12 +4,12 @@ import { useTheme } from '@mui/material/styles';
 import { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useNotifications } from '../notification/NotificationContext';
-import { useLanguage } from '../resources/lang/LanguageContext';
-import type { ICraft } from '../resources/types';
-import { setTimerPressed } from '../services/worker';
-import type { RootState } from '../store';
-import { useWorker } from '../worker/WorkerContext';
+import { useNotifications } from '../../notification/NotificationContext';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ICraft } from '../../resources/types';
+import { setTimerPressed } from '../../services/worker';
+import type { RootState } from '../../store';
+import { useWorker } from '../../worker/WorkerContext';
 
 interface ITimerButtonProps {
   itemId: ICraft['itemId'];

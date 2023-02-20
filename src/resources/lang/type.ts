@@ -158,6 +158,8 @@ export interface ILanguageItems {
 interface ILanguageUIOptions {
   auctionsBINOnlyDescription: string;
   auctionsBINOnlyLabel: string;
+  cancel: string;
+  delete: string;
   forceRefresh: string;
   hotmDescription: string;
   hotmLabel: string;
@@ -178,8 +180,12 @@ interface ILanguageUIOptions {
   playFrequencyOptionNonStop: string;
   playFrequencyOptionThreeTime: string;
   playFrequencyOptionTwice: string;
+  playerName: string;
+  playerProfile: string;
   quickForgeDescription: string;
   quickForgeLabel: string;
+  save: string;
+  syncProfileTitle: string;
   title: string;
 }
 
@@ -190,11 +196,16 @@ interface ILanguageUI {
   casting: string;
   craftCost: string;
   filters: string;
+  fuelColumn: string;
+  fuelTitle: string;
   hotm: string;
   hour: string;
   item: string;
   itemPrice: string;
+  itemPricePerCompost: string;
   options: ILanguageUIOptions;
+  organicMattersColumn: string;
+  organicMattersTitle: string;
   profit: string;
   profitByTimeEveryday: string;
   profitByTimeNonStop: string;

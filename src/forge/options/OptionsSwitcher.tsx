@@ -19,11 +19,11 @@ import { useTheme } from '@mui/material/styles';
 import { FC, useCallback, useContext, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
-import type { KeysLanguageType } from '../resources/lang/type';
-import type { IOptionsState } from '../services/common';
-import type { RootState } from '../store';
-import { useWorker } from '../worker/WorkerContext';
+import { LanguageContext, useLanguage } from '../../resources/lang/LanguageContext';
+import type { KeysLanguageType } from '../../resources/lang/type';
+import type { IOptionsState } from '../../services/common';
+import type { RootState } from '../../store';
+import { useWorker } from '../../worker/WorkerContext';
 
 import { PlayerSyncDialog } from './PlayerSyncDialog';
 
@@ -160,14 +160,16 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             overflow: 'scroll'
           }}
         >
-          <ListItem divider>
-            {playerSync && (
-              <Typography id="syncProfile-label">
-                Current Profile: {playerName} ({playerProfile.name})
+          {playerSync && (
+            <ListItem divider>
+              <Typography id="syncProfile-label" variant="h6">
+                {playerName} ({playerProfile.name})
               </Typography>
-            )}
+            </ListItem>
+          )}
+          <ListItem divider>
             <Button onClick={handleClickOpen} variant="outlined">
-              Sync Profile
+              {options.syncProfileTitle}
             </Button>
             <PlayerSyncDialog
               currentPlayerName={playerName}

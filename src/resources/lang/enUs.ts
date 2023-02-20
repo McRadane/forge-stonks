@@ -5,7 +5,7 @@ export const enUs: ILanguage = {
     'Amber Material': 'Amber Material',
     'Amber-polished Drill Engine': 'Amber-polished Drill Engine',
     'Ammonite Pet': 'Ammonite Pet',
-    BIOFUEL: 'BIOFUEL',
+    BIOFUEL: 'Biofuel',
     BROWN_MUSHROOM: 'Brown Mushroom',
     'Beacon I': 'Beacon I',
     'Beacon II': 'Beacon II',
@@ -158,7 +158,7 @@ export const enUs: ILanguage = {
     coins: 'Coins'
   },
   notification: {
-    timerEnded: 'Your {0} timer has ended',
+    timerEnded: 'Your {0} ({1}) timer has ended',
     timerStarted: 'Starting timer for {0}'
   },
   ui: {
@@ -168,13 +168,18 @@ export const enUs: ILanguage = {
     casting: 'Casting',
     craftCost: 'Crafting cost',
     filters: 'Filters',
+    fuelColumn: 'Fuels (2k needed)',
+    fuelTitle: 'Fuels costs',
     hotm: 'HOTM',
     hour: 'H',
     item: 'Item',
     itemPrice: 'Item price',
+    itemPricePerCompost: 'Price / Compost',
     options: {
       auctionsBINOnlyDescription: 'Use BINs Auctions only for material.',
       auctionsBINOnlyLabel: 'BINs material',
+      cancel: 'Cancel',
+      delete: 'Delete',
       forceRefresh: 'Force refresh',
       hotmDescription: 'Set your HOTM level.',
       hotmLabel: 'HOTM Level',
@@ -195,10 +200,16 @@ export const enUs: ILanguage = {
       playFrequencyOptionNonStop: 'Non-stop',
       playFrequencyOptionThreeTime: 'Three-time per days',
       playFrequencyOptionTwice: 'Twice a day',
+      playerName: 'Player Name',
+      playerProfile: 'Player Profile',
       quickForgeDescription: 'Quick Forge perks level. Current bonus',
       quickForgeLabel: 'Quick Forge',
+      save: 'Save',
+      syncProfileTitle: 'Sync profile',
       title: 'Options'
     },
+    organicMattersColumn: 'Matters (4k needed)',
+    organicMattersTitle: 'Organic Matter costs',
     profit: 'Profit',
     profitByTimeEveryday: 'Profit per day',
     profitByTimeNonStop: 'Profit per hour',
@@ -211,7 +222,7 @@ export const enUs: ILanguage = {
     time: 'Duration',
     timer: 'Timer',
     timerButton: 'Start timer',
-    title: "HyPixel Skyblock's Forge Stonks",
+    title: "HyPixel Skyblock's Stonks",
     totalPrice: 'Total price',
     type: 'Type',
     vendor: 'Vendor'

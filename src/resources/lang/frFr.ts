@@ -5,7 +5,7 @@ export const frFr: ILanguage = {
     'Amber Material': 'Amber Material',
     'Amber-polished Drill Engine': 'Amber-polished Drill Engine',
     'Ammonite Pet': 'Ammonite Pet',
-    BIOFUEL: 'BIOFUEL',
+    BIOFUEL: 'Biofuel',
     BROWN_MUSHROOM: 'Brown Mushroom',
     'Beacon I': 'Beacon I',
     'Beacon II': 'Beacon II',
@@ -158,7 +158,7 @@ export const frFr: ILanguage = {
     coins: 'Pièces'
   },
   notification: {
-    timerEnded: "Votre chrono pour {0} s'est terminé",
+    timerEnded: "Votre chrono pour {0} ({1}) s'est terminé",
     timerStarted: 'Démarrage du chrono pour {0}'
   },
   ui: {
@@ -168,13 +168,18 @@ export const frFr: ILanguage = {
     casting: 'Moulage',
     craftCost: 'Coût de fabrication',
     filters: 'Filtres',
+    fuelColumn: 'Carburants (2k nécessaire)',
+    fuelTitle: 'Prix des carburants',
     hotm: 'HOTM',
     hour: 'H',
     item: 'Objet',
     itemPrice: "Prix de l'objet",
+    itemPricePerCompost: 'Prix / Composte',
     options: {
       auctionsBINOnlyDescription: 'Utiliser uniquement les ressources en BIN',
       auctionsBINOnlyLabel: 'Ressources en BIN',
+      cancel: 'Annuler',
+      delete: 'Supprimer',
       forceRefresh: 'Rafraichissement',
       hotmDescription: "Indiquez votre niveau d'HOTM",
       hotmLabel: "Niveau d'HOTM",
@@ -195,10 +200,16 @@ export const frFr: ILanguage = {
       playFrequencyOptionNonStop: 'Team Chômage',
       playFrequencyOptionThreeTime: '3x par jour',
       playFrequencyOptionTwice: '2x par jour',
+      playerName: 'Nom du Joueur',
+      playerProfile: 'Nom du Profile',
       quickForgeDescription: "Niveau d'amélioration de Quick Forge. Bonus actuel",
       quickForgeLabel: 'Quick Forge',
+      save: 'Sauver',
+      syncProfileTitle: 'Sync profile',
       title: 'Options'
     },
+    organicMattersColumn: 'Matières (4k nécessaire)',
+    organicMattersTitle: 'Prix des matières organiques',
     profit: 'Bénéfices',
     profitByTimeEveryday: 'Bénéfices par jour',
     profitByTimeNonStop: 'Bénéfices par heure',
@@ -211,7 +222,7 @@ export const frFr: ILanguage = {
     time: 'Durée',
     timer: 'Chrono',
     timerButton: 'Lancer le chrono',
-    title: "HyPixel Skyblock's Forge Stonks",
+    title: "HyPixel Skyblock's Stonks",
     totalPrice: 'Prix total',
     type: 'Type',
     vendor: 'Vendeur'

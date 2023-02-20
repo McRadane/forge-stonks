@@ -3,10 +3,10 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { useSelector } from 'react-redux';
 
 import { useDrawerOpen, useDrawerSetStatus } from '../components/DrawerProvider';
-import { CraftsContainer } from '../craft/CraftsContainer';
-import { OptionsSwitcher } from '../options/OptionsSwitcher';
+import { CraftsContainer } from '../forge/CraftsContainer';
+import { OptionsSwitcher } from '../forge/options/OptionsSwitcher';
+import { Timers } from '../forge/timers/Timers';
 import type { RootState } from '../store';
-import { Timers } from '../timers/Timers';
 
 export const Forge = () => {
   const open = useDrawerOpen('forge');

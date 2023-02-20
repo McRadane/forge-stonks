@@ -196,10 +196,9 @@ export class WorkerRunner {
         case 'Response-TimerEnded':
           {
             this.logResponse(`A timer has ended`);
-            const message = this.contexts.language.dictionary.notification.timerEnded.replace(
-              '{0}',
-              this.contexts.language.dictionary.items[event.data.itemId]
-            );
+            const message = this.contexts.language.dictionary.notification.timerEnded
+              .replace('{0}', this.contexts.language.dictionary.items[event.data.itemId])
+              .replace('{1}', String(event.data.slot ?? ''));
             this.contexts.notification.triggerSuccess(message);
             audio.play();
           }

@@ -6,9 +6,9 @@ import Typography from '@mui/material/Typography';
 import { Theme, useTheme } from '@mui/material/styles';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useLanguage } from '../resources/lang/LanguageContext';
-import { useWorker } from '../worker/WorkerContext';
-import type { ITimer } from '../worker/type';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import { useWorker } from '../../worker/WorkerContext';
+import type { ITimer } from '../../worker/type';
 
 const getStyles = (theme: Theme) => ({
   container: {

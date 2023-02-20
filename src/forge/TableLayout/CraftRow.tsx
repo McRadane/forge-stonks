@@ -16,7 +16,7 @@ import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
-import { TimerButton } from '../../timers/TimerButton';
+import { TimerButton } from '../timers/TimerButton';
 
 import { DetailsTable } from './DetailsTable';
 

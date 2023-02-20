@@ -162,22 +162,28 @@ class ComputationWorker {
     this.database.addToCache('hotm', player.data.mining.core.tier.level ?? initialState.hotm);
     this.database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
 
-    this.database.timers.clear();
-    player.data.mining.forge.processes.forEach((forge) => {
+    // this.database.timers.clear();
+    player.data.mining.forge.processes.forEach(async (forge) => {
       let found = crafts.find((item) => item.itemId === forge.id);
 
       if (!found) {
         found = crafts.find((item) => item.itemId.toLowerCase() === forge.id.toLowerCase().replace('_', ' '));
       }
 
-      if (found) {
-        const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
+      const existing = await this.database.timers.toArray();
 
-        this.database.timers.add({
-          endTime: forge.timeFinished,
-          itemId: forge.id as keyof ILanguageItems,
-          startTime
-        } as ITimer);
+      if (found) {
+        const foundExisting = existing.find((timer) => timer.endTime === forge.timeFinished);
+        if (!foundExisting) {
+          const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
+
+          this.database.timers.add({
+            endTime: forge.timeFinished,
+            itemId: found.itemId as keyof ILanguageItems,
+            slot: forge.slot,
+            startTime
+          } as ITimer);
+        }
       }
     });
   }
@@ -221,7 +227,7 @@ class ComputationWorker {
       if (count <= 4) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
-        this.database.timers.add({ endTime, itemId, startTime } as ITimer);
+        this.database.timers.add({ endTime, itemId, slot: count + 1, startTime } as ITimer);
       }
 
       if (count === 0 && this.timersInterval === undefined) {
@@ -301,10 +307,10 @@ class ComputationWorker {
     const lang = this.getLang();
     timers.forEach((timer) => {
       if (now > timer.endTime) {
-        this.notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]));
         this.database.timers.delete(timer.id);
+        this.notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]).replace('{1}', String(timer.slot ?? '')));
         this.getTimers();
-        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId };
+        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId, slot: timer.slot };
         ctx.postMessage(command);
       }
     });
