@@ -210,6 +210,8 @@ export const frFr: ILanguage = {
     },
     organicMattersColumn: 'Matières (4k nécessaire)',
     organicMattersTitle: 'Prix des matières organiques',
+    pageForge: 'Forge',
+    pageGarden: 'Jardin',
     profit: 'Bénéfices',
     profitByTimeEveryday: 'Bénéfices par jour',
     profitByTimeNonStop: 'Bénéfices par heure',

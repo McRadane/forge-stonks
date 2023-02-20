@@ -8,7 +8,7 @@ import { OptionsSwitcher } from '../forge/options/OptionsSwitcher';
 import { Timers } from '../forge/timers/Timers';
 import type { RootState } from '../store';
 
-export const Forge = () => {
+const Forge = () => {
   const open = useDrawerOpen('forge');
   const { toggle } = useDrawerSetStatus('forge');
 
@@ -35,3 +35,9 @@ export const Forge = () => {
     </>
   );
 };
+
+/**
+ * Needed for React.lazy
+ */
+// eslint-disable-next-line import/no-default-export
+export default Forge;

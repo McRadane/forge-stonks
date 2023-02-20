@@ -23,7 +23,7 @@ import type {
   IWorkerCommandStopTimer
 } from './type';
 
-const audio = new Audio('/forge-stonks/orb.mp3');
+const audio = new Audio('/orb.mp3');
 audio.volume = 0.3;
 
 interface WorkerContexts {

@@ -210,6 +210,8 @@ export const enUs: ILanguage = {
     },
     organicMattersColumn: 'Matters (4k needed)',
     organicMattersTitle: 'Organic Matter costs',
+    pageForge: 'Forge',
+    pageGarden: 'Garden',
     profit: 'Profit',
     profitByTimeEveryday: 'Profit per day',
     profitByTimeNonStop: 'Profit per hour',

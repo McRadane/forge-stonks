@@ -206,6 +206,8 @@ interface ILanguageUI {
   options: ILanguageUIOptions;
   organicMattersColumn: string;
   organicMattersTitle: string;
+  pageForge: string;
+  pageGarden: string;
   profit: string;
   profitByTimeEveryday: string;
   profitByTimeNonStop: string;

@@ -1,23 +1,29 @@
 import type { Datum, PlotData } from 'plotly.js';
-import { FC, useMemo } from 'react';
-import ReactPlotly from 'react-plotly.js';
+import { FC, useEffect, useMemo, useRef } from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
 import type { ILanguageItems } from '../resources/lang/type';
 
 import type { IDataSourceItem } from './types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const Plotly: any;
+
 export interface IGardenProps {
   dataSource: Partial<Record<keyof ILanguageItems, IDataSourceItem>>;
   highlightItem: keyof ILanguageItems;
+  showLabel?: boolean;
+  text: 'name' | 'price' | 'ratio';
 }
 
 const colorHighlight = 'rgba(222,45,38,0.8)';
 const colorCheaper = 'rgba(204,204,204,1)';
 const colorCostier = 'rgba(204,204,204,0.2)';
 
-export const GardenChart: FC<IGardenProps> = ({ dataSource, highlightItem }) => {
+export const GardenChart: FC<IGardenProps> = ({ dataSource, highlightItem, showLabel, text }) => {
   const lang = useLanguage();
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const data = useMemo(() => {
     const trace: Partial<PlotData> = {
@@ -62,6 +68,7 @@ export const GardenChart: FC<IGardenProps> = ({ dataSource, highlightItem }) => 
 
     preparedData.forEach(({ color, name, price, ratio }) => {
       (trace.x as Datum[]).push(name);
+
       (trace.y as Datum[]).push(ratio);
 
       (trace.hovertext as string[]).push(
@@ -70,7 +77,18 @@ export const GardenChart: FC<IGardenProps> = ({ dataSource, highlightItem }) => 
         ).toLocaleString()}`
       );
 
-      (trace.text as string[]).push(Math.ceil(ratio).toLocaleString());
+      switch (text) {
+        case 'name':
+          (trace.text as string[]).push(name);
+          break;
+        case 'price':
+          (trace.text as string[]).push(Math.ceil(price).toLocaleString());
+          break;
+        case 'ratio':
+        default:
+          (trace.text as string[]).push(Math.ceil(ratio).toLocaleString());
+          break;
+      }
 
       if (trace.marker && color) {
         (trace.marker as { color: string[] }).color.push(color);
@@ -78,7 +96,19 @@ export const GardenChart: FC<IGardenProps> = ({ dataSource, highlightItem }) => 
     });
 
     return [trace];
-  }, [dataSource, highlightItem, lang.items, lang.ui.itemPrice, lang.ui.itemPricePerCompost]);
+  }, [dataSource, highlightItem, lang.items, lang.ui.itemPrice, lang.ui.itemPricePerCompost, text]);
 
-  return <ReactPlotly data={data} layout={{}} />;
+  useEffect(() => {
+    if (ref.current) {
+      Plotly.newPlot(ref.current, data, {
+        xaxis: {
+          autotick: false,
+          ticks: 'outside'
+        }
+      });
+    }
+  }, [data]);
+
+  return <div ref={ref} />;
+  //return <ReactPlotly data={data} layout={{}} />;
 };

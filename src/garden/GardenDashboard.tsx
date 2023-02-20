@@ -33,7 +33,7 @@ export const GardenDashboard: FC<IGardenDashboardProps> = ({ fuels, organicMatte
       </Box>
 
       <Box gridColumn="span 6">
-        <GardenChart dataSource={organicMatters} highlightItem="COMPOST" />
+        <GardenChart dataSource={organicMatters} highlightItem="COMPOST" text="name" />
       </Box>
       <Box gridColumn="span 12">
         <Typography variant="h3">{ui.fuelTitle}</Typography>
@@ -43,7 +43,7 @@ export const GardenDashboard: FC<IGardenDashboardProps> = ({ fuels, organicMatte
         <GardenTable dataSource={fuels} highlightItem="BIOFUEL" labelRatio={ui.fuelColumn} sourceItems={itemsFuels} />
       </Box>
       <Box gridColumn="span 6">
-        <GardenChart dataSource={fuels} highlightItem="BIOFUEL" />
+        <GardenChart dataSource={fuels} highlightItem="BIOFUEL" showLabel text="ratio" />
       </Box>
     </Box>
   );

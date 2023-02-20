@@ -12,7 +12,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { CSSObject, Theme, styled, useTheme } from '@mui/material/styles';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { ListItemButton } from '../components/ListItemButton';
@@ -94,9 +95,7 @@ export const Layout = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const language = useLanguage();
-  const {
-    ui: { title }
-  } = language;
+  const { ui } = language;
 
   const handleDrawerOpen = useCallback(() => {
     setOpen(true);
@@ -110,12 +109,25 @@ export const Layout = () => {
 
   const findRoute = routes.find((route) => (location.pathname === '/' ? route.index : `/${route.path}` === location.pathname));
 
+  const pageTitle = useMemo(() => {
+    if (findRoute) {
+      return ` - ${ui[findRoute.title]}`;
+    }
+    return '';
+  }, [findRoute, ui]);
+
   return (
     <>
+      <Helmet>
+        <title>
+          {ui.title}
+          {pageTitle}
+        </title>
+      </Helmet>
       <AppBar open={open} position="fixed">
         <Toolbar>
           <IconButton
-            aria-label="open drawer"
+            aria-label="Open menu"
             color="inherit"
             edge="start"
             onClick={handleDrawerOpen}
@@ -127,14 +139,17 @@ export const Layout = () => {
             <MenuIcon />
           </IconButton>
           <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
-            {title}
+            {ui.title}
+            {pageTitle}
           </Typography>
           <OptionDrawerButton name={findRoute?.option ?? null} />
         </Toolbar>
       </AppBar>
       <Drawer open={open} variant="permanent">
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>{theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}</IconButton>
+          <IconButton aria-label="Close menu" onClick={handleDrawerClose}>
+            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
         </DrawerHeader>
         <Divider />
         <List>
@@ -158,7 +173,7 @@ export const Layout = () => {
                   >
                     {route.icon}
                   </ListItemIcon>
-                  <ListItemText primary={route.title} sx={{ opacity: open ? 1 : 0 }} />
+                  <ListItemText primary={ui[route.title] as string} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>
               </ListItem>
             );

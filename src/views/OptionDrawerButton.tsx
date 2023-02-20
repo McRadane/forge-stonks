@@ -8,7 +8,7 @@ const OptionDrawerButtonInternal: FC<{ name: string }> = ({ name }) => {
   const { toggle } = useDrawerSetStatus(name);
 
   return (
-    <Button color="inherit" onClick={toggle}>
+    <Button aria-label="Show options" color="inherit" onClick={toggle}>
       <SettingsIcon />
     </Button>
   );
