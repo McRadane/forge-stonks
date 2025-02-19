@@ -15,8 +15,10 @@ export interface IPartialCraft {
   time: number;
 }
 
+export type CraftCategory = 'drill parts' | 'forging' | 'gear' | 'gemstone' | 'other' | 'pets' | 'refining' | 'stones' | 'tools';
+
 export interface ICraft extends IPartialCraft {
-  category: 'casting' | 'refine';
+  category: CraftCategory;
   id: number;
 }
 

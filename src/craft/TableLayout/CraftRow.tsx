@@ -17,6 +17,7 @@ import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 import { TimerButton } from '../../timers/TimerButton';
+import { getCategoryLabel } from '../functions';
 
 import { DetailsTable } from './DetailsTable';
 
@@ -52,7 +53,7 @@ export const CraftRow: FC<ICraftRowProps> = ({ craft }) => {
             <>
               <Chip label={bazaarItem ? ui.bazaar : ui.auction} size="small" />{' '}
               <Chip avatar={<Avatar>{hotm}</Avatar>} label={ui.hotm} size="small" />{' '}
-              <Chip label={craft.category === 'casting' ? ui.casting : ui.refine} size="small" />
+              <Chip label={getCategoryLabel(craft.category, ui)} size="small" />
             </>
           )}
         </TableCell>

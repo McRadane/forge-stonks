@@ -15,7 +15,7 @@ import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 import { TimerButton } from '../../timers/TimerButton';
-import { getProfitByTimeLabel } from '../functions';
+import { getCategoryLabel, getProfitByTimeLabel } from '../functions';
 
 import { DetailsList } from './DetailsList';
 import { GridRow } from './GridRow';
@@ -52,7 +52,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
               <GridRow left={ui.timer} right={<TimerButton itemId={craft.itemId} />} />
               <GridRow left={ui.sell} right={bazaarItem ? ui.bazaar : ui.auction} />
               <GridRow left={ui.hotm} right={hotm} />
-              <GridRow left={ui.type} right={category === 'casting' ? ui.casting : ui.refine} />
+              <GridRow left={ui.type} right={getCategoryLabel(craft.category, ui)} />
               <GridRow left={ui.sellPrice} right={<Coin amount={sell} />} />
               <GridRow left={ui.time} right={time < 0.5 ? 0 : time} />
               <GridRow left={ui.craftCost} right={<Coin amount={cost} />} />

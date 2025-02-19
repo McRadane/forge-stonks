@@ -5,5 +5,9 @@ interface ICoinProps {
 }
 
 export const Coin: FC<ICoinProps> = ({ amount }) => {
+  if (Number.isNaN(amount)) {
+    return <>-</>;
+  }
+
   return <>{Math.ceil(amount).toLocaleString()}</>;
 };

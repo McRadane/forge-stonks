@@ -129,7 +129,8 @@ class ComputationWorker {
     if (found) {
       this.messageResponse(`Start timer for ${JSON.stringify(found)}`);
       const count = await this.database.timers.count();
-      if (count <= 4) {
+      const slots = await this.getForgeSlots();
+      if (count <= slots) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
         this.database.timers.add({ endTime, itemId, startTime } as ITimer);
@@ -159,6 +160,12 @@ class ComputationWorker {
     }
 
     this.getTimers();
+  }
+
+  private async getForgeSlots() {
+    const { hotm } = await this.getAllOptions();
+
+    return Math.min(7, hotm);
   }
 
   private getTimers() {

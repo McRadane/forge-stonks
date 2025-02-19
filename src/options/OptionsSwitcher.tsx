@@ -196,7 +196,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
                     aria-labelledby="hotm-label"
                     id="hotm"
                     marks
-                    max={7}
+                    max={10}
                     min={2}
                     onChange={handleHOTMValue}
                     step={1}
