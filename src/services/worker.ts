@@ -1,10 +1,11 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import type { ICraft, ICraftWithCosts } from '../resources/types';
-import type { ITimer } from '../worker/type';
+import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
+import type { ITimer, IWorkerResponseGetPricesResult } from '../worker/type';
 
 interface IWorkerState {
   loading: boolean;
+  materialPrices: Partial<Record<ICraft['itemId'], ICraftWithPrice>>;
   prices: Partial<Record<ICraft['itemId'], ICraftWithCosts>>;
   timerLaunched: ICraft['itemId'][];
   timers: ITimer[];
@@ -12,6 +13,7 @@ interface IWorkerState {
 
 const initialState: IWorkerState = {
   loading: false,
+  materialPrices: {},
   prices: {},
   timerLaunched: [],
   timers: []
@@ -27,8 +29,9 @@ const workerSlice = createSlice({
     setNotLoading: (state) => {
       state.loading = false;
     },
-    setPrices: (state, action: PayloadAction<Record<ICraft['itemId'], ICraftWithCosts>>) => {
-      state.prices = action.payload;
+    setPrices: (state, action: PayloadAction<IWorkerResponseGetPricesResult>) => {
+      state.prices = action.payload.crafts;
+      state.materialPrices = action.payload.materials;
     },
     setTimerLaunched: (state, action: PayloadAction<ICraft['itemId']>) => {
       state.timerLaunched = state.timerLaunched.filter((item) => item !== action.payload);
