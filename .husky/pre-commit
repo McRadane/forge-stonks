@@ -2,4 +2,3 @@
 
 npm test
 node node_modules/.bin/lint-staged
-node node_modules/.bin/pretty-quick --staged
