@@ -97,7 +97,24 @@ const baseRules = [
     plugins: { 'react-hooks': fixupPluginRules(reactHooksPlugin) },
     rules: reactHooksPlugin.configs.recommended.rules
   },
-  { name: 'React Plugin', plugins: { react: reactPlugin }, rules: { ...reactPlugin.configs.recommended.rules, 'react/prop-types': 'off' } },
+  {
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        },
+        jsxPragma: null
+      }
+    },
+    name: 'React Plugin',
+    plugins: { react: reactPlugin },
+    rules: { ...reactPlugin.configs.recommended.rules, 'react/jsx-uses-react': 0, 'react/prop-types': 'off', 'react/react-in-jsx-scope': 0 },
+    settings: {
+      react: {
+        version: '19.0'
+      }
+    }
+  },
   prettier,
   { name: 'Web Plugin', plugins: { web: webPlugin }, rules: webPlugin.configs.all.rules },
   ...compat.extends('plugin:import/typescript'),
@@ -147,10 +164,10 @@ const baseRules = [
       'sonarjs/no-undefined-assignment': 'warn',
       'sonarjs/no-unused-function-argument': 'warn',
       'sonarjs/non-number-in-arithmetic-expression': 'warn',
+      'sonarjs/operation-returning-nan': 'warn',
       'sonarjs/prefer-immediate-return': 'warn',
       'sonarjs/prefer-object-literal': 'warn',
       'sonarjs/regular-expr': 'warn',
-      'sonarjs/operation-returning-nan': 'warn',
       'sonarjs/shorthand-property-grouping': 'warn',
       'sonarjs/standard-input': 'warn',
       'sonarjs/strings-comparison': 'warn',
