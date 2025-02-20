@@ -1,4 +1,0 @@
-.eslintrc.cjs
-jest.config.ts
-vite.config.ts
-src/vite-env.d.ts

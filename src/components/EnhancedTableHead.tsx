@@ -4,11 +4,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
-import type { FC } from 'react';
+import type { FC, MouseEvent } from 'react';
 
 export type Order = 'asc' | 'desc';
 
-interface HeadCell {
+interface IHeadCell {
   disablePadding: boolean;
   id: string;
   label: string;
@@ -16,16 +16,16 @@ interface HeadCell {
 }
 
 interface IEnhancedTableProps {
-  headCells: HeadCell[];
+  headCells: IHeadCell[];
+  onRequestSort: (event: MouseEvent<unknown>, property: string) => void;
   order: Order;
   orderBy: string;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
 }
 
 export const EnhancedTableHead: FC<IEnhancedTableProps> = (props) => {
   const { headCells, onRequestSort, order, orderBy } = props;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
+  const createSortHandler = (property: any) => (event: MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
 
@@ -59,7 +59,7 @@ export const EnhancedTableHead: FC<IEnhancedTableProps> = (props) => {
   );
 };
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+const descendingComparator = <T extends string>(a: T, b: T, orderBy: keyof T) => {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -67,9 +67,9 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     return 1;
   }
   return 0;
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getComparator<Key extends keyof any>(order: Order, orderBy: Key): (a: any, b: any) => number {
+export const getComparator = <TKey extends string>(order: Order, orderBy: TKey): ((a: any, b: any) => number) => {
   return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
-}
+};

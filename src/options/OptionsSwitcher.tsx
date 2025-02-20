@@ -4,18 +4,18 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import Slider from '@mui/material/Slider';
+import { useTheme } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
-import { FC, useCallback, useContext, useMemo } from 'react';
+import { type ChangeEvent, type FC, useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
@@ -82,7 +82,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
   );
 
   const handleMaxCraftingCost = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value === '' ? 0 : Number(event.target.value);
       worker.setOption('maxCraftingCost', value);
     },
@@ -116,8 +116,8 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
   return (
     <Drawer anchor={'right'} onClose={toggle} open={open}>
       <Box sx={{ /* width: 350, */ padding: 2, textAlign: 'left' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'self-start' }}>
-          <Typography component="div" gutterBottom variant="h6">
+        <Box sx={{ alignItems: 'self-start', display: 'flex', justifyContent: 'space-between' }}>
+          <Typography component="div" variant="h6" gutterBottom>
             {options.title}
           </Typography>
           <IconButton onClick={toggle} size="small" sx={{ height: theme.typography.fontSize }}>
@@ -134,9 +134,9 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>
               <Select
+                id="playFrequency"
                 aria-describedby="playFrequency-description"
                 aria-labelledby="playFrequency-label"
-                id="playFrequency"
                 label={options.playFrequencyLabel}
                 onChange={handlPlayFrequency}
                 value={playFrequency}
@@ -154,10 +154,10 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
               <Typography id="includeAuctionsFlip-label">{options.includeAuctionsFlipLabel}</Typography>
               <Switch
+                id="includeAuctionsFlip"
                 aria-describedby="includeAuctionsFlip-description"
                 aria-labelledby="includeAuctionsFlip-label"
                 checked={includeAuctionsFlip}
-                id="includeAuctionsFlip"
                 onChange={handleIncludeAuctionsFlip}
               />
               <FormHelperText id="includeAuctionsFlip-description">{options.includeAuctionsFlipDescription}</FormHelperText>
@@ -167,10 +167,10 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
               <Typography id="includePerfectGems-label">{options.includePerfectGemsLabel}</Typography>
               <Switch
+                id="includePerfectGems"
                 aria-describedby="includePerfectGems-description"
                 aria-labelledby="includePerfectGems-label"
                 checked={includePerfectGems}
-                id="includePerfectGems"
                 onChange={handleIncludePerfectGems}
               />
               <FormHelperText id="includePerfectGems-description">{options.includePerfectGemsDescription}</FormHelperText>
@@ -180,10 +180,10 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
               <Typography id="auctionsBINOnly-label">{options.auctionsBINOnlyLabel}</Typography>
               <Switch
+                id="auctionsBINOnly"
                 aria-describedby="auctionsBINOnly-description"
                 aria-labelledby="auctionsBINOnly-label"
                 checked={auctionsBINOnly}
-                id="auctionsBINOnly"
                 onChange={handleAuctionsBINOnly}
               />
               <FormHelperText id="auctionsBINOnly-description">{options.auctionsBINOnlyDescription}</FormHelperText>
@@ -193,10 +193,10 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
               <Typography id="intermediateCraft-label">{options.intermediateCraftLabel}</Typography>
               <Switch
+                id="intermediateCraft"
                 aria-describedby="intermediateCraft-description"
                 aria-labelledby="intermediateCraft-label"
                 checked={intermediateCraft}
-                id="intermediateCraft"
                 onChange={handleIntermediateCraft}
               />
               <FormHelperText id="intermediateCraft-description">{options.intermediateCraftDescription}</FormHelperText>
@@ -205,34 +205,34 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
           <ListItem divider>
             <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
               <Typography id="hotm-label">{options.hotmLabel}</Typography>
-              <Grid alignItems="center" container spacing={2} sx={{ padding: 2 }}>
-                <Grid item xs>
+              <Grid alignItems="center" spacing={2} sx={{ padding: 2 }} container>
+                <Grid>
                   <Slider
+                    id="hotm"
                     aria-describedby="hotm-description"
                     aria-label={options.hotmLabel}
                     aria-labelledby="hotm-label"
-                    id="hotm"
-                    marks
                     max={10}
                     min={2}
                     onChange={handleHOTMValue}
                     step={1}
                     value={hotm}
                     valueLabelDisplay="auto"
+                    marks
                   />
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Input
                     inputProps={{
-                      step: 10,
-                      min: 0,
+                      'aria-labelledby': 'hotm',
                       max: 100,
-                      type: 'number',
-                      'aria-labelledby': 'hotm'
+                      min: 0,
+                      step: 10,
+                      type: 'number'
                     }}
-                    readOnly
                     size="small"
                     value={hotm}
+                    readOnly
                   />
                 </Grid>
               </Grid>
@@ -243,9 +243,9 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth variant="standard">
               <Typography id="language-label">{options.languageLabel}</Typography>
               <Select
+                id="language"
                 aria-describedby="language-description"
                 aria-labelledby="language-label"
-                id="language"
                 onChange={handleLanguage}
                 value={userLanguage}
               >
@@ -259,14 +259,14 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             <FormControl fullWidth variant="standard">
               <Typography id="maxCraftingCost-label">{options.maxCraftingCostLabel}</Typography>
               <Input
-                aria-describedby="maxCraftingCost-description"
-                aria-labelledby="maxCraftingCost-label"
                 id="maxCraftingCost"
                 inputProps={{
+                  'aria-labelledby': 'input-slider',
                   min: 0,
-                  type: 'number',
-                  'aria-labelledby': 'input-slider'
+                  type: 'number'
                 }}
+                aria-describedby="maxCraftingCost-description"
+                aria-labelledby="maxCraftingCost-label"
                 onChange={handleMaxCraftingCost}
                 value={maxCraftingCost ?? 0}
               />
@@ -277,34 +277,34 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="quickForge-label">{options.quickForgeLabel}</Typography>
-              <Grid alignItems="center" container spacing={2} sx={{ padding: 2 }}>
-                <Grid item xs>
+              <Grid alignItems="center" spacing={2} sx={{ padding: 2 }} container>
+                <Grid>
                   <Slider
+                    id="quickForge"
                     aria-describedby="quickForge-description"
                     aria-label={options.quickForgeLabel}
                     aria-labelledby="quickForge-label"
-                    id="quickForge"
-                    marks
                     max={20}
                     min={0}
                     onChange={handleQuickForge}
                     step={1}
                     value={quickForge}
                     valueLabelDisplay="auto"
+                    marks
                   />
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Input
                     inputProps={{
-                      step: 10,
-                      min: 0,
+                      'aria-labelledby': 'quickForge',
                       max: 20,
-                      type: 'number',
-                      'aria-labelledby': 'quickForge'
+                      min: 0,
+                      step: 10,
+                      type: 'number'
                     }}
-                    readOnly
                     size="small"
                     value={quickForge}
+                    readOnly
                   />
                 </Grid>
               </Grid>

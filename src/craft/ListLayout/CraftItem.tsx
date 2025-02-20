@@ -1,12 +1,12 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { type FC, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Coin } from '../../components/Coin';
@@ -43,7 +43,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
         <ListItemText
           primary={
             <Grid container>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h4">
                   <Item>{id}</Item>
                 </Typography>

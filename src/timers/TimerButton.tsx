@@ -1,7 +1,7 @@
 import AlarmOnIcon from '@mui/icons-material/AlarmOn';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
-import { FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useNotifications } from '../notification/NotificationContext';

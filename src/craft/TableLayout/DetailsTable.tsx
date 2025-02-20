@@ -5,7 +5,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { useLanguage } from '../../resources/lang/LanguageContext';
@@ -28,7 +28,7 @@ export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
 
   return (
     <Box sx={{ margin: 1 }}>
-      <Typography component="div" gutterBottom variant="h6">
+      <Typography component="div" variant="h6" gutterBottom>
         {ui.shoppingList}
       </Typography>
       <Table aria-label={ui.shoppingList} size="small">
