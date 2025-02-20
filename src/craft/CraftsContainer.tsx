@@ -10,7 +10,7 @@ import { CraftsTable } from './TableLayout/CraftsTable';
 import { useItemsWithCraftPrice } from './functions';
 
 export const CraftsContainer: FC = () => {
-  const { maxCraftingCost } = useSelector((state: RootState) => state.options);
+  const { includePerfectGems, maxCraftingCost } = useSelector((state: RootState) => state.options);
 
   const allCrafts = useItemsWithCraftPrice();
 
@@ -21,8 +21,12 @@ export const CraftsContainer: FC = () => {
       filtered = filtered.filter((craft) => craft.craft < maxCraftingCost);
     }
 
+    if (!includePerfectGems) {
+      filtered = filtered.filter((craft) => craft.category !== 'gemstone');
+    }
+
     return filtered;
-  }, [allCrafts, maxCraftingCost]);
+  }, [allCrafts, includePerfectGems, maxCraftingCost]);
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down('md'));

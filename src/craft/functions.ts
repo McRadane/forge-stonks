@@ -23,12 +23,12 @@ export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
 };
 
 export const useItemsWithCraftPrice = () => {
-  const costs = useSelector((state: RootState) => state.worker.prices);
+  const { loadingTimestamp, prices: costs } = useSelector((state: RootState) => state.worker);
   const workerRunner = useWorker();
 
   useEffect(() => {
     workerRunner.getPrices();
-  }, [workerRunner]);
+  }, [workerRunner, loadingTimestamp]);
 
   return Object.values(costs);
 };

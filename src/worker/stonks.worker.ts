@@ -28,7 +28,7 @@ const ctx: Worker = self as any;
 const CACHE_DURATION = 3_600_000;
 
 class ComputationWorker {
-  private database: Database;
+  private readonly database: Database;
   private timersInterval: undefined | number;
   private languageKey: KeysLanguageType = 'en-US';
   private withNotification = false;
@@ -46,6 +46,7 @@ class ComputationWorker {
   public async forceRefresh(): Promise<void> {
     // console.log('starting getPrices');
     this.messageResponse('Starting forceRefresh');
+    await this.database.ensureInitialize();
     await this.database.forceRefresh();
   }
 
@@ -148,7 +149,8 @@ class ComputationWorker {
       this.messageResponse(`Start timer for ${JSON.stringify(found)}`);
       const count = await this.database.timers.count();
       const slots = await this.getForgeSlots();
-      if (count <= slots) {
+
+      if (count < slots) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
         this.database.timers.add({ endTime, itemId, startTime } as ITimer);
@@ -221,6 +223,7 @@ class ComputationWorker {
       cacheDuration: (await this.database.getFromCache<number>('cacheDuration')) ?? initialState.cacheDuration,
       hotm: (await this.database.getFromCache<number>('hotm')) ?? initialState.hotm,
       includeAuctionsFlip: (await this.database.getFromCache<boolean>('includeAuctionsFlip')) ?? initialState.includeAuctionsFlip,
+      includePerfectGems: (await this.database.getFromCache<boolean>('includePerfectGems')) ?? initialState.includePerfectGems,
       intermediateCraft: (await this.database.getFromCache<boolean>('intermediateCraft')) ?? initialState.intermediateCraft,
       maxCraftingCost: (await this.database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
       playFrequency: (await this.database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
@@ -251,9 +254,8 @@ class ComputationWorker {
     if (this.withNotification && Notification.permission === 'granted') {
       // Check whether notification permissions have already been granted;
       // if so, create a notification
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const notification = new Notification(message);
-      // …
+
+      new Notification(message);
     }
   }
 
@@ -406,7 +408,7 @@ class ComputationWorker {
     const quickForgeBonus = this.getQuickForgeBonus(quickForge);
 
     for await (const craft of crafts) {
-      const source = itemsSource[craft.itemId as keyof typeof itemsSource] ?? 'vendor';
+      const source = itemsSource[craft.itemId] ?? 'vendor';
 
       const itemDb = craft.bazaarItem
         ? await this.database.getItemPrice(craft.itemId, 'bazaar')

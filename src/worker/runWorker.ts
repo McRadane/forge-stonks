@@ -32,11 +32,10 @@ interface WorkerContexts {
 }
 
 export class WorkerRunner {
-  //private dispatch!: Dispatch<AnyAction>;
-  private worker!: Worker;
+  private readonly worker!: Worker;
   private timeGetPrices!: undefined | number;
   private languageKeyResponse: undefined | KeysLanguageType;
-  private contexts: WorkerContexts;
+  private readonly contexts: WorkerContexts;
 
   //private languageContext!: ILanguageContextDefinition;
 

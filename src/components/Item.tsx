@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { FC, useMemo } from 'react';
 import type React from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';
@@ -10,7 +10,7 @@ interface IItemProps {
 
 export const Item: FC<IItemProps> = ({ children }) => {
   const lang = useLanguage();
-  const childString = String(children) as keyof ILanguage['items'];
+  const childString = useMemo(() => (typeof children === 'string' ? String(children) : '') as keyof ILanguage['items'], [children]);
 
   if (lang.items[childString] !== undefined) {
     return <>{lang.items[childString]}</>;

@@ -3,6 +3,7 @@ export interface IOptionsState {
   cacheDuration: number;
   hotm: number;
   includeAuctionsFlip: boolean;
+  includePerfectGems: boolean;
   intermediateCraft: boolean;
   maxCraftingCost: number;
   playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
@@ -16,6 +17,7 @@ export const initialState: IOptionsState = {
   cacheDuration: 60,
   hotm: 2,
   includeAuctionsFlip: true,
+  includePerfectGems: false,
   intermediateCraft: false,
   maxCraftingCost: 0,
   playFrequency: 'nonstop',

@@ -69,8 +69,8 @@ export const getBazaarData = (): Promise<IBazaar[]> => {
     .get<IBazaarAPIResponse>('https://api.hypixel.net/skyblock/bazaar')
     .then((response) => response.data)
     .then((data) => {
-      if (!data || !data.success) {
-        throw new Error('Invalid query');
+      if (!data?.success) {
+        throw new Error('Invalid query to bazaar');
       }
 
       const result: IBazaar[] = Object.keys(data.products).map((key) => ({
@@ -87,11 +87,11 @@ const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPagina
   const pageDataResponse = await axios.get<IAuctionsAPIPaginatedResponse>(`https://api.hypixel.net/skyblock/auctions?page=${page}`);
   const pageData = pageDataResponse.data;
 
-  if (pageData && pageData.success) {
+  if (pageData?.success) {
     return pageData.auctions.filter((auction) => !auction.claimed);
   }
 
-  return Promise.reject();
+  return Promise.reject(new Error('No results'));
 };
 
 const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
@@ -111,13 +111,45 @@ const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
   return auctions;
 };
 
+const sortResults = (
+  results: {
+    uuid: string;
+    item_name: string;
+    category: string;
+    tier: string;
+    claimed: boolean;
+    starting_bid: number;
+    highest_bid_amount: number;
+    bin: boolean;
+  }[][],
+  auctions: Map<
+    string,
+    IAuctions & {
+      bin: boolean;
+    }
+  >
+) => {
+  results.forEach((element) => {
+    element.forEach((item) => {
+      const { bin, highest_bid_amount, item_name, starting_bid, uuid } = item;
+
+      auctions.set(uuid, {
+        bin,
+        buyPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
+        item_name,
+        sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount
+      });
+    });
+  });
+};
+
 export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
   return axios
     .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
     .then((response) => response.data)
     .then((data) => {
-      if (!data || !data.success) {
-        throw new Error('Invalid query');
+      if (!data?.success) {
+        throw new Error('Invalid query to auctions');
       }
 
       const auctions = filterAuctions(data);
@@ -130,18 +162,7 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
         }
       }
       return Promise.all(promises).then((results) => {
-        results.forEach((element) => {
-          element.forEach((item) => {
-            const { bin, highest_bid_amount, item_name, starting_bid, uuid } = item;
-
-            auctions.set(uuid, {
-              bin,
-              buyPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
-              item_name,
-              sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount
-            });
-          });
-        });
+        sortResults(results, auctions);
 
         return Array.from(auctions.values());
       });

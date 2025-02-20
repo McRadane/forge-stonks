@@ -34,9 +34,9 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     ui: { options }
   } = useLanguage();
 
-  const { auctionsBINOnly, hotm, includeAuctionsFlip, intermediateCraft, maxCraftingCost, playFrequency, quickForge } = useSelector(
-    (state: RootState) => state.options
-  );
+  const { auctionsBINOnly, hotm, includeAuctionsFlip, includePerfectGems, intermediateCraft, maxCraftingCost, playFrequency, quickForge } =
+    useSelector((state: RootState) => state.options);
+
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
   const theme = useTheme();
@@ -52,6 +52,10 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
   const handleIncludeAuctionsFlip = useCallback(() => {
     worker.setOption('includeAuctionsFlip', !includeAuctionsFlip);
   }, [includeAuctionsFlip, worker]);
+
+  const handleIncludePerfectGems = useCallback(() => {
+    worker.setOption('includePerfectGems', !includePerfectGems);
+  }, [includePerfectGems, worker]);
 
   const handleAuctionsBINOnly = useCallback(() => {
     worker.setOption('auctionsBINOnly', !auctionsBINOnly);
@@ -111,7 +115,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
 
   return (
     <Drawer anchor={'right'} onClose={toggle} open={open}>
-      <Box role="presentation" sx={{ /* width: 350, */ padding: 2, textAlign: 'left' }}>
+      <Box sx={{ /* width: 350, */ padding: 2, textAlign: 'left' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'self-start' }}>
           <Typography component="div" gutterBottom variant="h6">
             {options.title}
@@ -157,6 +161,19 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
                 onChange={handleIncludeAuctionsFlip}
               />
               <FormHelperText id="includeAuctionsFlip-description">{options.includeAuctionsFlipDescription}</FormHelperText>
+            </FormControl>
+          </ListItem>
+          <ListItem divider>
+            <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
+              <Typography id="includePerfectGems-label">{options.includePerfectGemsLabel}</Typography>
+              <Switch
+                aria-describedby="includePerfectGems-description"
+                aria-labelledby="includePerfectGems-label"
+                checked={includePerfectGems}
+                id="includePerfectGems"
+                onChange={handleIncludePerfectGems}
+              />
+              <FormHelperText id="includePerfectGems-description">{options.includePerfectGemsDescription}</FormHelperText>
             </FormControl>
           </ListItem>
           <ListItem divider>

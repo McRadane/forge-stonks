@@ -230,6 +230,8 @@ export const frFr: ILanguage = {
       hotmLabel: "Niveau d'HOTM",
       includeAuctionsFlipDescription: 'Include les craft vendus uniquement en actions',
       includeAuctionsFlipLabel: "Craft d'actions",
+      includePerfectGemsDescription: 'Inclure les gemmes parfaites dans les crafts',
+      includePerfectGemsLabel: 'Gemmes parfaites',
       intermediateCraftDescription: 'Crafter les objets intermédiaire',
       intermediateCraftLabel: 'Crafts intermédiaires',
       languageDescription: "Traduction uniquement de l'interface, les objets restent en anglais",

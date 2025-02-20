@@ -29,7 +29,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
 
   const { ui } = useLanguage();
 
-  const { bazaarItem, category, craft: cost, hotm, itemId: id, profit, profitHourly, sell, time } = craft;
+  const { bazaarItem, craft: cost, hotm, itemId: id, profit, profitHourly, sell, time } = craft;
 
   const playFrequency = useSelector((state: RootState) => state.options.playFrequency);
 

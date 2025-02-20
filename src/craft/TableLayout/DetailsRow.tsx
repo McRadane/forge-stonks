@@ -11,9 +11,10 @@ import { useItemCraftPrice } from '../functions';
 
 interface IDetailsRowProps {
   material: ICraftMaterial;
+  slots: number;
 }
 
-export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
+export const DetailsRow: FC<IDetailsRowProps> = ({ material, slots }) => {
   const cost = useItemCraftPrice(material.itemId);
 
   const { ui } = useLanguage();
@@ -27,12 +28,12 @@ export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
         <Coin amount={cost} />
       </TableCell>
       <TableCell align="right">{material.quantity}</TableCell>
-      <TableCell align="right">{material.quantity * 5}</TableCell>
+      <TableCell align="right">{material.quantity * slots}</TableCell>
       <TableCell align="right">
         <Coin amount={material.quantity * cost} />
       </TableCell>
       <TableCell align="right">
-        <Coin amount={material.quantity * cost * 5} />
+        <Coin amount={material.quantity * cost * slots} />
       </TableCell>
     </TableRow>
   );

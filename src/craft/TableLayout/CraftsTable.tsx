@@ -89,7 +89,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
       <Table aria-label={ui.title} size="small" sx={{ minWidth: 650 }}>
         <EnhancedTableHead headCells={headCells} onRequestSort={handleRequestSort} order={order} orderBy={orderBy} />
         <TableBody>
-          {crafts.sort(getComparator(order, orderBy)).map((craft) => (
+          {[...crafts].sort(getComparator(order, orderBy)).map((craft) => (
             <CraftRow craft={craft} key={craft.itemId} />
           ))}
         </TableBody>

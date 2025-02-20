@@ -21,9 +21,10 @@ export class Database extends Dexie {
   private _cacheDuration = -1;
   private _lastRefresh = -1;
   private _polling!: number;
+  private _initialized = false;
 
-  private ctx!: Worker;
-  private postRefresh: () => void;
+  private readonly ctx!: Worker;
+  private readonly postRefresh: () => void;
 
   constructor(ctx: Worker, postRefresh: () => void) {
     super('Database');
@@ -39,15 +40,23 @@ export class Database extends Dexie {
       cache: 'key',
       timers: 'id++, itemId, startTime, endTime'
     });
+  }
 
-    this.cache.get('lastRefresh').then((lastRefreshString) => {
-      if (lastRefreshString) {
-        const lastRefresh = Number(lastRefreshString.value);
-        if (!Number.isNaN(lastRefresh)) {
-          this._lastRefresh = lastRefresh;
-        }
+  public async ensureInitialize() {
+    if (this._initialized) {
+      return;
+    }
+
+    const lastRefreshString = await this.cache.get('lastRefresh');
+
+    if (lastRefreshString) {
+      const lastRefresh = Number(lastRefreshString.value);
+      if (!Number.isNaN(lastRefresh)) {
+        this._lastRefresh = lastRefresh;
       }
-    });
+    }
+
+    this._initialized = true;
   }
 
   public set cacheDuration(duration: undefined | number) {
@@ -85,31 +94,32 @@ export class Database extends Dexie {
     }
   }
 
-  public addToCache(key: string, value: unknown) {
-    return this.cache.get(key).then((exists) => {
-      if (exists) {
-        this.cache.update(key, { value });
-      } else {
-        this.cache.add({ key, value });
-      }
-    });
+  public async addToCache(key: string, value: unknown) {
+    await this.ensureInitialize();
+    const exists = await this.cache.get(key);
+    if (exists) {
+      this.cache.update(key, { value });
+    } else {
+      this.cache.add({ key, value });
+    }
   }
 
-  public removeFromCache(key: string) {
-    return this.cache.get(key).then((exists) => {
-      if (exists) {
-        this.cache.delete(key);
-      }
-    });
+  public async removeFromCache(key: string) {
+    await this.ensureInitialize();
+    const exists = await this.cache.get(key);
+    if (exists) {
+      this.cache.delete(key);
+    }
   }
 
-  public getFromCache<T>(key: string): Promise<undefined | T> {
-    return this.cache.get(key).then((exists) => {
-      return exists?.value as T;
-    });
+  public async getFromCache<T>(key: string): Promise<undefined | T> {
+    await this.ensureInitialize();
+    const exists = await this.cache.get(key);
+    return exists?.value as T;
   }
 
   public async forceRefresh() {
+    await this.ensureInitialize();
     const now = Date.now();
 
     this._lastRefresh = now;
@@ -125,22 +135,48 @@ export class Database extends Dexie {
     this.ctx.postMessage(command);
   }
 
+  private async _getRefreshPromiseBazaar(resolve: (value: PromiseLike<void> | void) => void) {
+    const bazaars = await getBazaarData();
+    this.transaction('rw', this.bazaars, async () => {
+      this.bazaars
+        .toCollection()
+        .delete()
+        .then(() => {
+          this.bazaars.bulkAdd(bazaars);
+          resolve();
+          this.sendMessage('Bazaar data has been updated');
+        });
+    });
+  }
+
+  private async _getRefreshPromiseAuctionsAndBins(minAuctions: IAuctions[], resolve: (value: PromiseLike<void> | void) => void) {
+    return this.auctions
+      .toCollection()
+      .delete()
+      .then(() => {
+        this.auctions.bulkAdd(minAuctions);
+        resolve();
+        this.sendMessage('Auctions data has been updated');
+      });
+  }
+
+  private async _getRefreshPromiseBins(minBins: IAuctions[], resolve: (value: PromiseLike<void> | void) => void) {
+    return this.bins
+      .toCollection()
+      .delete()
+      .then(() => {
+        this.bins.bulkAdd(minBins);
+        resolve();
+
+        this.sendMessage('BINs data has been updated');
+      });
+  }
+
   private async _refresh() {
     this.ctx.postMessage(commandLoadingTrue);
 
     const refreshPromiseBazaar = new Promise<void>((resolve) => {
-      return getBazaarData().then((bazaars) => {
-        this.transaction('rw', this.bazaars, async () => {
-          this.bazaars
-            .toCollection()
-            .delete()
-            .then(() => {
-              this.bazaars.bulkAdd(bazaars);
-              resolve();
-              this.sendMessage('Bazaar data has been updated');
-            });
-        });
-      });
+      this._getRefreshPromiseBazaar(resolve);
     });
 
     const refreshPromiseAuctionsAndBins = getAuctionData().then((auctionsAndBins) => {
@@ -152,26 +188,11 @@ export class Database extends Dexie {
         const minBins = this._findMinPrice(bins);
 
         const refreshPromiseAuctions = new Promise<void>((resolve) => {
-          return this.auctions
-            .toCollection()
-            .delete()
-            .then(() => {
-              this.auctions.bulkAdd(minAuctions);
-              resolve();
-              this.sendMessage('Auctions data has been updated');
-            });
+          return this._getRefreshPromiseAuctionsAndBins(minAuctions, resolve);
         });
 
         const refreshPromiseBins = new Promise<void>((resolve) => {
-          return this.bins
-            .toCollection()
-            .delete()
-            .then(() => {
-              this.bins.bulkAdd(minBins);
-              resolve();
-
-              this.sendMessage('BINs data has been updated');
-            });
+          return this._getRefreshPromiseBins(minBins, resolve);
         });
 
         return Promise.all([refreshPromiseAuctions, refreshPromiseBins]);
@@ -195,15 +216,8 @@ export class Database extends Dexie {
   private _findMinPrice(auctions: IAuctions[]): IAuctions[] {
     const minAuctionsRecord = auctions.reduce(
       (minItem, current) => {
-        if (!minItem[current.item_name]) {
+        if (!minItem[current.item_name] || minItem[current.item_name].min > current.buyPrice) {
           minItem[current.item_name] = { item: current, min: current.buyPrice };
-        } else {
-          if (minItem[current.item_name].min > current.buyPrice) {
-            minItem[current.item_name] = {
-              item: current,
-              min: current.buyPrice
-            };
-          }
         }
 
         return minItem;
@@ -215,6 +229,7 @@ export class Database extends Dexie {
   }
 
   public async getItemPrice(item: string, store: 'auctions' | 'auctions+bins' | 'bazaar' | 'bins') {
+    await this.ensureInitialize();
     if (store === 'bins') {
       return await this.bins.get(item);
     }
@@ -242,14 +257,17 @@ export class Database extends Dexie {
   }
 
   public async getItemBazaarPrice(item: string) {
+    await this.ensureInitialize();
     return await this.bazaars.get(item);
   }
 
   public async getItemAuctionsPrice(item: string) {
+    await this.ensureInitialize();
     return await this.auctions.get(item);
   }
 
   public async getItemBinsPrice(item: string) {
+    await this.ensureInitialize();
     return await this.bins.get(item);
   }
 }

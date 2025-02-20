@@ -205,6 +205,8 @@ interface ILanguageUIOptions {
   hotmLabel: string;
   includeAuctionsFlipDescription: string;
   includeAuctionsFlipLabel: string;
+  includePerfectGemsDescription: string;
+  includePerfectGemsLabel: string;
   intermediateCraftDescription: string;
   intermediateCraftLabel: string;
   languageDescription: string;

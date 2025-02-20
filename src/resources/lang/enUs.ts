@@ -231,6 +231,8 @@ export const enUs: ILanguage = {
       hotmLabel: 'HOTM Level',
       includeAuctionsFlipDescription: 'Include Auctions-only craft.',
       includeAuctionsFlipLabel: 'Auctions Craft',
+      includePerfectGemsDescription: 'Include perfect gemstone craft.',
+      includePerfectGemsLabel: 'Perfect Gemstone',
       intermediateCraftDescription: 'Craft intermediary material instead of buying-it.',
       intermediateCraftLabel: 'Intermediary Craft',
       languageDescription: 'Only the interface is translated, the item names are in english.',

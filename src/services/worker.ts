@@ -5,6 +5,7 @@ import type { ITimer, IWorkerResponseGetPricesResult } from '../worker/type';
 
 interface IWorkerState {
   loading: boolean;
+  loadingTimestamp: number;
   materialPrices: Partial<Record<ICraft['itemId'], ICraftWithPrice>>;
   prices: Partial<Record<ICraft['itemId'], ICraftWithCosts>>;
   timerLaunched: ICraft['itemId'][];
@@ -13,6 +14,7 @@ interface IWorkerState {
 
 const initialState: IWorkerState = {
   loading: false,
+  loadingTimestamp: 0,
   materialPrices: {},
   prices: {},
   timerLaunched: [],
@@ -28,6 +30,7 @@ const workerSlice = createSlice({
     },
     setNotLoading: (state) => {
       state.loading = false;
+      state.loadingTimestamp = Date.now();
     },
     setPrices: (state, action: PayloadAction<IWorkerResponseGetPricesResult>) => {
       state.prices = action.payload.crafts;
