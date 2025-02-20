@@ -28,7 +28,7 @@ export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
 
   return (
     <Box sx={{ margin: 1 }}>
-      <Typography component="div" gutterBottom variant="h6">
+      <Typography component="div" variant="h6" gutterBottom>
         {ui.shoppingList}
       </Typography>
       <Table aria-label={ui.shoppingList} size="small">

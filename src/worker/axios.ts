@@ -2,6 +2,24 @@ import axios from 'axios';
 
 import type { IAuctions, IBazaar } from './type';
 
+interface IAuctionsAPIPaginatedResponse {
+  auctions: {
+    bin: boolean; // Indicate if auction or BIN
+    category: string;
+    claimed: boolean; // Indicate if the auction is active
+    highest_bid_amount: number; // Price of auctions
+    item_name: string;
+    starting_bid: number; // Price for BIN
+    tier: string;
+    uuid: string;
+  }[];
+  lastUpdated: number;
+  page: number;
+  success: boolean;
+  totalAuctions: number;
+  totalPages: number;
+}
+
 interface IBazaarAPIResponse {
   products: Record<
     string,
@@ -16,24 +34,9 @@ interface IBazaarAPIResponse {
   success: boolean;
 }
 
-interface IAuctionsAPIPaginatedResponse {
-  auctions: {
-    uuid: string;
-    item_name: string;
-    category: string;
-    tier: string;
-    claimed: boolean; // Indicate if the auction is active
-    starting_bid: number; // Price for BIN
-    highest_bid_amount: number; // Price of auctions
-    bin: boolean; // Indicate if auction or BIN
-  }[];
-  lastUpdated: number;
-  page: number;
-  success: boolean;
-  totalAuctions: number;
-  totalPages: number;
+interface IPlayerAPIResponse {
+  profiles: Record<string, IProfile>;
 }
-
 interface IProfile {
   current: boolean;
   cute_name: string;
@@ -59,9 +62,6 @@ interface IProfile {
       };
     };
   };
-}
-interface IPlayerAPIResponse {
-  profiles: Record<string, IProfile>;
 }
 
 export const getBazaarData = (): Promise<IBazaar[]> => {
@@ -99,12 +99,12 @@ const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
 
   data.auctions
     .filter((auction) => !auction.claimed)
-    .forEach(({ bin, highest_bid_amount, item_name, starting_bid, uuid }) => {
+    .forEach(({ bin, highest_bid_amount: highestBidAmount, item_name: itemName, starting_bid: startingBid, uuid }) => {
       auctions.set(uuid, {
         bin,
-        buyPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount,
-        item_name,
-        sellPrice: bin || highest_bid_amount ? starting_bid : highest_bid_amount
+        buyPrice: bin || highestBidAmount ? startingBid : highestBidAmount,
+        item_name: itemName,
+        sellPrice: bin || highestBidAmount ? startingBid : highestBidAmount
       });
     });
 
@@ -113,14 +113,14 @@ const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
 
 const sortResults = (
   results: {
-    uuid: string;
-    item_name: string;
-    category: string;
-    tier: string;
-    claimed: boolean;
-    starting_bid: number;
-    highest_bid_amount: number;
     bin: boolean;
+    category: string;
+    claimed: boolean;
+    highest_bid_amount: number;
+    item_name: string;
+    starting_bid: number;
+    tier: string;
+    uuid: string;
   }[][],
   auctions: Map<
     string,
@@ -131,13 +131,13 @@ const sortResults = (
 ) => {
   results.forEach((element) => {
     element.forEach((item) => {
-      const { bin, highest_bid_amount, item_name, starting_bid, uuid } = item;
+      const { bin, highest_bid_amount: highestBidAmount, item_name: itemName, starting_bid: startingBid, uuid } = item;
 
       auctions.set(uuid, {
         bin,
-        buyPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount,
-        item_name,
-        sellPrice: bin || highest_bid_amount === 0 ? starting_bid : highest_bid_amount
+        buyPrice: bin || highestBidAmount === 0 ? startingBid : highestBidAmount,
+        item_name: itemName,
+        sellPrice: bin || highestBidAmount === 0 ? startingBid : highestBidAmount
       });
     });
   });
@@ -169,7 +169,7 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
     });
 };
 
-export const getPlayerProfiles = async (playerName: string): Promise<undefined | string[]> => {
+export const getPlayerProfiles = async (playerName: string): Promise<string[] | undefined> => {
   if (!playerName) {
     return;
   }
@@ -178,7 +178,8 @@ export const getPlayerProfiles = async (playerName: string): Promise<undefined |
     .then((response) => response.data)
     .then((response) => Object.keys(response.profiles));
 };
-export const getPlayerData = async (playerName: string, profileName: string): Promise<undefined | IProfile> => {
+
+export const getPlayerData = async (playerName: string, profileName: string): Promise<IProfile | undefined> => {
   if (!playerName || !profileName) {
     return;
   }

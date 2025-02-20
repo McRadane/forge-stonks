@@ -6,11 +6,13 @@ export interface IOptionsState {
   includePerfectGems: boolean;
   intermediateCraft: boolean;
   maxCraftingCost: number;
-  playFrequency: 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
   playerName?: string;
   playerProfile?: string;
+  playFrequency: PlayFrequencyType;
   quickForge: number;
 }
+
+type PlayFrequencyType = 'everyday' | 'less' | 'nonstop' | 'three-time' | 'twice';
 
 export const initialState: IOptionsState = {
   auctionsBINOnly: true,

@@ -1,4 +1,4 @@
-import { type Middleware, configureStore } from '@reduxjs/toolkit';
+import { configureStore, type Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 
 import { Logger } from './logger';
@@ -16,11 +16,11 @@ if (process.env.NODE_ENV === `development`) {
 }
 
 export const store = configureStore({
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
   reducer: {
     options: optionsReducer,
     worker: workerReducer
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares)
+  }
 });
 
 Logger.log('Creating the store', store);

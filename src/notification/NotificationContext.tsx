@@ -1,6 +1,6 @@
 import Alert, { type AlertColor } from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { type FC, type ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, type FC, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 export interface INotificationContextDefinition {
   triggerError(message: string): void;

@@ -1,7 +1,7 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import { type FC, type ReactNode, useCallback } from 'react';
 
 import type { Order } from '../../components/EnhancedTableHead';
@@ -26,15 +26,13 @@ export const Filter: FC<IFilterProps> = ({ children, property, setOrder, setOrde
 
   return (
     <>
-      <Grid item sm={4} xs={12}>
-        {children}
-      </Grid>
-      <Grid item sm={4} xs={6}>
+      <Grid size={{ sm: 4, xs: 12 }}>{children}</Grid>
+      <Grid size={{ sm: 4, xs: 12 }}>
         <Button onClick={handleAsc}>
           <KeyboardArrowUpIcon />
         </Button>
       </Grid>
-      <Grid item sm={4} xs={6}>
+      <Grid size={{ sm: 4, xs: 12 }}>
         <Button onClick={handleDesc}>
           <KeyboardArrowDownIcon />
         </Button>

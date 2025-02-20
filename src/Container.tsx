@@ -1,6 +1,6 @@
-import CssBaseline from '@mui/material/CssBaseline';
 import { red } from '@mui/material/colors';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useMemo } from 'react';
 import { Provider } from 'react-redux';

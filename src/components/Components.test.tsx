@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { expect, describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { Coin } from './Coin';
 import { Item } from './Item';

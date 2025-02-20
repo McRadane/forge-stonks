@@ -15,7 +15,9 @@ import path from 'path';
 import tseslint, { parser as typescriptParser } from 'typescript-eslint';
 import url from 'url';
 
+// eslint-disable-next-line sonarjs/variable-name
 const __filename = url.fileURLToPath(import.meta.url);
+// eslint-disable-next-line sonarjs/variable-name
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({ baseDirectory: __dirname });
@@ -41,12 +43,100 @@ const baseRules = [
   { name: 'ESLint Recommended', ...eslint.configs.recommended },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
-    languageOptions: { parser: typescriptParser, sourceType: 'module' },
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname
+      },
+      sourceType: 'module'
+    },
     // ignores: ['jest.config.ts', '**/*.d.ts'],
     name: 'typescript-eslint',
     plugins: { '@typescript-eslint': tseslint.plugin },
     rules: {
       '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        { format: ['StrictPascalCase'], prefix: ['T'], selector: 'typeParameter' },
+        {
+          custom: {
+            match: true,
+            regex: `^([A-Z][a-z0-9]+)+`
+          },
+          format: ['PascalCase'],
+          selector: ['class', 'enum']
+        },
+        {
+          custom: {
+            match: true,
+            regex: `^([A-Z][a-z0-9]+)+`
+          },
+          format: ['PascalCase'],
+          selector: 'typeAlias'
+        },
+        {
+          format: ['camelCase', 'PascalCase'],
+          leadingUnderscore: 'allow',
+          selector: ['variable', 'function'],
+          types: ['function']
+        },
+        {
+          format: ['PascalCase'],
+          prefix: ['I'],
+          selector: 'interface'
+        },
+        {
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+          modifiers: ['destructured'],
+          selector: 'variable'
+        },
+        {
+          filter: {
+            match: true,
+            regex: 'Promise$'
+          },
+          format: ['camelCase'],
+          modifiers: ['global'],
+          selector: 'variable'
+        },
+        {
+          format: ['camelCase'],
+          modifiers: ['const'],
+          selector: 'variable'
+        },
+        {
+          format: ['UPPER_CASE', 'camelCase'],
+          modifiers: ['global'],
+          selector: 'variable'
+        },
+        {
+          format: ['UPPER_CASE', 'camelCase', 'PascalCase'],
+          modifiers: ['exported', 'global'],
+          selector: 'variable'
+        },
+        {
+          format: ['UPPER_CASE', 'camelCase'],
+          leadingUnderscore: 'require',
+          modifiers: ['unused'],
+          selector: 'variable'
+        },
+        {
+          format: ['UPPER_CASE'],
+          selector: 'enumMember'
+        },
+        {
+          format: ['camelCase'],
+          leadingUnderscore: 'allow',
+          selector: 'parameter'
+        },
+        {
+          format: ['camelCase'],
+          leadingUnderscore: 'require',
+          modifiers: ['private'],
+          selector: 'memberLike'
+        }
+      ],
       '@typescript-eslint/no-array-constructor': 'error',
       '@typescript-eslint/no-duplicate-enum-values': 'error',
       '@typescript-eslint/no-empty-object-type': 'error',
@@ -108,7 +198,12 @@ const baseRules = [
     },
     name: 'React Plugin',
     plugins: { react: reactPlugin },
-    rules: { ...reactPlugin.configs.recommended.rules, 'react/jsx-uses-react': 0, 'react/prop-types': 'off', 'react/react-in-jsx-scope': 0 },
+    rules: {
+      ...reactPlugin.configs.recommended.rules,
+      'react/jsx-uses-react': 0,
+      'react/prop-types': 'off',
+      'react/react-in-jsx-scope': 0
+    },
     settings: {
       react: {
         version: '19.0'
@@ -122,12 +217,49 @@ const baseRules = [
   {
     name: 'Promise Plugin',
     plugins: { promise: legacyPlugin('eslint-plugin-promise', 'promise') },
-    rules: promisePlugin.configs.recommended.rules
+    rules: {
+      ...promisePlugin.configs.recommended.rules,
+      'promise/always-return': 'off'
+    }
   },
   {
     name: 'Perfecionist plugin',
     plugins: { perfectionist: perfectionistPlugin },
-    rules: { ...perfectionistPlugin.configs['recommended-natural'].rules }
+    rules: {
+      ...perfectionistPlugin.configs['recommended-natural'].rules,
+      'perfectionist/sort-array-includes': ['warn', { groupKind: 'literals-first' }],
+      'perfectionist/sort-classes': [
+        'warn',
+        {
+          groups: ['property', 'static-property', 'private-property', 'constructor', 'static-method', 'method', 'private-method']
+        }
+      ],
+      'perfectionist/sort-enums': 'warn',
+      'perfectionist/sort-imports': [
+        'warn',
+        {
+          groups: [['builtin', 'external'], 'internal', 'parent', ['sibling', 'index'], 'style', 'object', 'side-effect'],
+          newlinesBetween: 'always'
+        }
+      ],
+      'perfectionist/sort-interfaces': 'warn',
+      'perfectionist/sort-jsx-props': [
+        'warn',
+        {
+          customGroups: {
+            top: ['id', 'name', 'control']
+          },
+          groups: ['top', 'multiline', 'unknown', 'shorthand']
+        }
+      ],
+      'perfectionist/sort-map-elements': 'off',
+      'perfectionist/sort-modules': 'off',
+      'perfectionist/sort-named-exports': 'warn',
+      'perfectionist/sort-named-imports': 'warn',
+      'perfectionist/sort-object-types': 'warn',
+      'perfectionist/sort-objects': 'warn',
+      'perfectionist/sort-union-types': 'warn'
+    }
   },
   {
     ignores: ['jest.config.ts', '**/*.d.ts'],
@@ -153,7 +285,6 @@ const baseRules = [
       'sonarjs/no-for-in-iterable': 'warn',
       'sonarjs/no-function-declaration-in-block': 'warn',
       'sonarjs/no-implicit-dependencies': 'warn',
-      'sonarjs/no-inconsistent-returns': 'warn',
       'sonarjs/no-incorrect-string-concat': 'warn',
       'sonarjs/no-nested-incdec': 'warn',
       'sonarjs/no-nested-switch': 'warn',
@@ -168,7 +299,6 @@ const baseRules = [
       'sonarjs/prefer-immediate-return': 'warn',
       'sonarjs/prefer-object-literal': 'warn',
       'sonarjs/regular-expr': 'warn',
-      'sonarjs/shorthand-property-grouping': 'warn',
       'sonarjs/standard-input': 'warn',
       'sonarjs/strings-comparison': 'warn',
       'sonarjs/too-many-break-or-continue-in-loop': 'warn',

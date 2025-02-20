@@ -1,4 +1,4 @@
-import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { ITimer, IWorkerResponseGetPricesResult } from '../worker/type';

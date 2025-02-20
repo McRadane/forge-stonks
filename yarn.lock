@@ -3158,7 +3158,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axe-core@npm:^4.10.0":
+"axe-core@npm:^4.10.0, axe-core@npm:^4.4.2":
   version: 4.10.2
   resolution: "axe-core@npm:4.10.2"
   checksum: 10c0/0e20169077de96946a547fce0df39d9aeebe0077f9d3eeff4896518b96fde857f80b98f0d4279274a7178791744dd5a54bb4f322de45b4f561ffa2586ff9a09d
@@ -3442,7 +3442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^5.4.1":
+"chalk@npm:^5.0.1, chalk@npm:^5.4.1":
   version: 5.4.1
   resolution: "chalk@npm:5.4.1"
   checksum: 10c0/b23e88132c702f4855ca6d25cb5538b1114343e41472d5263ee8a37cccfccd9c4216d111e1097c6a27830407a1dc81fecdf2a56f2c63033d4dbbd88c10b0dcef
@@ -3865,6 +3865,13 @@ __metadata:
   dependencies:
     esutils: "npm:^2.0.2"
   checksum: 10c0/c96bdccabe9d62ab6fea9399fdff04a66e6563c1d6fb3a3a063e8d53c3bb136ba63e84250bbf63d00086a769ad53aef92d2bd483f03f837fc97b71cbee6b2520
+  languageName: node
+  linkType: hard
+
+"dom-accessibility-api@npm:^0.5.14":
+  version: 0.5.16
+  resolution: "dom-accessibility-api@npm:0.5.16"
+  checksum: 10c0/b2c2eda4fae568977cdac27a9f0c001edf4f95a6a6191dfa611e3721db2478d1badc01db5bb4fa8a848aeee13e442a6c2a4386d65ec65a1436f24715a2f8d053
   languageName: node
   linkType: hard
 
@@ -5015,6 +5022,7 @@ __metadata:
     typescript-eslint: "npm:^8.24.1"
     vite: "npm:^6.1.1"
     vitest: "npm:^3.0.6"
+    vitest-axe: "npm:^0.1.0"
   languageName: unknown
   linkType: soft
 
@@ -6369,6 +6377,13 @@ __metadata:
   dependencies:
     p-locate: "npm:^5.0.0"
   checksum: 10c0/d3972ab70dfe58ce620e64265f90162d247e87159b6126b01314dd67be43d50e96a50b517bce2d9452a79409c7614054c277b5232377de50416564a77ac7aad3
+  languageName: node
+  linkType: hard
+
+"lodash-es@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash-es@npm:4.17.21"
+  checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
   languageName: node
   linkType: hard
 
@@ -8827,6 +8842,22 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/4ec5ddc9436951a68b213cd59c2a157663ef423658c387400774582ea33da40dcae18e55f3adb3b629173e2183b10d49db8370bc51a0aa89797e4ca5a34702a0
+  languageName: node
+  linkType: hard
+
+"vitest-axe@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "vitest-axe@npm:0.1.0"
+  dependencies:
+    aria-query: "npm:^5.0.0"
+    axe-core: "npm:^4.4.2"
+    chalk: "npm:^5.0.1"
+    dom-accessibility-api: "npm:^0.5.14"
+    lodash-es: "npm:^4.17.21"
+    redent: "npm:^3.0.0"
+  peerDependencies:
+    vitest: ">=0.16.0"
+  checksum: 10c0/ad523ad3115f66b1605c3c0ea6a9932867c4273f8ad73b717afc5fe496159b5e11d50a8babf05ce4990c612558ee24579cf14258304ce6b32a77d15be9e98aa6
   languageName: node
   linkType: hard
 

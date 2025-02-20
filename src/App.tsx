@@ -38,16 +38,21 @@ export const App = () => {
     if (!workerInit.current && worker) {
       Logger.log('Initializing WebWorker');
       workerInit.current = true;
-      worker.getLanguage().then((language) => {
-        if (language) {
-          const resultLanguage = userLanguageChange(language);
-          if (resultLanguage !== language) {
-            worker.setLanguage(resultLanguage);
+      worker
+        .getLanguage()
+        .then((language) => {
+          if (language) {
+            const resultLanguage = userLanguageChange(language);
+            if (resultLanguage !== language) {
+              worker.setLanguage(resultLanguage);
+            }
           }
-        }
 
-        worker.initialize();
-      });
+          worker.initialize();
+        })
+        .catch((error) => {
+          Logger.log('Error durring WebWorker initialization', error);
+        });
     }
   }, [dispatch, languageContext, userLanguageChange, worker]);
 

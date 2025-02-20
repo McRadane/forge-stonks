@@ -95,6 +95,7 @@
     "build": "tsc && vite build",
     "dev": "vite",
     "lint": "eslint --report-unused-disable-directives -f vscode ./src",
+    "lint:fix": "eslint -f vscode --fix ./src",
     "postinstall": "husky install",
     "postpack": "pinst --enable",
     "prepack": "pinst --disable",

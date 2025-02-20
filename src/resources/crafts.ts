@@ -9,36 +9,37 @@ const SOURCE_VENDOR = 'vendor';
 
 export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' | 'vendor'> = {
   AMBER_MATERIAL: SOURCE_BAZAAR,
+  'Amber-polished Drill Engine': SOURCE_AUCTION,
   'Amber Crystal': SOURCE_VENDOR,
   'Amber Necklace': SOURCE_AUCTION,
-  'Amber-polished Drill Engine': SOURCE_AUCTION,
   'Amethyst Crystal': SOURCE_VENDOR,
   'Amethyst Gauntlet': SOURCE_AUCTION,
   'Ammonite Pet': SOURCE_AUCTION,
   'Ankylosaurus Pet': SOURCE_AUCTION,
   'Aquamarine Crystal': SOURCE_VENDOR,
   'Artifact Of Power': SOURCE_AUCTION,
-  BEJEWELED_HANDLE: SOURCE_BAZAAR,
   'Beacon I': SOURCE_AUCTION,
   'Beacon II': SOURCE_AUCTION,
   'Beacon III': SOURCE_AUCTION,
   'Beacon IV': SOURCE_AUCTION,
   'Beacon V': SOURCE_AUCTION,
+  BEJEWELED_HANDLE: SOURCE_BAZAAR,
   'Bejeweled Collar': SOURCE_AUCTION,
   'Blue Cheese Goblin Omelette': SOURCE_AUCTION,
   'Boots Of Divan': SOURCE_AUCTION,
-  CORLEONITE: SOURCE_BAZAAR,
   'Chestplate Of Divan': SOURCE_AUCTION,
   Chisel: SOURCE_AUCTION,
   'Citrine Crystal': SOURCE_VENDOR,
   'Claw Fossil': SOURCE_AUCTION,
   'Clubbed Fossil': SOURCE_AUCTION,
+  coins: SOURCE_VENDOR,
+  CORLEONITE: SOURCE_BAZAAR,
   DIAMONITE: SOURCE_BAZAAR,
   DIVAN_FRAGMENT: SOURCE_BAZAAR,
   DIVAN_POWDER_COATING: SOURCE_BAZAAR,
-  DRILL_ENGINE: SOURCE_BAZAAR,
   "Divan's Alloy": SOURCE_AUCTION,
   "Divan's Drill": SOURCE_AUCTION,
+  DRILL_ENGINE: SOURCE_BAZAAR,
   'Dwarven Handwarmers': SOURCE_AUCTION,
   'Dwarven Metal Talisman': SOURCE_AUCTION,
   ENCHANTED_COAL_BLOCK: SOURCE_BAZAAR,
@@ -75,12 +76,16 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   FLAWLESS_RUBY_GEM: SOURCE_BAZAAR,
   FLAWLESS_SAPPHIRE_GEM: SOURCE_BAZAAR,
   FLAWLESS_TOPAZ_GEM: SOURCE_BAZAAR,
+  'Footprint Fossil': SOURCE_AUCTION,
   FRIGID_HUSK: SOURCE_BAZAAR,
   FUEL_TANK: SOURCE_BAZAAR,
-  'Footprint Fossil': SOURCE_AUCTION,
   GEMSTONE_MIXTURE: SOURCE_BAZAAR,
+  'Gemstone Chamber': SOURCE_AUCTION,
+  'Gemstone Drill LT-522': SOURCE_AUCTION,
+  'Gemstone Fuel Tank': SOURCE_AUCTION,
   GLACITE_AMALGAMATION: SOURCE_BAZAAR,
   GLACITE_JEWEL: SOURCE_BAZAAR,
+  'Glacite-Plated Chisel': SOURCE_AUCTION,
   GLEAMING_CRYSTAL: SOURCE_BAZAAR,
   GLOSSY_GEMSTONE: SOURCE_BAZAAR,
   GOBLIN_EGG: SOURCE_BAZAAR,
@@ -88,38 +93,36 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   GOBLIN_EGG_GREEN: SOURCE_BAZAAR,
   GOBLIN_EGG_RED: SOURCE_BAZAAR,
   GOBLIN_EGG_YELLOW: SOURCE_BAZAAR,
-  GOLDEN_PLATE: SOURCE_BAZAAR,
-  'Gemstone Chamber': SOURCE_AUCTION,
-  'Gemstone Drill LT-522': SOURCE_AUCTION,
-  'Gemstone Fuel Tank': SOURCE_AUCTION,
-  'Glacite-Plated Chisel': SOURCE_AUCTION,
   'Goblin Omelette': SOURCE_AUCTION,
   'Goblin Pet': SOURCE_AUCTION,
+  GOLDEN_PLATE: SOURCE_BAZAAR,
   HARD_STONE: SOURCE_BAZAAR,
-  HOT_STUFF: SOURCE_BAZAAR,
   'Helix Fossil': SOURCE_AUCTION,
   'Helmet Of Divan': SOURCE_AUCTION,
+  HOT_STUFF: SOURCE_BAZAAR,
   'Jade Belt': SOURCE_AUCTION,
   'Jade Crystal': SOURCE_VENDOR,
   'Jasper Crystal': SOURCE_VENDOR,
   'Jasper Drill X': SOURCE_AUCTION,
   'Leggings Of Divan': SOURCE_AUCTION,
   MAGMA_CORE: SOURCE_BAZAAR,
+  'Mammoth Pet': SOURCE_AUCTION,
   MATCH_STICKS: SOURCE_BAZAAR,
   MITHRIL_ORE: SOURCE_BAZAAR,
   MITHRIL_PLATE: SOURCE_BAZAAR,
-  'Mammoth Pet': SOURCE_AUCTION,
+  'Mithril-Infused Fuel Tank': SOURCE_AUCTION,
+  'Mithril-Plated Drill Engine': SOURCE_AUCTION,
   'Mithril Belt': SOURCE_AUCTION,
   'Mithril Cloak': SOURCE_AUCTION,
   'Mithril Drill SX-R226': SOURCE_AUCTION,
   'Mithril Drill SX-R326': SOURCE_AUCTION,
   'Mithril Gauntlet': SOURCE_AUCTION,
   'Mithril Necklace': SOURCE_AUCTION,
-  'Mithril-Infused Fuel Tank': SOURCE_AUCTION,
-  'Mithril-Plated Drill Engine': SOURCE_AUCTION,
   'Mole Pet': SOURCE_AUCTION,
   'Onyx Crystal': SOURCE_VENDOR,
   'Opal Crystal': SOURCE_VENDOR,
+  'Pendant Of Divan': SOURCE_AUCTION,
+  'Penguin Pet': SOURCE_AUCTION,
   PERFECT_AMBER_GEM: SOURCE_BAZAAR,
   PERFECT_AMETHYST_GEM: SOURCE_BAZAAR,
   PERFECT_AQUAMARINE_GEM: SOURCE_BAZAAR,
@@ -133,51 +136,47 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   PERFECT_RUBY_GEM: SOURCE_BAZAAR,
   PERFECT_SAPPHIRE_GEM: SOURCE_BAZAAR,
   PERFECT_TOPAZ_GEM: SOURCE_BAZAAR,
-  PETRIFIED_STARFALL: SOURCE_BAZAAR,
-  PLASMA: SOURCE_BAZAAR,
-  POCKET_ICEBERG: SOURCE_BAZAAR,
-  POWER_CRYSTAL: SOURCE_BAZAAR,
-  PRECURSOR_APPARATUS: SOURCE_BAZAAR,
-  PURE_MITHRIL: SOURCE_BAZAAR,
-  'Pendant Of Divan': SOURCE_AUCTION,
-  'Penguin Pet': SOURCE_AUCTION,
   'Perfect Chisel': SOURCE_AUCTION,
   'Perfectly-Cut Fuel Tank': SOURCE_AUCTION,
   'Peridot Crystal': SOURCE_VENDOR,
   'Pesto Goblin Omelette': SOURCE_AUCTION,
+  PETRIFIED_STARFALL: SOURCE_BAZAAR,
+  PLASMA: SOURCE_BAZAAR,
+  POCKET_ICEBERG: SOURCE_BAZAAR,
   'Polished Topaz Rod': SOURCE_AUCTION,
   'Portable Campfire': SOURCE_AUCTION,
+  POWER_CRYSTAL: SOURCE_BAZAAR,
+  PRECURSOR_APPARATUS: SOURCE_BAZAAR,
+  PURE_MITHRIL: SOURCE_BAZAAR,
   REFINED_DIAMOND: SOURCE_BAZAAR,
   REFINED_MINERAL: SOURCE_BAZAAR,
   REFINED_MITHRIL: SOURCE_BAZAAR,
   REFINED_TITANIUM: SOURCE_BAZAAR,
   REFINED_TUNGSTEN: SOURCE_BAZAAR,
   REFINED_UMBER: SOURCE_BAZAAR,
-  ROCK_GEMSTONE: SOURCE_BAZAAR,
   'Reinforced Chisel': SOURCE_AUCTION,
   'Relic Of Power': SOURCE_AUCTION,
+  ROCK_GEMSTONE: SOURCE_BAZAAR,
+  'Ruby-polished Drill Engine': SOURCE_AUCTION,
   'Ruby Crystal': SOURCE_VENDOR,
   'Ruby Drill TX-15': SOURCE_AUCTION,
-  'Ruby-polished Drill Engine': SOURCE_AUCTION,
-  SKELETON_KEY: SOURCE_BAZAAR,
-  SLUDGE_JUICE: SOURCE_BAZAAR,
-  STARFALL: SOURCE_BAZAAR,
+  'Sapphire-polished Drill Engine': SOURCE_AUCTION,
   'Sapphire Cloak': SOURCE_AUCTION,
   'Sapphire Crystal': SOURCE_VENDOR,
-  'Sapphire-polished Drill Engine': SOURCE_AUCTION,
   'Shattered Locket': SOURCE_AUCTION,
+  SKELETON_KEY: SOURCE_BAZAAR,
+  SLUDGE_JUICE: SOURCE_BAZAAR,
   'Spicy Goblin Omelette': SOURCE_AUCTION,
   'Spine Fossil': SOURCE_AUCTION,
   'Spinosaurus Pet': SOURCE_AUCTION,
+  STARFALL: SOURCE_BAZAAR,
   'Starfall Seasoning': SOURCE_AUCTION,
   'Sunny Side Goblin Omelette': SOURCE_AUCTION,
   'T-Rex Pet': SOURCE_AUCTION,
   TITANIUM_ORE: SOURCE_BAZAAR,
   TITANIUM_TESSERACT: SOURCE_BAZAAR,
-  TREASURITE: SOURCE_BAZAAR,
-  TUNGSTEN_KEY: SOURCE_BAZAAR,
-  TUNGSTEN_ORE: SOURCE_BAZAAR,
-  TUNGSTEN_PLATE: SOURCE_BAZAAR,
+  'Titanium-Infused Fuel Tank': SOURCE_AUCTION,
+  'Titanium-Plated Drill Engine': SOURCE_AUCTION,
   'Titanium Artifact': SOURCE_AUCTION,
   'Titanium Belt': SOURCE_AUCTION,
   'Titanium Cloak': SOURCE_AUCTION,
@@ -190,20 +189,21 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   'Titanium Relic': SOURCE_AUCTION,
   'Titanium Ring': SOURCE_AUCTION,
   'Titanium Talisman': SOURCE_AUCTION,
-  'Titanium-Infused Fuel Tank': SOURCE_AUCTION,
-  'Titanium-Plated Drill Engine': SOURCE_AUCTION,
   'Topaz Crystal': SOURCE_VENDOR,
   'Topaz Drill KGR-12': SOURCE_AUCTION,
   'Travel Scroll to the Dwarven Base Camp': SOURCE_AUCTION,
   'Travel Scroll to the Dwarven Forge': SOURCE_AUCTION,
+  TREASURITE: SOURCE_BAZAAR,
+  TUNGSTEN_KEY: SOURCE_BAZAAR,
+  TUNGSTEN_ORE: SOURCE_BAZAAR,
+  TUNGSTEN_PLATE: SOURCE_BAZAAR,
   'Tungsten Regulator': SOURCE_AUCTION,
   'Tusk Fossil': SOURCE_AUCTION,
+  'Ugly Fossil': SOURCE_AUCTION,
   UMBER_KEY: SOURCE_BAZAAR,
   UMBER_PLATE: SOURCE_BAZAAR,
-  'Ugly Fossil': SOURCE_AUCTION,
-  WORM_MEMBRANE: SOURCE_BAZAAR,
   'Webbed Fossil': SOURCE_AUCTION,
-  coins: SOURCE_VENDOR
+  WORM_MEMBRANE: SOURCE_BAZAAR
 };
 
 const DAY = 24;
@@ -1436,7 +1436,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'refining',
         id: index + indexRefine
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsGear.map(
     (craft, index) =>
@@ -1444,7 +1444,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'gear',
         id: index + indexGear
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsGemstones.map(
     (craft, index) =>
@@ -1452,7 +1452,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'gemstone',
         id: index + indexGemstone
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsForging.map(
     (craft, index) =>
@@ -1460,7 +1460,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'forging',
         id: index + indexForging
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsStones.map(
     (craft, index) =>
@@ -1468,7 +1468,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'stones',
         id: index + indexStones
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsPets.map(
     (craft, index) =>
@@ -1476,7 +1476,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'pets',
         id: index + indexPets
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsTools.map(
     (craft, index) =>
@@ -1484,7 +1484,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'tools',
         id: index + indexTools
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsDrillParts.map(
     (craft, index) =>
@@ -1492,7 +1492,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'drill parts',
         id: index + indexDrillParts
-      } as ICraft)
+      }) as ICraft
   ),
   ...craftsOther.map(
     (craft, index) =>
@@ -1500,6 +1500,6 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'other',
         id: index + indexOther
-      } as ICraft)
+      }) as ICraft
   )
 ];

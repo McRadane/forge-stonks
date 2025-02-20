@@ -1,35 +1,59 @@
+export interface ILanguage {
+  items: ILanguageItems;
+  notification: {
+    timerEnded: string;
+    timerStarted: string;
+  };
+  ui: ILanguageUI;
+}
+
+export interface ILanguageContextDefinition {
+  allDictionary: { [key: string]: ILanguage };
+  dictionary: ILanguage;
+  userLanguage: KeysLanguageType;
+
+  /**
+   * Change the current language
+   * @param selected
+   */
+  userLanguageChange(selected: KeysLanguageType): KeysLanguageType;
+}
+
+export type KeysLanguageType = 'en-US' | 'fr-FR';
+
 interface ILanguageItems {
   AMBER_MATERIAL: string;
+  'Amber-polished Drill Engine': string;
   'Amber Crystal': string;
   'Amber Necklace': string;
-  'Amber-polished Drill Engine': string;
   'Amethyst Crystal': string;
   'Amethyst Gauntlet': string;
   'Ammonite Pet': string;
   'Ankylosaurus Pet': string;
   'Aquamarine Crystal': string;
   'Artifact Of Power': string;
-  BEJEWELED_HANDLE: string;
   'Beacon I': string;
   'Beacon II': string;
   'Beacon III': string;
   'Beacon IV': string;
   'Beacon V': string;
+  BEJEWELED_HANDLE: string;
   'Bejeweled Collar': string;
   'Blue Cheese Goblin Omelette': string;
   'Boots Of Divan': string;
-  CORLEONITE: string;
   'Chestplate Of Divan': string;
   Chisel: string;
   'Citrine Crystal': string;
   'Claw Fossil': string;
   'Clubbed Fossil': string;
+  coins: string;
+  CORLEONITE: string;
   DIAMONITE: string;
   DIVAN_FRAGMENT: string;
   DIVAN_POWDER_COATING: string;
-  DRILL_ENGINE: string;
   "Divan's Alloy": string;
   "Divan's Drill": string;
+  DRILL_ENGINE: string;
   'Dwarven Handwarmers': string;
   'Dwarven Metal Talisman': string;
   ENCHANTED_COAL_BLOCK: string;
@@ -66,12 +90,16 @@ interface ILanguageItems {
   FLAWLESS_RUBY_GEM: string;
   FLAWLESS_SAPPHIRE_GEM: string;
   FLAWLESS_TOPAZ_GEM: string;
+  'Footprint Fossil': string;
   FRIGID_HUSK: string;
   FUEL_TANK: string;
-  'Footprint Fossil': string;
   GEMSTONE_MIXTURE: string;
+  'Gemstone Chamber': string;
+  'Gemstone Drill LT-522': string;
+  'Gemstone Fuel Tank': string;
   GLACITE_AMALGAMATION: string;
   GLACITE_JEWEL: string;
+  'Glacite-Plated Chisel': string;
   GLEAMING_CRYSTAL: string;
   GLOSSY_GEMSTONE: string;
   GOBLIN_EGG: string;
@@ -79,38 +107,36 @@ interface ILanguageItems {
   GOBLIN_EGG_GREEN: string;
   GOBLIN_EGG_RED: string;
   GOBLIN_EGG_YELLOW: string;
-  GOLDEN_PLATE: string;
-  'Gemstone Chamber': string;
-  'Gemstone Drill LT-522': string;
-  'Gemstone Fuel Tank': string;
-  'Glacite-Plated Chisel': string;
   'Goblin Omelette': string;
   'Goblin Pet': string;
+  GOLDEN_PLATE: string;
   HARD_STONE: string;
-  HOT_STUFF: string;
   'Helix Fossil': string;
   'Helmet Of Divan': string;
+  HOT_STUFF: string;
   'Jade Belt': string;
   'Jade Crystal': string;
   'Jasper Crystal': string;
   'Jasper Drill X': string;
   'Leggings Of Divan': string;
   MAGMA_CORE: string;
+  'Mammoth Pet': string;
   MATCH_STICKS: string;
   MITHRIL_ORE: string;
   MITHRIL_PLATE: string;
-  'Mammoth Pet': string;
+  'Mithril-Infused Fuel Tank': string;
+  'Mithril-Plated Drill Engine': string;
   'Mithril Belt': string;
   'Mithril Cloak': string;
   'Mithril Drill SX-R226': string;
   'Mithril Drill SX-R326': string;
   'Mithril Gauntlet': string;
   'Mithril Necklace': string;
-  'Mithril-Infused Fuel Tank': string;
-  'Mithril-Plated Drill Engine': string;
   'Mole Pet': string;
   'Onyx Crystal': string;
   'Opal Crystal': string;
+  'Pendant Of Divan': string;
+  'Penguin Pet': string;
   PERFECT_AMBER_GEM: string;
   PERFECT_AMETHYST_GEM: string;
   PERFECT_AQUAMARINE_GEM: string;
@@ -124,51 +150,47 @@ interface ILanguageItems {
   PERFECT_RUBY_GEM: string;
   PERFECT_SAPPHIRE_GEM: string;
   PERFECT_TOPAZ_GEM: string;
-  PETRIFIED_STARFALL: string;
-  PLASMA: string;
-  POCKET_ICEBERG: string;
-  POWER_CRYSTAL: string;
-  PRECURSOR_APPARATUS: string;
-  PURE_MITHRIL: string;
-  'Pendant Of Divan': string;
-  'Penguin Pet': string;
   'Perfect Chisel': string;
   'Perfectly-Cut Fuel Tank': string;
   'Peridot Crystal': string;
   'Pesto Goblin Omelette': string;
+  PETRIFIED_STARFALL: string;
+  PLASMA: string;
+  POCKET_ICEBERG: string;
   'Polished Topaz Rod': string;
   'Portable Campfire': string;
+  POWER_CRYSTAL: string;
+  PRECURSOR_APPARATUS: string;
+  PURE_MITHRIL: string;
   REFINED_DIAMOND: string;
   REFINED_MINERAL: string;
   REFINED_MITHRIL: string;
   REFINED_TITANIUM: string;
   REFINED_TUNGSTEN: string;
   REFINED_UMBER: string;
-  ROCK_GEMSTONE: string;
   'Reinforced Chisel': string;
   'Relic Of Power': string;
+  ROCK_GEMSTONE: string;
+  'Ruby-polished Drill Engine': string;
   'Ruby Crystal': string;
   'Ruby Drill TX-15': string;
-  'Ruby-polished Drill Engine': string;
-  SKELETON_KEY: string;
-  SLUDGE_JUICE: string;
-  STARFALL: string;
+  'Sapphire-polished Drill Engine': string;
   'Sapphire Cloak': string;
   'Sapphire Crystal': string;
-  'Sapphire-polished Drill Engine': string;
   'Shattered Locket': string;
+  SKELETON_KEY: string;
+  SLUDGE_JUICE: string;
   'Spicy Goblin Omelette': string;
   'Spine Fossil': string;
   'Spinosaurus Pet': string;
+  STARFALL: string;
   'Starfall Seasoning': string;
   'Sunny Side Goblin Omelette': string;
   'T-Rex Pet': string;
   TITANIUM_ORE: string;
   TITANIUM_TESSERACT: string;
-  TREASURITE: string;
-  TUNGSTEN_KEY: string;
-  TUNGSTEN_ORE: string;
-  TUNGSTEN_PLATE: string;
+  'Titanium-Infused Fuel Tank': string;
+  'Titanium-Plated Drill Engine': string;
   'Titanium Artifact': string;
   'Titanium Belt': string;
   'Titanium Cloak': string;
@@ -181,50 +203,21 @@ interface ILanguageItems {
   'Titanium Relic': string;
   'Titanium Ring': string;
   'Titanium Talisman': string;
-  'Titanium-Infused Fuel Tank': string;
-  'Titanium-Plated Drill Engine': string;
   'Topaz Crystal': string;
   'Topaz Drill KGR-12': string;
   'Travel Scroll to the Dwarven Base Camp': string;
   'Travel Scroll to the Dwarven Forge': string;
+  TREASURITE: string;
+  TUNGSTEN_KEY: string;
+  TUNGSTEN_ORE: string;
+  TUNGSTEN_PLATE: string;
   'Tungsten Regulator': string;
   'Tusk Fossil': string;
+  'Ugly Fossil': string;
   UMBER_KEY: string;
   UMBER_PLATE: string;
-  'Ugly Fossil': string;
-  WORM_MEMBRANE: string;
   'Webbed Fossil': string;
-  coins: string;
-}
-
-interface ILanguageUIOptions {
-  auctionsBINOnlyDescription: string;
-  auctionsBINOnlyLabel: string;
-  forceRefresh: string;
-  hotmDescription: string;
-  hotmLabel: string;
-  includeAuctionsFlipDescription: string;
-  includeAuctionsFlipLabel: string;
-  includePerfectGemsDescription: string;
-  includePerfectGemsLabel: string;
-  intermediateCraftDescription: string;
-  intermediateCraftLabel: string;
-  languageDescription: string;
-  languageLabel: string;
-  languageOptionEnglish: string;
-  languageOptionFrench: string;
-  maxCraftingCostDescription: string;
-  maxCraftingCostLabel: string;
-  playFrequencyDescription: string;
-  playFrequencyLabel: string;
-  playFrequencyOptionEveryday: string;
-  playFrequencyOptionLess: string;
-  playFrequencyOptionNonStop: string;
-  playFrequencyOptionThreeTime: string;
-  playFrequencyOptionTwice: string;
-  quickForgeDescription: string;
-  quickForgeLabel: string;
-  title: string;
+  WORM_MEMBRANE: string;
 }
 
 interface ILanguageUI {
@@ -264,25 +257,32 @@ interface ILanguageUI {
   vendor: string;
 }
 
-export interface ILanguage {
-  items: ILanguageItems;
-  notification: {
-    timerEnded: string;
-    timerStarted: string;
-  };
-  ui: ILanguageUI;
-}
-
-export type KeysLanguageType = 'en-US' | 'fr-FR';
-
-export interface ILanguageContextDefinition {
-  allDictionary: { [key: string]: ILanguage };
-  dictionary: ILanguage;
-  userLanguage: KeysLanguageType;
-
-  /**
-   * Change the current language
-   * @param selected
-   */
-  userLanguageChange(selected: KeysLanguageType): KeysLanguageType;
+interface ILanguageUIOptions {
+  auctionsBINOnlyDescription: string;
+  auctionsBINOnlyLabel: string;
+  forceRefresh: string;
+  hotmDescription: string;
+  hotmLabel: string;
+  includeAuctionsFlipDescription: string;
+  includeAuctionsFlipLabel: string;
+  includePerfectGemsDescription: string;
+  includePerfectGemsLabel: string;
+  intermediateCraftDescription: string;
+  intermediateCraftLabel: string;
+  languageDescription: string;
+  languageLabel: string;
+  languageOptionEnglish: string;
+  languageOptionFrench: string;
+  maxCraftingCostDescription: string;
+  maxCraftingCostLabel: string;
+  playFrequencyDescription: string;
+  playFrequencyLabel: string;
+  playFrequencyOptionEveryday: string;
+  playFrequencyOptionLess: string;
+  playFrequencyOptionNonStop: string;
+  playFrequencyOptionThreeTime: string;
+  playFrequencyOptionTwice: string;
+  quickForgeDescription: string;
+  quickForgeLabel: string;
+  title: string;
 }

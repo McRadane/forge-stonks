@@ -6,9 +6,8 @@ import { type Theme, useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import type { ITimer } from '../worker/type';
-
 import { useLanguage } from '../resources/lang/LanguageContext';
+import type { ITimer } from '../worker/type';
 import { useWorker } from '../worker/WorkerContext';
 
 const getStyles = (theme: Theme) => ({
@@ -39,7 +38,7 @@ const getStyles = (theme: Theme) => ({
   }
 });
 
-type ITimerProps = ITimer;
+type TimerPropsType = ITimer;
 
 const getLabel = (hours: number | undefined, minutes: number | undefined, seconds: number) => {
   if (hours !== undefined) {
@@ -53,7 +52,7 @@ const getLabel = (hours: number | undefined, minutes: number | undefined, second
   return `${seconds}s`;
 };
 
-export const Timer: FC<ITimerProps> = ({ endTime, id, itemId, startTime }) => {
+export const Timer: FC<TimerPropsType> = ({ endTime, id, itemId, startTime }) => {
   const calculateTime = useCallback((now: number) => ((now - startTime) * 100) / (endTime - startTime), [endTime, startTime]);
 
   const [currentTime, setCurrentTime] = useState(Date.now);

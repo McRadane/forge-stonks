@@ -2,7 +2,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import { type FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { type Order, getComparator } from '../../components/EnhancedTableHead';
+import { getComparator, type Order } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
@@ -37,7 +37,7 @@ export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
   return (
     <>
       <Accordion>
-        <AccordionSummary aria-controls="panel1a-content" expandIcon={<ExpandMoreIcon />} id="panel1a-header">
+        <AccordionSummary aria-controls="panel1a-content" id="panel1a-header" expandIcon={<ExpandMoreIcon />}>
           <Typography>{ui.filters}</Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -46,23 +46,23 @@ export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
               <ListItemText
                 primary={
                   <Grid container>
-                    <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="id">
+                    <Filter property="id" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.item}
                     </Filter>
-                    <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="sell">
+                    <Filter property="sell" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.sellPrice}
                     </Filter>
-                    <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="time">
+                    <Filter property="time" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.time}
                     </Filter>
-                    <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="craft">
+                    <Filter property="craft" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.craftCost}
                     </Filter>
-                    <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="profit">
+                    <Filter property="profit" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.profit}
                     </Filter>
                     {playFrequency !== 'less' && (
-                      <Filter setOrder={setOrder} setOrderBy={setOrderBy} property="profitHourly">
+                      <Filter property="profitHourly" setOrder={setOrder} setOrderBy={setOrderBy}>
                         {profitByTime}
                       </Filter>
                     )}

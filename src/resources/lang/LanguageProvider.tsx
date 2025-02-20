@@ -1,8 +1,8 @@
 import { type FC, type ReactNode, useMemo, useState } from 'react';
 
-import { LanguageContext } from './LanguageContext';
 import { dictionaryList, languageSelectorHelper } from './language';
-import type { KeysLanguageType, ILanguageContextDefinition } from './type';
+import { LanguageContext } from './LanguageContext';
+import type { ILanguageContextDefinition, KeysLanguageType } from './type';
 
 interface ILanguageProviderProps {
   children: ReactNode;
