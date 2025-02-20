@@ -40,6 +40,18 @@ const getStyles = (theme: Theme) => ({
 
 type ITimerProps = ITimer;
 
+const getLabel = (hours: undefined | number, minutes: undefined | number, seconds: number) => {
+  if (hours !== undefined) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  if (minutes !== undefined) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  return `${seconds}s`;
+};
+
 export const Timer: FC<ITimerProps> = ({ endTime, id, itemId, startTime }) => {
   const calculateTime = useCallback((now: number) => ((now - startTime) * 100) / (endTime - startTime), [endTime, startTime]);
 
@@ -86,8 +98,7 @@ export const Timer: FC<ITimerProps> = ({ endTime, id, itemId, startTime }) => {
       seconds = 0;
     }
 
-    const newLabel =
-      hours !== undefined ? `${hours}h ${minutes}m ${seconds}s` : minutes !== undefined ? `${minutes}m ${seconds}s` : `${seconds}s`;
+    const newLabel = getLabel(hours, minutes, seconds);
 
     if (newLabel !== previousLabel.current) {
       previousLabel.current = newLabel;

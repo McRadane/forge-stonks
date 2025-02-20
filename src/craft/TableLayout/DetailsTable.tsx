@@ -5,10 +5,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import type { FC } from 'react';
+import { FC, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraft } from '../../resources/types';
+import type { RootState } from '../../store';
 
 import { DetailsRow } from './DetailsRow';
 
@@ -18,6 +20,11 @@ interface IDetailsTableProps {
 
 export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
   const { ui } = useLanguage();
+  const hotm = useSelector((state: RootState) => state.options.hotm);
+
+  const slots = useMemo(() => {
+    return Math.min(hotm, 7);
+  }, [hotm]);
 
   return (
     <Box sx={{ margin: 1 }}>
@@ -30,14 +37,18 @@ export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
             <TableCell>{ui.item}</TableCell>
             <TableCell align="right">{ui.itemPrice}</TableCell>
             <TableCell align="right">{ui.amount}</TableCell>
-            <TableCell align="right">{ui.amount} x 5</TableCell>
+            <TableCell align="right">
+              {ui.amount} x {slots}
+            </TableCell>
             <TableCell align="right">{ui.totalPrice}</TableCell>
-            <TableCell align="right">{ui.totalPrice} x 5</TableCell>
+            <TableCell align="right">
+              {ui.totalPrice} x {slots}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {item.craftMaterial.map((material) => (
-            <DetailsRow key={material.itemId} material={material} />
+            <DetailsRow key={material.itemId} material={material} slots={slots} />
           ))}
         </TableBody>
       </Table>

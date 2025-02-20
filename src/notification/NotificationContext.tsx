@@ -1,6 +1,6 @@
 import Alert, { AlertColor } from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { FC, ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import { FC, ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 export interface INotificationContextDefinition {
   triggerError(message: string): void;
@@ -24,12 +24,16 @@ interface INotificationProviderProps {
   children: ReactNode;
 }
 
+const notificationFilter = (id: number) => (notification: { id: number }) => {
+  return notification.id !== id;
+};
+
 export const NotificationProvider: FC<INotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<{ id: number; message: string; type: AlertColor }[]>([]);
 
   const handleCloses = useCallback(
     (id: number) => () => {
-      setNotifications((current) => current.filter((notification) => notification.id !== id));
+      setNotifications((current) => current.filter(notificationFilter(id)));
     },
     []
   );
@@ -55,8 +59,10 @@ export const NotificationProvider: FC<INotificationProviderProps> = ({ children 
     });
   }, []);
 
+  const value = useMemo(() => ({ triggerError, triggerInfo, triggerSuccess }), [triggerError, triggerInfo, triggerSuccess]);
+
   return (
-    <NotificationContext.Provider value={{ triggerError, triggerInfo, triggerSuccess }}>
+    <NotificationContext.Provider value={value}>
       {children}
       {notifications.map((notification) => (
         <Snackbar autoHideDuration={6000} key={notification.id} onClose={handleCloses(notification.id)} open>

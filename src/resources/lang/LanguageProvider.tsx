@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useMemo, useState } from 'react';
 
 import { LanguageContext } from './LanguageContext';
 import { dictionaryList, languageSelectorHelper } from './language';
@@ -11,19 +11,21 @@ interface ILanguageProviderProps {
 export const LanguageProvider: FC<ILanguageProviderProps> = ({ children }: ILanguageProviderProps) => {
   const [userLanguage, setUserLanguage] = useState<KeysLanguageType>(languageSelectorHelper());
 
-  const provider: ILanguageContextDefinition = {
-    allDictionary: dictionaryList,
+  const provider: ILanguageContextDefinition = useMemo(() => {
+    return {
+      allDictionary: dictionaryList,
 
-    dictionary: dictionaryList[userLanguage],
-    userLanguage,
+      dictionary: dictionaryList[userLanguage],
+      userLanguage,
 
-    userLanguageChange: (selected) => {
-      const resultLanguage = languageSelectorHelper(selected);
-      setUserLanguage(resultLanguage);
+      userLanguageChange: (selected) => {
+        const resultLanguage = languageSelectorHelper(selected);
+        setUserLanguage(resultLanguage);
 
-      return resultLanguage;
-    }
-  };
+        return resultLanguage;
+      }
+    };
+  }, [userLanguage]);
 
   return <LanguageContext.Provider value={provider}>{children}</LanguageContext.Provider>;
 };

@@ -1,6 +1,7 @@
 {
-    "sonarlint.connectedMode.project": {
-        "connectionId": "mcradane",
-        "projectKey": "McRadane_forge-stonks"
-    }
+  "sonarlint.connectedMode.project": {
+    "connectionId": "mcradane",
+    "projectKey": "McRadane_forge-stonks"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

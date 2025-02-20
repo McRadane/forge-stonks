@@ -2,9 +2,10 @@ import { crafts, itemsSource, itemsVendorPrice } from '../resources/crafts';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
 import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
-import type { ICraft, ICraftWithCosts } from '../resources/types';
+import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import { initialState, IOptionsState } from '../services/common';
 
+import { getPlayerData } from './axios';
 import { Database } from './database';
 import type {
   WorkerCommandEvents,
@@ -13,6 +14,7 @@ import type {
   IWorkerCommandStopTimer,
   IWorkerResponseGetLanguage,
   IWorkerResponseGetPrices,
+  IWorkerResponseGetPricesResult,
   IWorkerResponseMessage,
   IWorkerResponseOptions,
   IWorkerResponseTimerEnded,
@@ -26,7 +28,7 @@ const ctx: Worker = self as any;
 const CACHE_DURATION = 3_600_000;
 
 class ComputationWorker {
-  private database: Database;
+  private readonly database: Database;
   private timersInterval: undefined | number;
   private languageKey: KeysLanguageType = 'en-US';
   private withNotification = false;
@@ -44,6 +46,7 @@ class ComputationWorker {
   public async forceRefresh(): Promise<void> {
     // console.log('starting getPrices');
     this.messageResponse('Starting forceRefresh');
+    await this.database.ensureInitialize();
     await this.database.forceRefresh();
   }
 
@@ -89,6 +92,22 @@ class ComputationWorker {
       }, 1000) as unknown as number;
     }
 
+    const playerName = await this.database.getFromCache<string>('playerName');
+    const playerProfile = await this.database.getFromCache<string>('playerProfile');
+    if (playerName && playerProfile) {
+      const player = await getPlayerData(playerName, playerProfile);
+      if (player) {
+        this.database.addToCache('hotm', player.data.mining.core.tier ?? initialState.hotm);
+        this.database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
+        this.database.timers.clear();
+        /* player.data.mining.forge.processes.forEach((forge) => {
+          this.database.timers.add({
+            itemId: forge.id
+          });
+        }); */
+      }
+    }
+
     this.getTimers();
     this.getPrices();
   }
@@ -129,7 +148,9 @@ class ComputationWorker {
     if (found) {
       this.messageResponse(`Start timer for ${JSON.stringify(found)}`);
       const count = await this.database.timers.count();
-      if (count <= 4) {
+      const slots = await this.getForgeSlots();
+
+      if (count < slots) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
         this.database.timers.add({ endTime, itemId, startTime } as ITimer);
@@ -161,6 +182,12 @@ class ComputationWorker {
     this.getTimers();
   }
 
+  private async getForgeSlots() {
+    const { hotm } = await this.getAllOptions();
+
+    return Math.min(7, hotm);
+  }
+
   private getTimers() {
     this.database.timers.toArray().then((timers) => {
       const command: IWorkerResponseTimers = { command: 'Response-Timers', timers };
@@ -190,15 +217,18 @@ class ComputationWorker {
     return filtersCraft;
   }
 
-  private async getAllOptions() {
+  private async getAllOptions(): Promise<IOptionsState> {
     return {
       auctionsBINOnly: (await this.database.getFromCache<boolean>('auctionsBINOnly')) ?? initialState.auctionsBINOnly,
       cacheDuration: (await this.database.getFromCache<number>('cacheDuration')) ?? initialState.cacheDuration,
       hotm: (await this.database.getFromCache<number>('hotm')) ?? initialState.hotm,
       includeAuctionsFlip: (await this.database.getFromCache<boolean>('includeAuctionsFlip')) ?? initialState.includeAuctionsFlip,
+      includePerfectGems: (await this.database.getFromCache<boolean>('includePerfectGems')) ?? initialState.includePerfectGems,
       intermediateCraft: (await this.database.getFromCache<boolean>('intermediateCraft')) ?? initialState.intermediateCraft,
       maxCraftingCost: (await this.database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
       playFrequency: (await this.database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
+      playerName: await this.database.getFromCache<string>('playerName'),
+      playerProfile: await this.database.getFromCache<string>('playerProfile'),
       quickForge: (await this.database.getFromCache<number>('quickForge')) ?? initialState.quickForge
     };
   }
@@ -224,9 +254,8 @@ class ComputationWorker {
     if (this.withNotification && Notification.permission === 'granted') {
       // Check whether notification permissions have already been granted;
       // if so, create a notification
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const notification = new Notification(message);
-      // …
+
+      new Notification(message);
     }
   }
 
@@ -333,20 +362,53 @@ class ComputationWorker {
     return 1;
   }
 
-  private async getItemsWithCraftPrice({
+  private async getMaterialPrice({
     auctionsBINOnly,
     crafts,
-    // costsRef,
-    intermediateCraft,
-    playFrequency,
-    quickForge
-  }: IOptionsState & { crafts: ICraft[] }) {
+    intermediateCraft
+  }: IOptionsState & { crafts: ICraft[] }): Promise<Record<ICraft['itemId'], ICraftWithPrice>> {
+    const newMaterials = {} as Record<ICraft['itemId'], ICraftWithPrice>;
+    for await (const craft of crafts) {
+      for await (const craftMaterial of craft.craftMaterial) {
+        if (intermediateCraft) {
+          await this.updater({
+            auctionsBINOnly,
+            // costRef: costsRef[craft.itemId],
+            id: craftMaterial.itemId,
+            intermediateCraft,
+            isCraft: craftMaterial.intermediaryCraft,
+            source: craftMaterial.source,
+            callback: (newCost: number) => {
+              newMaterials[craftMaterial.itemId] = { ...craft, craft: newCost, time: 0 };
+            }
+          });
+        } else {
+          const materialitemDb =
+            craftMaterial.source === 'bazaar'
+              ? await this.database.getItemPrice(craftMaterial.itemId, 'bazaar')
+              : await this.database.getItemPrice(craftMaterial.itemId, 'bins');
+          newMaterials[craftMaterial.itemId] = { ...craft, craft: materialitemDb?.buyPrice ?? 0, time: 0 };
+        }
+      }
+    }
+    return newMaterials;
+  }
+  private async getItemsWithCraftPrice(options: IOptionsState & { crafts: ICraft[] }): Promise<IWorkerResponseGetPricesResult> {
+    const {
+      auctionsBINOnly,
+      crafts,
+      // costsRef,
+      intermediateCraft,
+      playFrequency,
+      quickForge
+    } = options;
     const newCosts = {} as Record<ICraft['itemId'], ICraftWithCosts>;
+    const newMaterials = await this.getMaterialPrice(options);
 
     const quickForgeBonus = this.getQuickForgeBonus(quickForge);
 
     for await (const craft of crafts) {
-      const source = itemsSource[craft.itemId as keyof typeof itemsSource] ?? 'vendor';
+      const source = itemsSource[craft.itemId] ?? 'vendor';
 
       const itemDb = craft.bazaarItem
         ? await this.database.getItemPrice(craft.itemId, 'bazaar')
@@ -385,7 +447,7 @@ class ComputationWorker {
       });
     }
 
-    return newCosts;
+    return { crafts: newCosts, materials: newMaterials };
   }
 
   private getLang(): ILanguage {

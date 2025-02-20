@@ -15,13 +15,18 @@ export interface IPartialCraft {
   time: number;
 }
 
+export type CraftCategory = 'drill parts' | 'forging' | 'gear' | 'gemstone' | 'other' | 'pets' | 'refining' | 'stones' | 'tools';
+
 export interface ICraft extends IPartialCraft {
-  category: 'casting' | 'refine';
+  category: CraftCategory;
   id: number;
 }
 
-export interface ICraftWithCosts extends ICraft {
+export interface ICraftWithPrice extends ICraft {
   craft: number;
+}
+
+export interface ICraftWithCosts extends ICraftWithPrice {
   profit: number;
   profitHourly: number;
   sell: number;

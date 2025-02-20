@@ -74,7 +74,7 @@ export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
         </AccordionDetails>
       </Accordion>
       <List component={Paper}>
-        {crafts.sort(getComparator(order, orderBy)).map((craft) => (
+        {[...crafts].sort(getComparator(order, orderBy)).map((craft) => (
           <CraftItem craft={craft} key={craft.itemId} />
         ))}
       </List>
