@@ -1,4 +1,4 @@
-import { Middleware, configureStore } from '@reduxjs/toolkit';
+import { type Middleware, configureStore } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 
 import { Logger } from './logger';

@@ -1,4 +1,4 @@
-import { FC, ReactNode, createContext, useContext, useMemo } from 'react';
+import { type FC, type ReactNode, createContext, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { NotificationContext } from '../notification/NotificationContext';

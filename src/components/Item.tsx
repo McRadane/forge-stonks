@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import type React from 'react';
 
 import { useLanguage } from '../resources/lang/LanguageContext';

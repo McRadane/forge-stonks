@@ -18,9 +18,7 @@ import url from 'url';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname
-});
+const compat = new FlatCompat({ baseDirectory: __dirname });
 
 const legacyPlugin = (name, alias = name) => {
   const plugin = compat.plugins(name)[0]?.plugins?.[alias];
@@ -36,19 +34,11 @@ const baseRules = [
   {
     files: ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.ts', '**/*.tsx'],
     ignores: ['coverage/**', 'test/**', 'build/**', 'dist/**', '.yarn/**', '**/*.d.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node
-      }
-    },
-    plugins: { 'only-warn': onlyWarnPlugin },
-    name: 'Global Include and Ignore'
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    name: 'Global Include and Ignore',
+    plugins: { 'only-warn': onlyWarnPlugin }
   },
-  {
-    name: 'ESLint Recommended',
-    ...eslint.configs.recommended
-  },
+  { name: 'ESLint Recommended', ...eslint.configs.recommended },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     languageOptions: { parser: typescriptParser, sourceType: 'module' },
@@ -104,125 +94,71 @@ const baseRules = [
   },
   {
     name: 'React Hooks Plugin',
-    plugins: {
-      'react-hooks': fixupPluginRules(reactHooksPlugin)
-    },
+    plugins: { 'react-hooks': fixupPluginRules(reactHooksPlugin) },
     rules: reactHooksPlugin.configs.recommended.rules
   },
-  {
-    name: 'React Plugin',
-    plugins: {
-      react: reactPlugin
-    },
-    rules: {
-      ...reactPlugin.configs.recommended.rules,
-      'react/prop-types': 'off'
-    }
-  },
+  { name: 'React Plugin', plugins: { react: reactPlugin }, rules: { ...reactPlugin.configs.recommended.rules, 'react/prop-types': 'off' } },
   prettier,
-  {
-    name: 'Web Plugin',
-    plugins: {
-      web: webPlugin
-    },
-    rules: webPlugin.configs.all.rules
-  },
+  { name: 'Web Plugin', plugins: { web: webPlugin }, rules: webPlugin.configs.all.rules },
   ...compat.extends('plugin:import/typescript'),
-  {
-    name: 'JSX A11y Plugin',
-    plugins: {
-      'jsx-a11y': jsxA11yPlugin
-    },
-    rules: jsxA11yPlugin.configs.recommended.rules
-  },
+  { name: 'JSX A11y Plugin', plugins: { 'jsx-a11y': jsxA11yPlugin }, rules: jsxA11yPlugin.configs.recommended.rules },
   {
     name: 'Promise Plugin',
-    plugins: {
-      promise: legacyPlugin('eslint-plugin-promise', 'promise')
-    },
+    plugins: { promise: legacyPlugin('eslint-plugin-promise', 'promise') },
     rules: promisePlugin.configs.recommended.rules
   },
   {
     name: 'Perfecionist plugin',
     plugins: { perfectionist: perfectionistPlugin },
-    rules: {
-      ...perfectionistPlugin.configs['recommended-natural'].rules
-    }
+    rules: { ...perfectionistPlugin.configs['recommended-natural'].rules }
   },
   {
     ignores: ['jest.config.ts', '**/*.d.ts'],
     name: 'SonarLint Plugin',
-    plugins: {
-      sonarjs: sonarjsPlugin
-    },
+    plugins: { sonarjs: sonarjsPlugin },
     rules: {
       ...sonarjsConfigs.recommended.rules,
       'sonarjs/arguments-usage': 'warn',
       'sonarjs/array-constructor': 'warn',
       'sonarjs/class-prototype': 'warn',
-      'sonarjs/cognitive-complexity': 'warn',
+      'sonarjs/comment-regex': 'warn',
+      'sonarjs/cyclomatic-complexity': 'warn',
+      'sonarjs/declarations-in-global-scope': 'warn',
       'sonarjs/destructuring-assignment-syntax': 'warn',
-      'sonarjs/file-name-differ-from-class': 'warn',
-
-      'sonarjs/max-switch-cases': 'warn',
+      'sonarjs/expression-complexity': 'warn',
+      'sonarjs/for-in': 'warn',
+      'sonarjs/function-name': 'warn',
       'sonarjs/max-union-size': 'warn',
       'sonarjs/nested-control-flow': 'warn',
-      'sonarjs/no-all-duplicated-branches': 'warn',
       'sonarjs/no-built-in-override': 'warn',
       'sonarjs/no-collapsible-if': 'warn',
-      'sonarjs/no-collection-size-mischeck': 'warn',
       'sonarjs/no-duplicate-string': 'warn',
-      'sonarjs/no-duplicated-branches': 'warn',
-      'sonarjs/no-element-overwrite': 'warn',
-      'sonarjs/no-empty-collection': 'warn',
-      'sonarjs/no-empty-function': ['warn', { allow: [] }], // The default parameter is not set
-      'sonarjs/no-empty-interface': 'warn',
-      'sonarjs/no-extra-arguments': 'warn',
       'sonarjs/no-for-in-iterable': 'warn',
       'sonarjs/no-function-declaration-in-block': 'warn',
-      'sonarjs/no-gratuitous-expressions': 'warn',
-      'sonarjs/no-identical-conditions': 'warn',
-      'sonarjs/no-identical-expressions': 'warn',
-      'sonarjs/no-identical-functions': 'warn',
-      'sonarjs/no-ignored-return': 'warn',
       'sonarjs/no-implicit-dependencies': 'warn',
+      'sonarjs/no-inconsistent-returns': 'warn',
       'sonarjs/no-incorrect-string-concat': 'warn',
-      'sonarjs/no-inverted-boolean-check': 'warn',
       'sonarjs/no-nested-incdec': 'warn',
       'sonarjs/no-nested-switch': 'warn',
-      'sonarjs/no-nested-template-literals': 'warn',
-      'sonarjs/no-one-iteration-loop': 'warn',
-      'sonarjs/no-redundant-boolean': 'warn',
-      'sonarjs/no-redundant-jump': 'warn',
+      'sonarjs/no-redundant-parentheses': 'warn',
+      'sonarjs/no-reference-error': 'warn',
+      'sonarjs/no-require-or-define': 'warn',
       'sonarjs/no-return-type-any': 'warn',
-      'sonarjs/no-same-line-conditional': 'warn',
-
-      'sonarjs/no-small-switch': 'warn',
-      'sonarjs/no-this-alias': 'warn',
-      'sonarjs/no-unused-collection': 'warn',
-      'sonarjs/no-unused-expressions': [
-        'warn',
-        {
-          allowShortCircuit: false,
-          allowTaggedTemplates: false,
-          allowTernary: false,
-          enforceForJSX: false
-        }
-      ],
+      'sonarjs/no-undefined-assignment': 'warn',
       'sonarjs/no-unused-function-argument': 'warn',
-      'sonarjs/no-use-of-empty-return-value': 'warn',
-      'sonarjs/no-useless-catch': 'warn',
-      'sonarjs/non-existent-operator': 'warn',
-      'sonarjs/object-shorthand': 'warn',
+      'sonarjs/non-number-in-arithmetic-expression': 'warn',
       'sonarjs/prefer-immediate-return': 'warn',
       'sonarjs/prefer-object-literal': 'warn',
-      'sonarjs/prefer-single-boolean-return': 'warn',
-      'sonarjs/prefer-template': 'warn',
-      'sonarjs/prefer-while': 'warn',
+      'sonarjs/regular-expr': 'warn',
+      'sonarjs/operation-returning-nan': 'warn',
+      'sonarjs/shorthand-property-grouping': 'warn',
+      'sonarjs/standard-input': 'warn',
       'sonarjs/strings-comparison': 'warn',
-      'sonarjs/switch-without-default': 'warn',
       'sonarjs/too-many-break-or-continue-in-loop': 'warn',
-      'sonarjs/unicode-aware-regex': 'warn'
+      'sonarjs/unicode-aware-regex': 'warn',
+      'sonarjs/useless-string-operation': 'warn',
+      'sonarjs/values-not-convertible-to-numbers': 'warn',
+      'sonarjs/variable-name': 'warn'
     }
   }
 ];

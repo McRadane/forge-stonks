@@ -3,7 +3,7 @@ import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
 import type { KeysLanguageType, ILanguage } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
-import { initialState, IOptionsState } from '../services/common';
+import { initialState, type IOptionsState } from '../services/common';
 
 import { getPlayerData } from './axios';
 import { Database } from './database';

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo, useState } from 'react';
+import { type FC, type ReactNode, useMemo, useState } from 'react';
 
 import { LanguageContext } from './LanguageContext';
 import { dictionaryList, languageSelectorHelper } from './language';

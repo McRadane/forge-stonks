@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Theme, useTheme } from '@mui/material/styles';
+import { type Theme, useTheme } from '@mui/material/styles';
 import type { FC, ReactNode } from 'react';
 
 const getStyles = (theme: Theme) => ({
