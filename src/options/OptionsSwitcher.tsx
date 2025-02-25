@@ -4,14 +4,12 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid2';
 import IconButton from '@mui/material/IconButton';
 import Input from '@mui/material/Input';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
-import Slider from '@mui/material/Slider';
 import { useTheme } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
@@ -66,8 +64,8 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
   }, [intermediateCraft, worker]);
 
   const handleHOTMValue = useCallback(
-    (_e: Event, num: number | number[]) => {
-      const value = Array.isArray(num) ? num[0] : num;
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value === '' ? 0 : Number(event.target.value);
 
       worker.setOption('hotm', value);
     },
@@ -90,8 +88,8 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
   );
 
   const handleQuickForge = useCallback(
-    (_e: Event, num: number | number[]) => {
-      const value = Array.isArray(num) ? num[0] : num;
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value === '' ? 0 : Number(event.target.value);
       worker.setOption('quickForge', value);
     },
     [worker]
@@ -203,39 +201,22 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             </FormControl>
           </ListItem>
           <ListItem divider>
-            <FormControl fullWidth sx={{ alignItems: 'flex-start' }}>
+            <FormControl fullWidth variant="standard">
               <Typography id="hotm-label">{options.hotmLabel}</Typography>
-              <Grid alignItems="center" spacing={2} sx={{ padding: 2 }} container>
-                <Grid>
-                  <Slider
-                    id="hotm"
-                    aria-describedby="hotm-description"
-                    aria-label={options.hotmLabel}
-                    aria-labelledby="hotm-label"
-                    max={10}
-                    min={2}
-                    onChange={handleHOTMValue}
-                    step={1}
-                    value={hotm}
-                    valueLabelDisplay="auto"
-                    marks
-                  />
-                </Grid>
-                <Grid>
-                  <Input
-                    inputProps={{
-                      'aria-labelledby': 'hotm',
-                      max: 100,
-                      min: 0,
-                      step: 10,
-                      type: 'number'
-                    }}
-                    size="small"
-                    value={hotm}
-                    readOnly
-                  />
-                </Grid>
-              </Grid>
+              <Input
+                id="hotm"
+                inputProps={{
+                  max: 10,
+                  min: 2,
+                  step: 1,
+                  type: 'number'
+                }}
+                aria-describedby="hotm-description"
+                aria-labelledby="hotm-label"
+                onChange={handleHOTMValue}
+                value={hotm}
+              />
+
               <FormHelperText id="hotm-description">{options.hotmDescription}</FormHelperText>
             </FormControl>
           </ListItem>
@@ -277,37 +258,19 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="quickForge-label">{options.quickForgeLabel}</Typography>
-              <Grid alignItems="center" spacing={2} sx={{ padding: 2 }} container>
-                <Grid>
-                  <Slider
-                    id="quickForge"
-                    aria-describedby="quickForge-description"
-                    aria-label={options.quickForgeLabel}
-                    aria-labelledby="quickForge-label"
-                    max={20}
-                    min={0}
-                    onChange={handleQuickForge}
-                    step={1}
-                    value={quickForge}
-                    valueLabelDisplay="auto"
-                    marks
-                  />
-                </Grid>
-                <Grid>
-                  <Input
-                    inputProps={{
-                      'aria-labelledby': 'quickForge',
-                      max: 20,
-                      min: 0,
-                      step: 10,
-                      type: 'number'
-                    }}
-                    size="small"
-                    value={quickForge}
-                    readOnly
-                  />
-                </Grid>
-              </Grid>
+              <Input
+                id="quickForge"
+                inputProps={{
+                  max: 20,
+                  min: 0,
+                  step: 1,
+                  type: 'number'
+                }}
+                aria-describedby="quickForge-description"
+                aria-labelledby="quickForge-label"
+                onChange={handleQuickForge}
+                value={quickForge}
+              />
               <FormHelperText id="quickForge-description">
                 {options.quickForgeDescription}: {quickForgeLevel}%
               </FormHelperText>
