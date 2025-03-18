@@ -1,9 +1,10 @@
 import Dexie from 'dexie';
 
 import { forge } from '../models/forge';
+import { IWorkerResponseLoading, IWorkerResponseMessage } from '../worker/type';
 
-import { getAuctionData, getBazaarData } from './axios';
-import type { IAuctions, IBazaar, ITimer, ITimerDB, IWorkerResponseLoading, IWorkerResponseMessage } from './type';
+import { getAuctionPriceData, getBazaarPriceData } from './axios';
+import type { IAuctions, IAuctionsAPI, IBazaar, ITimer, ITimerDB } from './types';
 
 interface ICache {
   key: string;
@@ -16,6 +17,7 @@ const commandLoadingFalse: IWorkerResponseLoading = { command: 'Response-Loading
 type StoreTypes = 'auctions' | 'auctions+bins' | 'bazaar' | 'bins';
 
 export class Database extends Dexie {
+  protected auctionsAttribute!: Dexie.Table<IAuctionsAPI, string>;
   protected auctionsPrices!: Dexie.Table<IAuctions, string>;
   protected bazaarsPrices!: Dexie.Table<IBazaar, string>;
   protected binsPrices!: Dexie.Table<IAuctions, string>;
@@ -37,6 +39,7 @@ export class Database extends Dexie {
     this._postRefresh = postRefresh;
 
     this.version(1).stores({
+      auctionsAttribute: 'uuid',
       // eslint-disable-next-line sonarjs/no-duplicate-string
       auctionsPrices: 'item_name, sellPrice, buyPrice',
       bazaarsPrices: 'item_name, sellPrice, buyPrice',
@@ -110,6 +113,29 @@ export class Database extends Dexie {
     this._lastRefresh = now;
     this.addToCache('lastRefresh', now);
     await this._refresh();
+  }
+
+  public async getAuctionsAttribute(): Promise<IAuctionsAPI[]> {
+    await this.ensureInitialize();
+
+    return new Promise<IAuctionsAPI[]>((resolve, reject) => {
+      this.auctionsAttribute
+        .toArray()
+        .then((array) => {
+          if (array.length > 0) {
+            resolve(array);
+          } else {
+            const interval = setInterval(async () => {
+              const newArray = await this.auctionsAttribute.toArray();
+              if (newArray.length > 0) {
+                clearInterval(interval);
+                resolve(newArray);
+              }
+            }, 100);
+          }
+        })
+        .catch((reason: Error) => reject(reason));
+    });
   }
 
   public async getFromCache<T = ICache>(key: string): Promise<T | undefined> {
@@ -211,8 +237,23 @@ export class Database extends Dexie {
       });
   }
 
+  private async _getRefreshPromiseAuctionsAttributes(
+    auctionsAttributes: IAuctionsAPI[],
+    resolve: (value: PromiseLike<void> | void) => void
+  ) {
+    return this.auctionsAttribute
+      .toCollection()
+      .delete()
+      .then(() => {
+        this.auctionsAttribute.bulkAdd(auctionsAttributes);
+        resolve();
+
+        this._sendMessage('Auction attributes data has been updated');
+      });
+  }
+
   private async _getRefreshPromiseBazaar(resolve: (value: PromiseLike<void> | void) => void) {
-    const bazaars = await getBazaarData();
+    const bazaars = await getBazaarPriceData();
     this.transaction('rw', this.bazaarsPrices, async () => {
       return this.bazaarsPrices
         .toCollection()
@@ -244,9 +285,9 @@ export class Database extends Dexie {
       this._getRefreshPromiseBazaar(resolve);
     });
 
-    const refreshPromiseAuctionsAndBins = getAuctionData().then((auctionsAndBins) => {
+    const refreshPromiseAuctionsAndBins = getAuctionPriceData().then((auctionsAndBins) => {
       return this.transaction('rw', this.auctionsPrices, this.binsPrices, async () => {
-        const filteredAuctionsAndBins = auctionsAndBins.filter((auction) => forge.auctionItems.includes(auction.item_name));
+        const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => forge.auctionItems.includes(auction.item_name));
         const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
         const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);
 
@@ -261,7 +302,11 @@ export class Database extends Dexie {
           return this._getRefreshPromiseBins(minBins, resolve);
         });
 
-        return Promise.all([refreshPromiseAuctions, refreshPromiseBins]);
+        const refreshPromiseAuctionsAttributes = new Promise<void>((resolve) => {
+          return this._getRefreshPromiseAuctionsAttributes(auctionsAndBins.all, resolve);
+        });
+
+        return Promise.all([refreshPromiseAuctions, refreshPromiseBins, refreshPromiseAuctionsAttributes]);
       });
     });
 

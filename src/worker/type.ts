@@ -1,19 +1,8 @@
+import { IAuctionAttributes, ITimerDB } from '../requests/types';
 import type { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import type { KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
-
-export interface IAuctions {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
-
-export interface IBazaar {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
 
 /**
  * Ask for a fll refresh
@@ -87,6 +76,11 @@ export interface IWorkerCommandGetGardenPrices {
   // crafts: ICraft[];
 }
 
+export interface IWorkerCommandGetAuctionsAttributes {
+  command: 'Command-GetAuctionsAttributes';
+  // crafts: ICraft[];
+}
+
 /**
  * Ask for a fll refresh
  */
@@ -117,12 +111,21 @@ export interface IWorkerResponseGetGardenPricesResult {
   organics: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>>;
 }
 
+export interface IWorkerResponseAuctionsAttributesResult {
+  auctionsAttributes: IAuctionAttributes[]
+}
+
 /**
  * Return the items prices
  */
 export interface IWorkerResponseGetGardenPrices {
   command: 'Response-GetGardenPrices';
   results: IWorkerResponseGetGardenPricesResult;
+}
+
+export interface IWorkerResponseGetAuctionsAttributes {
+  command: 'Response-GetAuctionsAttributes';
+  results: IWorkerResponseAuctionsAttributesResult;
 }
 
 export interface IWorkerResponseGetPricesResult {
@@ -183,6 +186,7 @@ type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
 type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
 type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
 type WorkerCommandEventGetGardenPrices = WorkerEvent<IWorkerCommandGetGardenPrices>;
+type WorkerCommandEventGetAuctionsAttributes = WorkerEvent<IWorkerCommandGetAuctionsAttributes>;
 type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
 type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
 type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
@@ -191,6 +195,7 @@ type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
 
 export type WorkerCommandEvents =
   | WorkerCommandEventForceRefresh
+  | WorkerCommandEventGetAuctionsAttributes
   | WorkerCommandEventGetGardenPrices
   | WorkerCommandEventGetLanguage
   | WorkerCommandEventGetPrices
@@ -200,22 +205,13 @@ export type WorkerCommandEvents =
   | WorkerCommandEventStartTimer
   | WorkerCommandEventStopTimer;
 
-type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
+export type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
 
-export type WorkerResponseEvents =
-  | WorkerResponseEventGetGardenPrices
-  | WorkerResponseEventGetLanguage
-  | WorkerResponseEventGetPrices
-  | WorkerResponseEventLoading
-  | WorkerResponseEventMessage
-  | WorkerResponseEventOptions
-  | WorkerResponseEventTimerEnded
-  | WorkerResponseEventTimers
-  | WorkerResponseEventTimerSet;
 type WorkerEvent<T> = {
   data: T;
 };
 export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+export type WorkerResponseEventGetAuctionsAttributes = WorkerEvent<IWorkerResponseGetAuctionsAttributes>;
 export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
 export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
 export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
@@ -228,14 +224,14 @@ export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
 
-export interface ITimer {
-  endTime: number;
-  // id: number;
-  itemId: ICraft['itemId'];
-  slot: number;
-  startTime: number;
-}
-
-export interface ITimerDB extends ITimer {
-  id: number;
-}
+export type WorkerResponseEvents =
+  | WorkerResponseEventGetGardenPrices
+  | WorkerResponseEventGetAuctionsAttributes
+  | WorkerResponseEventGetLanguage
+  | WorkerResponseEventGetPrices
+  | WorkerResponseEventLoading
+  | WorkerResponseEventMessage
+  | WorkerResponseEventOptions
+  | WorkerResponseEventTimerEnded
+  | WorkerResponseEventTimers
+  | WorkerResponseEventTimerSet;

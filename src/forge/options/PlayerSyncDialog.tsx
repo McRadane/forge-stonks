@@ -15,7 +15,7 @@ import TextField from '@mui/material/TextField';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import { getPlayerProfiles } from '../../worker/axios';
+import { getPlayerProfiles } from '../../requests/axios';
 
 interface ISavedOptions {
   playerName: string;

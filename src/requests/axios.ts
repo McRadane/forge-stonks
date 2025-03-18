@@ -1,87 +1,16 @@
 import axios from 'axios';
 
-import type { IAuctions, IBazaar } from './type';
+import type {
+  IAuctions,
+  IAuctionsAPI,
+  IAuctionsAPIPaginatedResponse,
+  IBazaar,
+  IBazaarAPIResponse,
+  IPlayerAPIResponse,
+  IProfile
+} from './types';
 
-interface IAuctionsAPIPaginatedResponse {
-  auctions: {
-    bin: boolean; // Indicate if auction or BIN
-    category: string;
-    claimed: boolean; // Indicate if the auction is active
-    highest_bid_amount: number; // Price of auctions
-    item_name: string;
-    starting_bid: number; // Price for BIN
-    tier: string;
-    uuid: string;
-  }[];
-  lastUpdated: number;
-  page: number;
-  success: boolean;
-  totalAuctions: number;
-  totalPages: number;
-}
-
-interface IBazaarAPIResponse {
-  products: Record<
-    string,
-    {
-      product_id: string;
-      quick_status: {
-        buyPrice: number;
-        sellPrice: number;
-      };
-    }
-  >;
-  success: boolean;
-}
-
-interface IPlayerAPIResponse {
-  profiles: Record<string, IProfile>;
-}
-
-/*
-export const HOTM_XP = {
-  1: 0,
-  2: 3000,
-  3: 9000,
-  4: 25000,
-  5: 60000,
-  6: 100000,
-  7: 150000,
-};
-*/
-
-export interface IProfile {
-  current: boolean;
-  cute_name: string;
-  data: {
-    mining: {
-      core: {
-        tier: {
-          level?: number;
-        };
-      };
-      forge: {
-        processes: {
-          id: string;
-          slot: number;
-          timeFinished: number;
-        }[];
-      };
-    };
-  };
-  raw: {
-    mining_core: {
-      nodes: {
-        forge_time?: number;
-      };
-    };
-  };
-}
-interface IPlayerAPIResponse {
-  profiles: Record<string, IProfile>;
-}
-
-export const getBazaarData = (): Promise<IBazaar[]> => {
+export const getBazaarPriceData = (): Promise<IBazaar[]> => {
   return axios
     .get<IBazaarAPIResponse>('https://api.hypixel.net/skyblock/bazaar')
     .then((response) => response.data)
@@ -160,7 +89,7 @@ const sortResults = (
   });
 };
 
-export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> => {
+export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Array<IAuctions & { bin: boolean }>; }> => {
   return axios
     .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
     .then((response) => response.data)
@@ -169,7 +98,8 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
         throw new Error('Invalid query to auctions');
       }
 
-      const auctions = filterAuctions(data);
+      const auctionsPrices = filterAuctions(data);
+      const allAuctions = data.auctions;
 
       const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
 
@@ -179,9 +109,10 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
         }
       }
       return Promise.all(promises).then((results) => {
-        sortResults(results, auctions);
+        sortResults(results, auctionsPrices);
+        allAuctions.push(...results.flat());
 
-        return Array.from(auctions.values());
+        return { all: allAuctions, price: Array.from(auctionsPrices.values()) };
       });
     });
 };

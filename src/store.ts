@@ -2,12 +2,15 @@ import { configureStore, type Middleware } from '@reduxjs/toolkit';
 import { createLogger } from 'redux-logger';
 
 import { Logger } from './logger';
+import { attributesReducer } from './services/attributes';
+import { forgeReducer } from './services/forge';
+import { gardenReducer } from './services/garden';
 import { optionsReducer } from './services/options';
 import { workerReducer } from './services/worker';
 
 const middlewares: Middleware[] = [];
 
-if (process.env.NODE_ENV === `development`) {
+if (import.meta.env.DEV) {
   const logger = createLogger({
     // ...options
   });
@@ -18,6 +21,9 @@ if (process.env.NODE_ENV === `development`) {
 export const store = configureStore({
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(...middlewares),
   reducer: {
+    attributes: attributesReducer,
+    forge: forgeReducer,
+    garden: gardenReducer,
     options: optionsReducer,
     worker: workerReducer
   }

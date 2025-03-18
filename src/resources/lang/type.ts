@@ -358,35 +358,3 @@ interface ILanguageUIOptions {
   title: string;
 }
 
-interface ILanguageUI3 {
-  amount: string;
-  auction: string;
-  bazaar: string;
-  casting: string;
-  craftCost: string;
-  filters: string;
-
-  hotm: string;
-  hour: string;
-  item: string;
-  itemPrice: string;
-
-  options: ILanguageUIOptions;
-
-  profit: string;
-  profitByTimeEveryday: string;
-  profitByTimeNonStop: string;
-  profitByTimeThreeTime: string;
-  profitByTimeTwice: string;
-  refine: string;
-  sell: string;
-  sellPrice: string;
-  shoppingList: string;
-  time: string;
-  timer: string;
-  timerButton: string;
-  title: string;
-  totalPrice: string;
-  type: string;
-  vendor: string;
-}

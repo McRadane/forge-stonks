@@ -25,7 +25,7 @@ export default defineConfig(({ command }) => {
     worker: {
       format: 'es'
     }
-  };
+  } as UserConfigExport;
   if (command === 'serve') {
     return {
       ...baseConfig,

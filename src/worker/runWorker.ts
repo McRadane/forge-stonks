@@ -4,9 +4,12 @@ import { Logger } from '../logger';
 import type { INotificationContextDefinition } from '../notification/NotificationContext';
 import type { ILanguageContextDefinition, KeysLanguageType } from '../resources/lang/type';
 import type { ICraft } from '../resources/types';
+import { setAttributes } from '../services/attributes';
 import type { IOptionsState } from '../services/common';
+import { setPrices, setTimerLaunched, setTimers } from '../services/forge';
+import { setGardenPrices } from '../services/garden';
 import { setOptions } from '../services/options';
-import { setGardenPrices, setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
+import { setLoading, setNotLoading } from '../services/worker';
 
 import Worker from './stonks.worker?worker';
 import type {
@@ -19,6 +22,8 @@ import type {
   IWorkerCommandSetOptions,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
+  WorkerResponseEventGetAuctionsAttributes,
+  WorkerResponseEventGetGardenPrices,
   WorkerResponseEventGetLanguage,
   WorkerResponseEventGetPrices,
   WorkerResponseEventLoading,
@@ -151,13 +156,16 @@ export class WorkerRunner {
   private _listener() {
     this._worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
+        case 'Response-GetAuctionsAttributes':
+            this._responseGetAuctionsAttributes(event as WorkerResponseEventGetAuctionsAttributes);
+            break;
         case 'Response-GetGardenPrices':
-          this._contexts.dispatch(setGardenPrices(event.data.results));
+          this._responseGetGardenPrices(event as WorkerResponseEventGetGardenPrices);
           break;
         case 'Response-GetLanguage':
           this._responseGetLanguage(event as WorkerResponseEventGetLanguage);
           break;
-        case 'Response-GetPrices':
+          case 'Response-GetPrices':
           this._responseGetPrices(event as WorkerResponseEventGetPrices);
           break;
         case 'Response-Loading':
@@ -190,11 +198,24 @@ export class WorkerRunner {
     Logger.log('%cWORKER RESPONSE ::', 'font-weight:bold;color:purple', ...message);
   }
 
+  private _responseGetAuctionsAttributes(event: WorkerResponseEventGetAuctionsAttributes) {
+    this._logResponse('Get auctions attributes');
+
+    this._contexts.dispatch(setAttributes(event.data.results.auctionsAttributes));
+  }
+
+  private _responseGetGardenPrices(event: WorkerResponseEventGetGardenPrices) {
+    this._logResponse('Get prices for the garden');
+
+    this._contexts.dispatch(setGardenPrices(event.data.results));
+  }
+
   private _responseGetLanguage(event: WorkerResponseEventGetLanguage) {
     this._logResponse(`Received language key ${event.data.language}`);
 
     this._languageKeyResponse = event.data.language;
   }
+
   private _responseGetPrices(event: WorkerResponseEventGetPrices) {
     if (this._timeGetPrices !== null) {
       const endTime = performance.now();

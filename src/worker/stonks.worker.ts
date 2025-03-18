@@ -1,3 +1,7 @@
+import { rawAuctionToAuction } from '../auctionsAttributes/functions';
+import { getPlayerData } from '../requests/axios';
+import { Database } from '../requests/database';
+import { IProfile } from '../requests/types';
 import { crafts } from '../resources/forge';
 import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import { itemsSource, itemsVendorPrice } from '../resources/items';
@@ -7,11 +11,10 @@ import type { ILanguage, KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import { initialState, type IOptionsState } from '../services/common';
 
-import { getPlayerData, type IProfile } from './axios';
-import { Database } from './database';
 import type {
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
+  IWorkerResponseGetAuctionsAttributes,
   IWorkerResponseGetGardenPrices,
   IWorkerResponseGetLanguage,
   IWorkerResponseGetPrices,
@@ -39,6 +42,26 @@ class ComputationWorker {
     this._database = new Database(ctx, () => {});
 
     this._database.cacheDuration = CACHE_DURATION;
+  }
+
+  public async _getAuctionsAttributes(): Promise<void> {
+    // console.log('starting getPrices');
+    // this.messageResponse('Starting getPrices');
+
+    this._messageResponse('Starting getAuctionsAttributes');
+
+    const rawItems = await this._database.getAuctionsAttribute();
+
+    const auctionsAttributes = rawItems.map((auction) => rawAuctionToAuction(auction));
+
+    this._messageResponse('Ending getAuctionsAttributes');
+    const command: IWorkerResponseGetAuctionsAttributes = {
+      command: 'Response-GetAuctionsAttributes',
+      results: {
+        auctionsAttributes
+      }
+    };
+    ctx.postMessage(command);
   }
 
   public async _getGardenPrices(): Promise<void> {
@@ -439,6 +462,7 @@ class ComputationWorker {
     const command: IWorkerResponseMessage = { command: 'Response-Message', message };
     ctx.postMessage(command);
   }
+
   private _notifyMe(message: string) {
     // Check if the browser supports notifications
     if (this._withNotification && Notification.permission === 'granted') {
@@ -537,9 +561,12 @@ ctx.addEventListener('message', (event: WorkerCommandEvents) => {
     case 'Command-ForceRefresh':
       worker.forceRefresh();
       break;
-    case 'Command-GetGardenPrices':
+    case 'Command-GetAuctionsAttributes':
+        worker._getAuctionsAttributes();
+        break;
+      case 'Command-GetGardenPrices':
       worker._getGardenPrices();
-      break;
+      break;      
     case 'Command-GetLanguage':
       worker.getLanguage();
       break;
