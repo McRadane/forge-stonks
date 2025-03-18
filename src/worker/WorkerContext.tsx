@@ -1,4 +1,4 @@
-import { FC, ReactNode, createContext, useContext, useMemo } from 'react';
+import { createContext, type FC, type ReactNode, useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { NotificationContext } from '../notification/NotificationContext';
@@ -27,9 +27,9 @@ export const WorkerProvider: FC<IWorkerProviderProps> = ({ children }) => {
   const language = useContext(LanguageContext);
   const notification = useContext(NotificationContext);
 
-  const instance = useMemo(() => {
-    return new WorkerRunner({ dispatch, language, notification });
+  const value = useMemo(() => {
+    return { instance: new WorkerRunner({ dispatch, language, notification }) };
   }, [dispatch, language, notification]);
 
-  return <WorkerRunnerContext.Provider value={{ instance }}>{children}</WorkerRunnerContext.Provider>;
+  return <WorkerRunnerContext.Provider value={value}>{children}</WorkerRunnerContext.Provider>;
 };

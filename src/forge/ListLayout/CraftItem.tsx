@@ -1,12 +1,12 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { type FC, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Coin } from '../../components/Coin';
@@ -14,7 +14,7 @@ import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
-import { getProfitByTimeLabel } from '../functions';
+import { getCategoryLabel, getProfitByTimeLabel } from '../functions';
 import { TimerButton } from '../timers/TimerButton';
 
 import { DetailsList } from './DetailsList';
@@ -29,7 +29,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
 
   const { ui } = useLanguage();
 
-  const { bazaarItem, category, craft: cost, hotm, itemId: id, profit, profitHourly, sell, time } = craft;
+  const { bazaarItem, craft: cost, hotm, itemId: id, profit, profitHourly, sell, time } = craft;
 
   const playFrequency = useSelector((state: RootState) => state.options.playFrequency);
 
@@ -43,7 +43,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
         <ListItemText
           primary={
             <Grid container>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h4">
                   <Item>{id}</Item>
                 </Typography>
@@ -52,7 +52,7 @@ export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {
               <GridRow left={ui.timer} right={<TimerButton itemId={craft.itemId} />} />
               <GridRow left={ui.sell} right={bazaarItem ? ui.bazaar : ui.auction} />
               <GridRow left={ui.hotm} right={hotm} />
-              <GridRow left={ui.type} right={category === 'casting' ? ui.casting : ui.refine} />
+              <GridRow left={ui.type} right={getCategoryLabel(craft.category, ui)} />
               <GridRow left={ui.sellPrice} right={<Coin amount={sell} />} />
               <GridRow left={ui.time} right={time < 0.5 ? 0 : time} />
               <GridRow left={ui.craftCost} right={<Coin amount={cost} />} />

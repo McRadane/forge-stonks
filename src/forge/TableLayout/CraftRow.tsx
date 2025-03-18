@@ -4,11 +4,11 @@ import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Coin } from '../../components/Coin';
@@ -16,6 +16,7 @@ import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
+import { getCategoryLabel } from '../functions';
 import { TimerButton } from '../timers/TimerButton';
 
 import { DetailsTable } from './DetailsTable';
@@ -52,7 +53,7 @@ export const CraftRow: FC<ICraftRowProps> = ({ craft }) => {
             <>
               <Chip label={bazaarItem ? ui.bazaar : ui.auction} size="small" />{' '}
               <Chip avatar={<Avatar>{hotm}</Avatar>} label={ui.hotm} size="small" />{' '}
-              <Chip label={craft.category === 'casting' ? ui.casting : ui.refine} size="small" />
+              <Chip label={getCategoryLabel(craft.category, ui)} size="small" />
             </>
           )}
         </TableCell>

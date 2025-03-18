@@ -3,9 +3,43 @@ import type { KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 
-type WorkerEvent<T> = {
-  data: T;
-};
+export interface IAuctions {
+  buyPrice: number;
+  item_name: string;
+  sellPrice: number;
+}
+
+export interface IBazaar {
+  buyPrice: number;
+  item_name: string;
+  sellPrice: number;
+}
+
+export interface ITimer {
+  endTime: number;
+  id: number;
+  itemId: ICraft['itemId'];
+  startTime: number;
+}
+
+/**
+ * Ask for a fll refresh
+ */
+export interface IWorkerCommandForceRefresh {
+  command: 'Command-ForceRefresh';
+}
+
+export interface IWorkerCommandGetLanguage {
+  command: 'Command-GetLanguage';
+}
+
+/**
+ * Ask for the items prices
+ */
+export interface IWorkerCommandGetPrices {
+  command: 'Command-GetPrices';
+  // crafts: ICraft[];
+}
 
 /**
  * Initialize
@@ -21,10 +55,6 @@ export interface IWorkerCommandInitialize {
 export interface IWorkerCommandSetLanguage {
   command: 'Command-SetLanguage';
   language: KeysLanguageType;
-}
-
-export interface IWorkerCommandGetLanguage {
-  command: 'Command-GetLanguage';
 }
 
 export interface IWorkerCommandSetOptions {
@@ -73,7 +103,7 @@ export interface IWorkerCommandForceRefresh {
 
 export interface IWorkerResponseGetLanguage {
   command: 'Response-GetLanguage';
-  language?: KeysLanguageType;
+  language: KeysLanguageType | null;
 }
 
 export interface IWorkerResponseGetPricesResult {
@@ -102,12 +132,9 @@ export interface IWorkerResponseGetGardenPrices {
   results: IWorkerResponseGetGardenPricesResult;
 }
 
-/**
- * Return a message for the Logger
- */
-export interface IWorkerResponseMessage {
-  command: 'Response-Message';
-  message: string;
+export interface IWorkerResponseGetPricesResult {
+  crafts: Record<ICraft['itemId'], ICraftWithCosts>;
+  materials: Record<ICraft['itemId'], ICraftWithPrice>;
 }
 
 /**
@@ -119,10 +146,23 @@ export interface IWorkerResponseLoading {
 }
 
 /**
+ * Return a message for the Logger
+ */
+export interface IWorkerResponseMessage {
+  command: 'Response-Message';
+  message: string;
+}
+
+/**
  * Return the options
  */
 export interface IWorkerResponseOptions extends Partial<IOptionsState> {
   command: 'Response-Options';
+}
+
+export interface IWorkerResponseTimerEnded {
+  command: 'Response-TimerEnded';
+  itemId: ICraft['itemId'];
 }
 
 /**
@@ -132,7 +172,6 @@ export interface IWorkerResponseTimers {
   command: 'Response-Timers';
   timers: ITimer[];
 }
-
 /**
  * Tell the UI that the timer command has been executed
  */
@@ -168,15 +207,7 @@ export type WorkerCommandEvents =
   | WorkerCommandEventStartTimer
   | WorkerCommandEventStopTimer;
 
-type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
-type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
 type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
-type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
-type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
-type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
-type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
-type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
-type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEvents =
   | WorkerResponseEventGetGardenPrices
@@ -186,20 +217,15 @@ export type WorkerResponseEvents =
   | WorkerResponseEventMessage
   | WorkerResponseEventOptions
   | WorkerResponseEventTimerEnded
-  | WorkerResponseEventTimerSet
-  | WorkerResponseEventTimers;
-
-export interface IAuctions {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
-
-export interface IBazaar {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
+  | WorkerResponseEventTimers
+  | WorkerResponseEventTimerSet;
+type WorkerEvent<T> = {
+  data: T;
+};
+export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
+export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
 
 export interface ITimer {
   endTime: number;
@@ -208,3 +234,10 @@ export interface ITimer {
   slot: number;
   startTime: number;
 }
+export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
+
+export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
+
+export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
+
+export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;

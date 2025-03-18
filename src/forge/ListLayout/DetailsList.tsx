@@ -18,7 +18,7 @@ export const DetailsList: FC<IDetailsListProps> = ({ item }) => {
 
   return (
     <Box sx={{ margin: 1 }}>
-      <Typography component="div" gutterBottom variant="h5">
+      <Typography component="div" variant="h5" gutterBottom>
         {ui.shoppingList}
       </Typography>
       <List component={Paper}>

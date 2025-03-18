@@ -3,8 +3,8 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useSelector } from 'react-redux';
 
@@ -27,7 +27,7 @@ export const Timers = () => {
   if (matches) {
     return (
       <Accordion>
-        <AccordionSummary aria-controls="panel1a-content" expandIcon={<ExpandMoreIcon />} id="panel1a-header">
+        <AccordionSummary aria-controls="panel1a-content" id="panel1a-header" expandIcon={<ExpandMoreIcon />}>
           <Typography>
             {ui.timer} ({timers.length})
           </Typography>

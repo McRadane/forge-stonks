@@ -14,7 +14,7 @@ keyLanguages.forEach((key) => {
   shortnameLanguages[key.substring(0, 2)] = key;
 });
 
-const resolveLanguage = (lang: KeysLanguageType): undefined | KeysLanguageType => {
+const resolveLanguage = (lang: KeysLanguageType): KeysLanguageType | undefined => {
   const wShortBrowserLanguage = lang.substring(0, 2);
 
   // Check if the Cache language correspond to a known language

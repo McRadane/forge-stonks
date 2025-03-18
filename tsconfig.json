@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -15,7 +15,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [{ "path": "tsconfig.node.json" }]

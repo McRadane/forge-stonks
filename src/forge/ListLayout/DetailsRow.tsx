@@ -1,4 +1,4 @@
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import type { FC } from 'react';
@@ -23,7 +23,7 @@ export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
     <ListItemText
       primary={
         <Grid container>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">
               <Item>{material.itemId}</Item>
             </Typography>

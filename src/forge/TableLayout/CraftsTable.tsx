@@ -2,10 +2,10 @@ import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { type FC, type MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { EnhancedTableHead, Order, getComparator } from '../../components/EnhancedTableHead';
+import { EnhancedTableHead, getComparator, type Order } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
@@ -25,7 +25,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
   const { ui } = useLanguage();
 
   const handleRequestSort = useCallback(
-    (_event: React.MouseEvent<unknown>, property: string) => {
+    (_event: MouseEvent<unknown>, property: string) => {
       if (orderBy === property) {
         setOrder(order === 'asc' ? 'desc' : 'asc');
       } else {
@@ -89,7 +89,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
       <Table aria-label={ui.title} size="small" sx={{ minWidth: 650 }}>
         <EnhancedTableHead headCells={headCells} onRequestSort={handleRequestSort} order={order} orderBy={orderBy} />
         <TableBody>
-          {crafts.sort(getComparator(order, orderBy)).map((craft) => (
+          {[...crafts].sort(getComparator(order, orderBy)).map((craft) => (
             <CraftRow craft={craft} key={craft.itemId} />
           ))}
         </TableBody>

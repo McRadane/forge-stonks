@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
@@ -7,6 +7,7 @@ import type { ITimer, IWorkerResponseGetGardenPricesResult, IWorkerResponseGetPr
 interface IWorkerState {
   fuels: Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>>;
   loading: boolean;
+  loadingTimestamp: number;
   materialPrices: Partial<Record<ICraft['itemId'], ICraftWithPrice>>;
   organicMatters: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>>;
   prices: Partial<Record<ICraft['itemId'], ICraftWithCosts>>;
@@ -17,6 +18,7 @@ interface IWorkerState {
 const initialState: IWorkerState = {
   fuels: {},
   loading: false,
+  loadingTimestamp: 0,
   materialPrices: {},
   organicMatters: {},
   prices: {},
@@ -37,6 +39,7 @@ const workerSlice = createSlice({
     },
     setNotLoading: (state) => {
       state.loading = false;
+      state.loadingTimestamp = Date.now();
     },
     setPrices: (state, action: PayloadAction<IWorkerResponseGetPricesResult>) => {
       state.prices = action.payload.crafts;

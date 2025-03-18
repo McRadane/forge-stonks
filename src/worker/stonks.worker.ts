@@ -3,14 +3,13 @@ import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import { itemsSource, itemsVendorPrice } from '../resources/items';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
-import type { KeysLanguageType, ILanguage, ILanguageItems } from '../resources/lang/type';
+import type { ILanguage, ILanguageItems, KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
-import { initialState, IOptionsState } from '../services/common';
+import { initialState, type IOptionsState } from '../services/common';
 
-import { getPlayerData, IProfile } from './axios';
+import { getPlayerData, type IProfile } from './axios';
 import { Database } from './database';
 import type {
-  WorkerCommandEvents,
   ITimer,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
@@ -21,8 +20,9 @@ import type {
   IWorkerResponseMessage,
   IWorkerResponseOptions,
   IWorkerResponseTimerEnded,
+  IWorkerResponseTimers,
   IWorkerResponseTimerSet,
-  IWorkerResponseTimers
+  WorkerCommandEvents
 } from './type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,63 +31,22 @@ const ctx: Worker = self as any;
 const CACHE_DURATION = 3_600_000;
 
 class ComputationWorker {
-  private database: Database;
-  private timersInterval: undefined | number;
-  private languageKey: KeysLanguageType = 'en-US';
-  private withNotification = false;
+  private readonly _database: Database;
+  private _languageKey: KeysLanguageType = 'en-US';
+  private _timersInterval: number | undefined;
+  private _withNotification = false;
 
   constructor() {
-    this.database = new Database(ctx, () => {
-      /* if (this.crafts) {
-        this.getPrices({ command: 'Command-GetPrices', crafts: this.crafts });
-      } */
-    });
+    this._database = new Database(ctx, () => {});
 
-    this.database.cacheDuration = CACHE_DURATION;
+    this._database.cacheDuration = CACHE_DURATION;
   }
 
-  public async forceRefresh(): Promise<void> {
-    // console.log('starting getPrices');
-    this.messageResponse('Starting forceRefresh');
-    await this.database.forceRefresh();
-  }
-
-  public async getLanguage() {
-    this.messageResponse('ask for language');
-    const data = await this.database.cache.get('language');
-    if (data) {
-      this.languageKey = data.value as KeysLanguageType;
-      const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: this.languageKey };
-      ctx.postMessage(command);
-    }
-
-    const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: undefined };
-    ctx.postMessage(command);
-  }
-  public async getPrices(): Promise<void> {
+  public async _getGardenPrices(): Promise<void> {
     // console.log('starting getPrices');
     // this.messageResponse('Starting getPrices');
 
-    const options = await this.getAllOptions();
-    const crafts = await this.getCrafts();
-
-    this.messageResponse('Starting getPrices');
-
-    this.getItemsWithCraftPrice({ crafts, ...options }).then((results) => {
-      this.messageResponse('Ending getPrices');
-      const command: IWorkerResponseGetPrices = {
-        command: 'Response-GetPrices',
-        results
-      };
-      ctx.postMessage(command);
-    });
-  }
-
-  public async getGardenPrices(): Promise<void> {
-    // console.log('starting getPrices');
-    // this.messageResponse('Starting getPrices');
-
-    this.messageResponse('Starting getGardenPrices');
+    this._messageResponse('Starting getGardenPrices');
 
     const organicMattersIds = Object.keys(itemsOrganicMatter);
     const fuelsIds = Object.keys(itemsFuels);
@@ -98,7 +57,7 @@ class ComputationWorker {
     for await (const itemId of organicMattersIds) {
       const source = itemsSource[itemId as keyof ILanguage['items']];
 
-      const result = await this.resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
+      const result = await this._resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
 
       if (!isNaN(result.buy)) {
         resultOrganicMatters[itemId as keyof typeof itemsOrganicMatter] = {
@@ -111,7 +70,7 @@ class ComputationWorker {
     for await (const itemId of fuelsIds) {
       const source = itemsSource[itemId as keyof ILanguage['items']];
 
-      const result = await this.resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
+      const result = await this._resolveItemPrices(itemId as keyof ILanguage['items'], source, true);
 
       if (!isNaN(result.buy)) {
         resultFuels[itemId as keyof typeof itemsFuels] = {
@@ -121,7 +80,7 @@ class ComputationWorker {
       }
     }
 
-    this.messageResponse('Ending getGardenPrices');
+    this._messageResponse('Ending getGardenPrices');
     const command: IWorkerResponseGetGardenPrices = {
       command: 'Response-GetGardenPrices',
       results: {
@@ -132,76 +91,86 @@ class ComputationWorker {
     ctx.postMessage(command);
   }
 
-  public async initialize(withNotification: boolean) {
-    this.messageResponse('Initializing');
-    this.getOptions();
-    this.withNotification = withNotification;
-    const count = await this.database.timers.count();
+  public async forceRefresh(): Promise<void> {
+    this._messageResponse('Starting forceRefresh');
+    await this._database.ensureInitialize();
+    await this._database.forceRefresh();
+  }
+  public async getLanguage() {
+    this._messageResponse('ask for language');
+    const data = await this._database.cache.get('language');
+    if (data) {
+      this._languageKey = data.value as KeysLanguageType;
+      const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: this._languageKey };
+      ctx.postMessage(command);
+    }
 
-    if (count !== 0 && this.timersInterval === undefined) {
-      this.timersInterval = setInterval(() => {
-        this.checkTimers();
+    const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: null };
+    ctx.postMessage(command);
+  }
+
+  public async getPrices(): Promise<void> {
+    const options = await this._getAllOptions();
+    const crafts = await this._getCrafts();
+
+    this._messageResponse('Starting getPrices');
+
+    const results = await this._getItemsWithCraftPrice({ crafts, ...options });
+
+    this._messageResponse('Ending getPrices');
+    const command: IWorkerResponseGetPrices = {
+      command: 'Response-GetPrices',
+      results
+    };
+    ctx.postMessage(command);
+  }
+
+  public async initialize(withNotification: boolean) {
+    this._messageResponse('Initializing');
+    this._getOptions();
+    this._withNotification = withNotification;
+    const count = await this._database.timers.count();
+
+    if (count !== 0 && this._timersInterval === undefined) {
+      this._timersInterval = setInterval(() => {
+        this._checkTimers();
       }, 1000) as unknown as number;
     }
 
-    const playerName = await this.database.getFromCache<string>('playerName');
-    const playerProfile = await this.database.getFromCache<{ id: string; name: string }>('playerProfile');
-
+    const playerName = await this._database.getFromCache<string>('playerName');
+    const playerProfile = await this._database.getFromCache<{ id: string; name: string }>('playerProfile');
     if (playerName && playerProfile) {
       const player = await getPlayerData(playerName, playerProfile.id);
       if (player) {
-        this.syncPlayerProfile(player);
+        this._database.addToCache('hotm', player.data.mining.core.tier ?? initialState.hotm);
+        this._database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
+        this._database.timers.clear();
+        /* player.data.mining.forge.processes.forEach((forge) => {
+          this.database.timers.add({
+            itemId: forge.id
+          });
+        }); */
       }
     }
 
-    this.getTimers();
+    this._getTimers();
     this.getPrices();
   }
 
-  public async syncPlayerProfile(player: IProfile) {
-    this.database.addToCache('hotm', player.data.mining.core.tier.level ?? initialState.hotm);
-    this.database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
-
-    // this.database.timers.clear();
-    player.data.mining.forge.processes.forEach(async (forge) => {
-      let found = crafts.find((item) => item.itemId === forge.id);
-
-      if (!found) {
-        found = crafts.find((item) => item.itemId.toLowerCase() === forge.id.toLowerCase().replace('_', ' '));
-      }
-
-      const existing = await this.database.timers.toArray();
-
-      if (found) {
-        const foundExisting = existing.find((timer) => timer.endTime === forge.timeFinished);
-        if (!foundExisting) {
-          const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
-
-          this.database.timers.add({
-            endTime: forge.timeFinished,
-            itemId: found.itemId as keyof ILanguageItems,
-            slot: forge.slot,
-            startTime
-          } as ITimer);
-        }
-      }
-    });
-  }
-
   public setLanguage(language: KeysLanguageType) {
-    this.database.addToCache('language', language);
+    this._database.addToCache('language', language);
 
-    this.languageKey = language;
+    this._languageKey = language;
   }
 
   public async setOptions(options: Partial<IOptionsState>) {
-    const allOptions = await this.getAllOptions();
+    const allOptions = await this._getAllOptions();
     const touched: Partial<IOptionsState> = {};
 
     Object.keys(options).forEach((optionName) => {
       const value = options[optionName as keyof Partial<IOptionsState>];
       if (value !== allOptions[optionName as keyof Partial<IOptionsState>]) {
-        this.database.addToCache(optionName, value);
+        this._database.addToCache(optionName, value);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         touched[optionName as keyof Partial<IOptionsState>] = value as any;
       }
@@ -222,58 +191,106 @@ class ComputationWorker {
     const found = crafts.find((item) => item.itemId === itemId);
 
     if (found) {
-      this.messageResponse(`Start timer for ${JSON.stringify(found)}`);
-      const count = await this.database.timers.count();
-      if (count <= 4) {
+      this._messageResponse(`Start timer for ${JSON.stringify(found)}`);
+      const count = await this._database.timers.count();
+      const slots = await this._getForgeSlots();
+
+      if (count < slots) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
-        this.database.timers.add({ endTime, itemId, slot: count + 1, startTime } as ITimer);
+        this._database.timers.add({ endTime, itemId, slot: count + 1, startTime } as ITimer);
       }
 
-      if (count === 0 && this.timersInterval === undefined) {
-        this.timersInterval = setInterval(() => {
-          this.checkTimers();
+      if (count === 0 && this._timersInterval === undefined) {
+        this._timersInterval = setInterval(() => {
+          this._checkTimers();
         }, 1000) as unknown as number;
       }
     } else {
-      this.messageResponse(`Start timer but item not found ${itemId}`);
+      this._messageResponse(`Start timer but item not found ${itemId}`);
     }
 
-    this.getTimers();
+    this._getTimers();
 
     const command: IWorkerResponseTimerSet = { command: 'Response-TimerSet', itemId };
     ctx.postMessage(command);
   }
 
   public async stopTimer({ id }: IWorkerCommandStopTimer) {
-    await this.database.timers.delete(id);
-    const count = await this.database.timers.count();
+    await this._database.timers.delete(id);
+    const count = await this._database.timers.count();
 
     if (count === 0) {
-      clearInterval(this.timersInterval);
+      clearInterval(this._timersInterval);
     }
 
-    this.getTimers();
+    this._getTimers();
   }
 
-  private getTimers() {
-    this.database.timers.toArray().then((timers) => {
-      const command: IWorkerResponseTimers = { command: 'Response-Timers', timers };
-      ctx.postMessage(command);
+  public async syncPlayerProfile(player: IProfile) {
+    this._database.addToCache('hotm', player.data.mining.core.tier.level ?? initialState.hotm);
+    this._database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
+
+    // this.database.timers.clear();
+    player.data.mining.forge.processes.forEach(async (forge) => {
+      let found = crafts.find((item) => item.itemId === forge.id);
+
+      if (!found) {
+        found = crafts.find((item) => item.itemId.toLowerCase() === forge.id.toLowerCase().replace('_', ' '));
+      }
+
+      const existing = await this._database.timers.toArray();
+
+      if (found) {
+        const foundExisting = existing.find((timer) => timer.endTime === forge.timeFinished);
+        if (!foundExisting) {
+          const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
+
+          this._database.timers.add({
+            endTime: forge.timeFinished,
+            itemId: found.itemId as keyof ILanguageItems,
+            slot: forge.slot,
+            startTime
+          } as ITimer);
+        }
+      }
     });
   }
 
-  private async getOptions() {
-    const command: IWorkerResponseOptions = {
-      command: 'Response-Options',
-      ...(await this.getAllOptions())
-    };
+  private async _checkTimers() {
+    const now = Date.now();
+    const timers = await this._database.timers.toArray();
 
-    ctx.postMessage(command);
+    const lang = this._getLang();
+    timers.forEach((timer) => {
+      if (now > timer.endTime) {
+        this._notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]));
+        this._database.timers.delete(timer.id);
+        this._getTimers();
+        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId, slot: timer.slot };
+        ctx.postMessage(command);
+      }
+    });
   }
 
-  private async getCrafts() {
-    const { hotm, includeAuctionsFlip } = await this.getAllOptions();
+  private async _getAllOptions(): Promise<IOptionsState> {
+    return {
+      auctionsBINOnly: (await this._database.getFromCache<boolean>('auctionsBINOnly')) ?? initialState.auctionsBINOnly,
+      cacheDuration: (await this._database.getFromCache<number>('cacheDuration')) ?? initialState.cacheDuration,
+      hotm: (await this._database.getFromCache<number>('hotm')) ?? initialState.hotm,
+      includeAuctionsFlip: (await this._database.getFromCache<boolean>('includeAuctionsFlip')) ?? initialState.includeAuctionsFlip,
+      includePerfectGems: (await this._database.getFromCache<boolean>('includePerfectGems')) ?? initialState.includePerfectGems,
+      intermediateCraft: (await this._database.getFromCache<boolean>('intermediateCraft')) ?? initialState.intermediateCraft,
+      maxCraftingCost: (await this._database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
+      playerName: await this._database.getFromCache<string>('playerName'),
+      playerProfile: await this._database.getFromCache<{ id: string; name: string }>('playerProfile'),
+      playFrequency: (await this._database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
+      quickForge: (await this._database.getFromCache<number>('quickForge')) ?? initialState.quickForge
+    };
+  }
+
+  private async _getCrafts() {
+    const { hotm, includeAuctionsFlip } = await this._getAllOptions();
 
     let filtersCraft = crafts;
     if (!includeAuctionsFlip) {
@@ -285,187 +302,13 @@ class ComputationWorker {
     return filtersCraft;
   }
 
-  private async getAllOptions(): Promise<IOptionsState> {
-    return {
-      auctionsBINOnly: (await this.database.getFromCache<boolean>('auctionsBINOnly')) ?? initialState.auctionsBINOnly,
-      cacheDuration: (await this.database.getFromCache<number>('cacheDuration')) ?? initialState.cacheDuration,
-      hotm: (await this.database.getFromCache<number>('hotm')) ?? initialState.hotm,
-      includeAuctionsFlip: (await this.database.getFromCache<boolean>('includeAuctionsFlip')) ?? initialState.includeAuctionsFlip,
-      intermediateCraft: (await this.database.getFromCache<boolean>('intermediateCraft')) ?? initialState.intermediateCraft,
-      maxCraftingCost: (await this.database.getFromCache<number>('maxCraftingCost')) ?? initialState.maxCraftingCost,
-      playFrequency: (await this.database.getFromCache<IOptionsState['playFrequency']>('playFrequency')) ?? initialState.playFrequency,
-      playerName: await this.database.getFromCache<string>('playerName'),
-      playerProfile: await this.database.getFromCache<{ id: string; name: string }>('playerProfile'),
-      quickForge: (await this.database.getFromCache<number>('quickForge')) ?? initialState.quickForge
-    };
+  private async _getForgeSlots() {
+    const { hotm } = await this._getAllOptions();
+
+    return Math.min(7, hotm);
   }
 
-  private async checkTimers() {
-    const now = Date.now();
-    const timers = await this.database.timers.toArray();
-
-    const lang = this.getLang();
-    timers.forEach((timer) => {
-      if (now > timer.endTime) {
-        this.database.timers.delete(timer.id);
-        this.notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]).replace('{1}', String(timer.slot ?? '')));
-        this.getTimers();
-        const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId, slot: timer.slot };
-        ctx.postMessage(command);
-      }
-    });
-  }
-
-  private notifyMe(message: string) {
-    // Check if the browser supports notifications
-    if (this.withNotification && Notification.permission === 'granted') {
-      // Check whether notification permissions have already been granted;
-      // if so, create a notification
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const notification = new Notification(message);
-      // …
-    }
-  }
-
-  private messageResponse(message: string) {
-    const command: IWorkerResponseMessage = { command: 'Response-Message', message };
-    ctx.postMessage(command);
-  }
-
-  private async resolveItemPrices(
-    id: keyof ILanguage['items'],
-    source: 'auction' | 'bazaar' | 'vendor',
-    auctionsBINOnly: boolean
-  ): Promise<{ buy: number; sell: number }> {
-    if (source === 'bazaar') {
-      const found = await this.database.getItemBazaarPrice(id);
-
-      if (found) {
-        return { buy: found.buyPrice, sell: found.sellPrice };
-      }
-      return { buy: NaN, sell: NaN };
-    } else if (source === 'vendor') {
-      const price = itemsVendorPrice[id] ?? 0;
-
-      return { buy: price, sell: price };
-    }
-
-    const foundBins = await this.database.getItemBinsPrice(id);
-
-    if (foundBins && auctionsBINOnly) {
-      return { buy: foundBins?.buyPrice, sell: foundBins?.buyPrice };
-    }
-
-    const foundAuctions = await this.database.getItemAuctionsPrice(id);
-
-    if (foundBins || foundAuctions) {
-      const lowerPrice = Math.min(...([foundBins?.buyPrice, foundAuctions?.buyPrice].filter((price) => price) as number[]));
-
-      return { buy: lowerPrice, sell: lowerPrice };
-    }
-
-    return { buy: NaN, sell: NaN };
-  }
-
-  private async resolveItemCraftPrice(id: string, intermediateCraft: boolean, auctionsBINOnly: boolean) {
-    const found = crafts.find((item) => item.itemId === id);
-
-    if (found) {
-      let sum = 0;
-      for await (const material of found.craftMaterial) {
-        if (intermediateCraft && material.intermediaryCraft) {
-          const buy = await this.resolveItemCraftPrice(material.itemId, intermediateCraft, auctionsBINOnly);
-          sum += buy * material.quantity;
-        } else if (material.source === 'vendor') {
-          sum += (itemsVendorPrice[material.itemId] ?? 0) * material.quantity;
-        } else {
-          const { buy } = await this.resolveItemPrices(material.itemId, material.source, auctionsBINOnly);
-          sum += buy * material.quantity;
-        }
-      }
-
-      return sum;
-    }
-
-    return NaN;
-  }
-
-  private async updater(options: {
-    auctionsBINOnly: boolean;
-    // costRef: number;
-    id: keyof ILanguage['items'];
-    intermediateCraft: boolean;
-    isCraft: boolean;
-    source?: string;
-    callback(newPrice: number): void;
-  }) {
-    const { auctionsBINOnly, callback, id, intermediateCraft, isCraft, source } = options;
-    if (isCraft) {
-      const newCost = await this.resolveItemCraftPrice(id, intermediateCraft, auctionsBINOnly);
-      //if (costRef !== newCost) {
-      callback(newCost);
-      //}
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { buy } = await this.resolveItemPrices(id, source as any, auctionsBINOnly);
-      //if (costRef !== buy) {
-      callback(buy);
-      //}
-    }
-  }
-
-  private getQuickForgeBonus(quickForge: number) {
-    if (quickForge >= 2 && quickForge <= 10) {
-      return 0.85;
-    }
-
-    if (quickForge >= 11 && quickForge <= 19) {
-      return 0.805;
-    }
-
-    if (quickForge === 20) {
-      return 0.7;
-    }
-
-    return 1;
-  }
-
-  private async getMaterialPrice({
-    auctionsBINOnly,
-    crafts,
-    intermediateCraft
-  }: IOptionsState & { crafts: ICraft[] }): Promise<Record<ICraft['itemId'], ICraftWithPrice>> {
-    const newMaterials = {} as Record<ICraft['itemId'], ICraftWithPrice>;
-
-    for await (const craft of crafts) {
-      for await (const craftMaterial of craft.craftMaterial) {
-        if (intermediateCraft) {
-          await this.updater({
-            auctionsBINOnly,
-            // costRef: costsRef[craft.itemId],
-            id: craftMaterial.itemId,
-            intermediateCraft,
-            isCraft: craftMaterial.intermediaryCraft,
-            source: craftMaterial.source,
-            callback: (newCost: number) => {
-              newMaterials[craftMaterial.itemId] = { ...craft, craft: newCost, time: 0 };
-            }
-          });
-        } else {
-          const materialitemDb =
-            craftMaterial.source === 'bazaar'
-              ? await this.database.getItemPrice(craftMaterial.itemId, 'bazaar')
-              : await this.database.getItemPrice(craftMaterial.itemId, 'bins');
-
-          newMaterials[craftMaterial.itemId] = { ...craft, craft: materialitemDb?.buyPrice ?? 0, time: 0 };
-        }
-      }
-    }
-
-    return newMaterials;
-  }
-
-  private async getItemsWithCraftPrice(options: IOptionsState & { crafts: ICraft[] }): Promise<IWorkerResponseGetPricesResult> {
+  private async _getItemsWithCraftPrice(options: IOptionsState & { crafts: ICraft[] }): Promise<IWorkerResponseGetPricesResult> {
     const {
       auctionsBINOnly,
       crafts,
@@ -475,25 +318,20 @@ class ComputationWorker {
       quickForge
     } = options;
     const newCosts = {} as Record<ICraft['itemId'], ICraftWithCosts>;
-    const newMaterials = await this.getMaterialPrice(options);
+    const newMaterials = await this._getMaterialPrice(options);
 
-    const quickForgeBonus = this.getQuickForgeBonus(quickForge);
+    const quickForgeBonus = this._getQuickForgeBonus(quickForge);
 
     for await (const craft of crafts) {
-      const source = itemsSource[craft.itemId as keyof typeof itemsSource] ?? 'vendor';
+      const source = itemsSource[craft.itemId] ?? 'vendor';
 
       const itemDb = craft.bazaarItem
-        ? await this.database.getItemPrice(craft.itemId, 'bazaar')
-        : await this.database.getItemPrice(craft.itemId, 'bins');
+        ? await this._database.getItemPrice(craft.itemId, 'bazaar')
+        : await this._database.getItemPrice(craft.itemId, 'bins');
       const sell = itemDb?.sellPrice ?? 0;
 
-      await this.updater({
+      await this._updater({
         auctionsBINOnly,
-        // costRef: costsRef[craft.itemId],
-        id: craft.itemId,
-        intermediateCraft,
-        isCraft: true,
-        source,
         callback: (newCost: number) => {
           const profit = sell - newCost;
           let period = 1;
@@ -515,20 +353,180 @@ class ComputationWorker {
           const profitHourly = (profit / Math.max(time, period)) * period;
 
           newCosts[craft.itemId] = { ...craft, craft: newCost, profit, profitHourly, sell, time };
-        }
+        },
+        id: craft.itemId,
+        intermediateCraft,
+        isCraft: true,
+        source
       });
     }
 
     return { crafts: newCosts, materials: newMaterials };
   }
 
-  private getLang(): ILanguage {
-    switch (this.languageKey) {
+  private _getLang(): ILanguage {
+    switch (this._languageKey) {
       case 'fr-FR':
         return frFr;
       case 'en-US':
       default:
         return enUs;
+    }
+  }
+
+  private async _getMaterialPrice({
+    auctionsBINOnly,
+    crafts,
+    intermediateCraft
+  }: IOptionsState & { crafts: ICraft[] }): Promise<Record<ICraft['itemId'], ICraftWithPrice>> {
+    const newMaterials = {} as Record<ICraft['itemId'], ICraftWithPrice>;
+    for await (const craft of crafts) {
+      for await (const craftMaterial of craft.craftMaterial) {
+        if (intermediateCraft) {
+          await this._updater({
+            auctionsBINOnly,
+            callback: (newCost: number) => {
+              newMaterials[craftMaterial.itemId] = { ...craft, craft: newCost, time: 0 };
+            },
+            id: craftMaterial.itemId,
+            intermediateCraft,
+            isCraft: craftMaterial.intermediaryCraft,
+            source: craftMaterial.source
+          });
+        } else {
+          const materialitemDb =
+            craftMaterial.source === 'bazaar'
+              ? await this._database.getItemPrice(craftMaterial.itemId, 'bazaar')
+              : await this._database.getItemPrice(craftMaterial.itemId, 'bins');
+          newMaterials[craftMaterial.itemId] = { ...craft, craft: materialitemDb?.buyPrice ?? 0, time: 0 };
+        }
+      }
+    }
+    return newMaterials;
+  }
+
+  private async _getOptions() {
+    const command: IWorkerResponseOptions = {
+      command: 'Response-Options',
+      ...(await this._getAllOptions())
+    };
+
+    ctx.postMessage(command);
+  }
+
+  private _getQuickForgeBonus(quickForge: number) {
+    if (quickForge >= 2 && quickForge <= 10) {
+      return 0.85;
+    }
+
+    if (quickForge >= 11 && quickForge <= 19) {
+      return 0.805;
+    }
+
+    if (quickForge === 20) {
+      return 0.7;
+    }
+
+    return 1;
+  }
+
+  private async _getTimers() {
+    const timers = await this._database.timers.toArray();
+    const command: IWorkerResponseTimers = { command: 'Response-Timers', timers };
+    ctx.postMessage(command);
+  }
+
+  private _messageResponse(message: string) {
+    const command: IWorkerResponseMessage = { command: 'Response-Message', message };
+    ctx.postMessage(command);
+  }
+  private _notifyMe(message: string) {
+    // Check if the browser supports notifications
+    if (this._withNotification && Notification.permission === 'granted') {
+      // Check whether notification permissions have already been granted;
+      // if so, create a notification
+
+      new Notification(message);
+    }
+  }
+
+  private async _resolveItemCraftPrice(id: string, intermediateCraft: boolean, auctionsBINOnly: boolean) {
+    const found = crafts.find((item) => item.itemId === id);
+
+    if (found) {
+      let sum = 0;
+      for await (const material of found.craftMaterial) {
+        if (intermediateCraft && material.intermediaryCraft) {
+          const buy = await this._resolveItemCraftPrice(material.itemId, intermediateCraft, auctionsBINOnly);
+          sum += buy * material.quantity;
+        } else if (material.source === 'vendor') {
+          sum += (itemsVendorPrice[material.itemId] ?? 0) * material.quantity;
+        } else {
+          const { buy } = await this._resolveItemPrices(material.itemId, material.source, auctionsBINOnly);
+          sum += buy * material.quantity;
+        }
+      }
+
+      return sum;
+    }
+
+    return NaN;
+  }
+
+  private async _resolveItemPrices(
+    id: keyof ILanguage['items'],
+    source: 'auction' | 'bazaar' | 'vendor',
+    auctionsBINOnly: boolean
+  ): Promise<{ buy: number; sell: number }> {
+    if (source === 'bazaar') {
+      const found = await this._database.getItemBazaarPrice(id);
+
+      if (found) {
+        return { buy: found.buyPrice, sell: found.sellPrice };
+      }
+      return { buy: NaN, sell: NaN };
+    } else if (source === 'vendor') {
+      const price = itemsVendorPrice[id] ?? 0;
+
+      return { buy: price, sell: price };
+    }
+
+    const foundBins = await this._database.getItemBinsPrice(id);
+
+    if (foundBins && auctionsBINOnly) {
+      return { buy: foundBins?.buyPrice, sell: foundBins?.buyPrice };
+    }
+
+    const foundAuctions = await this._database.getItemAuctionsPrice(id);
+
+    if (foundBins || foundAuctions) {
+      const lowerPrice = Math.min(...([foundBins?.buyPrice, foundAuctions?.buyPrice].filter((price) => price) as number[]));
+
+      return { buy: lowerPrice, sell: lowerPrice };
+    }
+
+    return { buy: NaN, sell: NaN };
+  }
+
+  private async _updater(options: {
+    auctionsBINOnly: boolean;
+    callback(newPrice: number): void;
+    // costRef: number;
+    id: keyof ILanguage['items'];
+    intermediateCraft: boolean;
+    isCraft: boolean;
+    source?: string;
+  }) {
+    const { auctionsBINOnly, callback, id, intermediateCraft, isCraft, source } = options;
+    if (isCraft) {
+      const newCost = await this._resolveItemCraftPrice(id, intermediateCraft, auctionsBINOnly);
+
+      callback(newCost);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { buy } = await this._resolveItemPrices(id, source as any, auctionsBINOnly);
+
+      callback(buy);
     }
   }
 }
@@ -541,7 +539,7 @@ ctx.addEventListener('message', (event: WorkerCommandEvents) => {
       worker.forceRefresh();
       break;
     case 'Command-GetGardenPrices':
-      worker.getGardenPrices();
+      worker._getGardenPrices();
       break;
     case 'Command-GetLanguage':
       worker.getLanguage();
