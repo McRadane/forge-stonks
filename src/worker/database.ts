@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { forge } from '../models/forge';
 
 import { getAuctionData, getBazaarData } from './axios';
-import type { IAuctions, IBazaar, ITimer, IWorkerResponseLoading, IWorkerResponseMessage } from './type';
+import type { IAuctions, IBazaar, ITimer, ITimerDB, IWorkerResponseLoading, IWorkerResponseMessage } from './type';
 
 interface ICache {
   key: string;
@@ -20,7 +20,7 @@ export class Database extends Dexie {
   protected bazaarsPrices!: Dexie.Table<IBazaar, string>;
   protected binsPrices!: Dexie.Table<IAuctions, string>;
   protected cache!: Dexie.Table<ICache, string>;
-  protected forgeTimers!: Dexie.Table<ITimer, number>;
+  protected forgeTimers!: Dexie.Table<ITimerDB, number>;
 
   private _cacheDuration = -1;
   private readonly _ctx!: Worker;
@@ -48,7 +48,7 @@ export class Database extends Dexie {
 
   public async addTimers(timer: ITimer) {
     await this.ensureInitialize();
-    return this.forgeTimers.add(timer);
+    return this.forgeTimers.add(timer as ITimerDB);
   }
 
   public async addToCache(key: string, value: unknown) {
@@ -161,7 +161,7 @@ export class Database extends Dexie {
     return await this.bazaarsPrices.get(item);
   }
 
-  public async getTimers(): Promise<ITimer[]> {
+  public async getTimers(): Promise<ITimerDB[]> {
     await this.ensureInitialize();
     return this.forgeTimers.toArray();
   }

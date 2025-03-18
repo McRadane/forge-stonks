@@ -9,12 +9,12 @@ import { useWorker } from '../worker/WorkerContext';
 
 export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
   const costs = useSelector((state: RootState) => state.worker.prices);
-
   const materialCosts = useSelector((state: RootState) => state.worker.materialPrices);
 
   if (materialCosts[id]?.craft !== undefined) {
     return materialCosts[id]?.craft ?? 0;
   }
+
   if (costs[id]?.craft !== undefined) {
     return costs[id]?.craft ?? 0;
   }

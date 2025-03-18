@@ -7,7 +7,7 @@ export interface IOptionsState {
   intermediateCraft: boolean;
   maxCraftingCost: number;
   playerName?: string;
-  playerProfile?: string;
+  playerProfile?: { id: string; name: string };
   playFrequency: PlayFrequencyType;
   quickForge: number;
 }

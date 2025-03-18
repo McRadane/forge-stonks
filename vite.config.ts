@@ -5,7 +5,8 @@ import { defineConfig, UserConfigExport } from 'vite';
 
 export default defineConfig(({ command }) => {
   const baseConfig: UserConfigExport = {
-    base: '/forge-stonks/',
+    // base: '/forge-stonks/',
+    // base: '/forge-stonks/',
     build: {
       rollupOptions: {
         output: {

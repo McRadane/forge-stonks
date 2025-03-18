@@ -16,11 +16,13 @@ import Typography from '@mui/material/Typography';
 import { type ChangeEvent, type FC, useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { LanguageContext, useLanguage } from '../resources/lang/LanguageContext';
-import type { KeysLanguageType } from '../resources/lang/type';
-import type { IOptionsState } from '../services/common';
-import type { RootState } from '../store';
-import { useWorker } from '../worker/WorkerContext';
+import { LanguageContext, useLanguage } from '../../resources/lang/LanguageContext';
+import type { KeysLanguageType } from '../../resources/lang/type';
+import type { IOptionsState } from '../../services/common';
+import type { RootState } from '../../store';
+import { useWorker } from '../../worker/WorkerContext';
+
+// import { PlayerSyncDialog } from './PlayerSyncDialog';
 
 interface IOptionsSwitcherProps {
   open: boolean;
@@ -32,8 +34,22 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     ui: { options }
   } = useLanguage();
 
-  const { auctionsBINOnly, hotm, includeAuctionsFlip, includePerfectGems, intermediateCraft, maxCraftingCost, playFrequency, quickForge } =
-    useSelector((state: RootState) => state.options);
+  const {
+    auctionsBINOnly,
+    hotm,
+    includeAuctionsFlip,
+    includePerfectGems,
+    intermediateCraft,
+    maxCraftingCost,
+    // playerName,
+    // playerProfile,
+    playFrequency,
+    quickForge
+  } = useSelector((state: RootState) => state.options);
+
+  // const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
+
+  // const playerSync = playerName !== undefined && playerProfile !== undefined;
 
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
@@ -46,6 +62,24 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     },
     [worker]
   );
+
+  /* const handleClickOpen = useCallback(() => {
+    setPlayerSyncOpen(true);
+  }, []);
+
+  const handleClose = useCallback(
+    (value?: { playerName: string; playerProfile: { id: string; name: string } }) => {
+      setPlayerSyncOpen(false);
+      if (value) {
+        worker.setOption('playerName', value.playerName);
+        worker.setOption('playerProfile', value.playerProfile);
+      } else {
+        worker.setOption('playerName', undefined);
+        worker.setOption('playerProfile', undefined);
+      }
+    },
+    [worker]
+  ); */
 
   const handleIncludeAuctionsFlip = useCallback(() => {
     worker.setOption('includeAuctionsFlip', !includeAuctionsFlip);
@@ -128,6 +162,24 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             overflow: 'scroll'
           }}
         >
+          {/*{playerSync && (
+            <ListItem divider>
+              <Typography id="syncProfile-label" variant="h6">
+                {playerName} ({playerProfile.name})
+              </Typography>
+            </ListItem>
+          )}
+          <ListItem divider>
+            <Button onClick={handleClickOpen} variant="outlined">
+              {options.syncProfileTitle}
+            </Button>
+            <PlayerSyncDialog
+              currentPlayerName={playerName}
+              currentPlayerProfile={playerProfile}
+              onClose={handleClose}
+              open={playerSyncOpen}
+            />
+          </ListItem>*/}
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>

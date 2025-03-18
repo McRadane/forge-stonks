@@ -21,7 +21,7 @@ export interface ILanguageContextDefinition {
 
 export type KeysLanguageType = 'en-US' | 'fr-FR';
 
-interface ILanguageItems {
+export interface ILanguageItems {
   AMBER_MATERIAL: string;
   'Amber-polished Drill Engine': string;
   'Amber Crystal': string;
@@ -39,15 +39,23 @@ interface ILanguageItems {
   'Beacon V': string;
   BEJEWELED_HANDLE: string;
   'Bejeweled Collar': string;
+  BIOFUEL: string;
   'Blue Cheese Goblin Omelette': string;
   'Boots Of Divan': string;
+  BOX_OF_SEEDS: string;
+  BROWN_MUSHROOM: string;
+  CACTUS: string;
+  CARROT_ITEM: string;
   'Chestplate Of Divan': string;
   Chisel: string;
   'Citrine Crystal': string;
   'Claw Fossil': string;
   'Clubbed Fossil': string;
   coins: string;
+  COMPOST: string;
+  CONDENSED_FERMENTO: string;
   CORLEONITE: string;
+  CROPIE: string;
   DIAMONITE: string;
   DIVAN_FRAGMENT: string;
   DIVAN_POWDER_COATING: string;
@@ -56,23 +64,48 @@ interface ILanguageItems {
   DRILL_ENGINE: string;
   'Dwarven Handwarmers': string;
   'Dwarven Metal Talisman': string;
+  ELECTRON_TRANSMITTER: string;
+  ENCHANTED_BAKED_POTATO: string;
+  ENCHANTED_BREAD: string;
+  ENCHANTED_BROWN_MUSHROOM: string;
+  ENCHANTED_CACTUS: string;
+  ENCHANTED_CACTUS_GREEN: string;
+  ENCHANTED_CARROT: string;
   ENCHANTED_COAL_BLOCK: string;
   ENCHANTED_COBBLESTONE: string;
+  ENCHANTED_COCOA: string;
   ENCHANTED_DIAMOND_BLOCK: string;
   ENCHANTED_ENDER_PEARL: string;
   ENCHANTED_GLACITE: string;
   ENCHANTED_GOLD_BLOCK: string;
+  ENCHANTED_HAY_BALE: string;
+  ENCHANTED_HUGE_MUSHROOM_1: string;
+  ENCHANTED_HUGE_MUSHROOM_2: string;
   ENCHANTED_IRON_BLOCK: string;
   ENCHANTED_LAPIS_LAZULI: string;
+  ENCHANTED_MELON: string;
+  ENCHANTED_MELON_BLOCK: string;
   ENCHANTED_MITHRIL: string;
+  ENCHANTED_NETHER_STALK: string;
+  ENCHANTED_PAPER: string;
+  ENCHANTED_POISONOUS_POTATO: string;
+  ENCHANTED_POTATO: string;
+  ENCHANTED_PUMPKIN: string;
+  ENCHANTED_RED_MUSHROOM: string;
   ENCHANTED_REDSTONE_BLOCK: string;
+  ENCHANTED_SEEDS: string;
+  ENCHANTED_SUGAR: string;
+  ENCHANTED_SUGAR_CANE: string;
   ENCHANTED_TITANIUM: string;
   ENCHANTED_TUNGSTEN: string;
   ENCHANTED_UMBER: string;
+  ENCHANTED_WHEAT: string;
+  FERMENTO: string;
   FINE_AMBER_GEM: string;
   FINE_AMETHYST_GEM: string;
   FINE_AQUAMARINE_GEM: string;
   FINE_CITRINE_GEM: string;
+  FINE_FLOUR: string;
   FINE_JADE_GEM: string;
   FINE_ONYX_GEM: string;
   FINE_PERIDOT_GEM: string;
@@ -90,6 +123,7 @@ interface ILanguageItems {
   FLAWLESS_RUBY_GEM: string;
   FLAWLESS_SAPPHIRE_GEM: string;
   FLAWLESS_TOPAZ_GEM: string;
+  FLOWERING_BOUQUET: string;
   'Footprint Fossil': string;
   FRIGID_HUSK: string;
   FUEL_TANK: string;
@@ -111,9 +145,14 @@ interface ILanguageItems {
   'Goblin Pet': string;
   GOLDEN_PLATE: string;
   HARD_STONE: string;
+  HAY_BLOCK: string;
   'Helix Fossil': string;
   'Helmet Of Divan': string;
   HOT_STUFF: string;
+  HUGE_MUSHROOM_1: string;
+  HUGE_MUSHROOM_2: string;
+  'INK_SACK:2': string;
+  'INK_SACK:3': string;
   'Jade Belt': string;
   'Jade Crystal': string;
   'Jasper Crystal': string;
@@ -122,6 +161,8 @@ interface ILanguageItems {
   MAGMA_CORE: string;
   'Mammoth Pet': string;
   MATCH_STICKS: string;
+  MELON: string;
+  MELON_BLOCK: string;
   MITHRIL_ORE: string;
   MITHRIL_PLATE: string;
   'Mithril-Infused Fuel Tank': string;
@@ -133,6 +174,9 @@ interface ILanguageItems {
   'Mithril Gauntlet': string;
   'Mithril Necklace': string;
   'Mole Pet': string;
+  MUTANT_NETHER_STALK: string;
+  NETHER_STALK: string;
+  OIL_BARREL: string;
   'Onyx Crystal': string;
   'Opal Crystal': string;
   'Pendant Of Divan': string;
@@ -156,12 +200,19 @@ interface ILanguageItems {
   'Pesto Goblin Omelette': string;
   PETRIFIED_STARFALL: string;
   PLASMA: string;
+  PLASMA_BUCKET: string;
   POCKET_ICEBERG: string;
+  POISONOUS_POTATO: string;
+  POLISHED_PUMPKIN: string;
   'Polished Topaz Rod': string;
   'Portable Campfire': string;
+  POTATO_ITEM: string;
   POWER_CRYSTAL: string;
   PRECURSOR_APPARATUS: string;
+  PUMPKIN: string;
   PURE_MITHRIL: string;
+  RED_MUSHROOM: string;
+  RED_ROSE: string;
   REFINED_DIAMOND: string;
   REFINED_MINERAL: string;
   REFINED_MITHRIL: string;
@@ -177,16 +228,20 @@ interface ILanguageItems {
   'Sapphire-polished Drill Engine': string;
   'Sapphire Cloak': string;
   'Sapphire Crystal': string;
+  SEEDS: string;
   'Shattered Locket': string;
   SKELETON_KEY: string;
   SLUDGE_JUICE: string;
   'Spicy Goblin Omelette': string;
   'Spine Fossil': string;
   'Spinosaurus Pet': string;
+  SQUASH: string;
   STARFALL: string;
   'Starfall Seasoning': string;
+  SUGAR_CANE: string;
   'Sunny Side Goblin Omelette': string;
   'T-Rex Pet': string;
+  TIGHTLY_TIED_HAY_BALE: string;
   TITANIUM_ORE: string;
   TITANIUM_TESSERACT: string;
   'Titanium-Infused Fuel Tank': string;
@@ -216,8 +271,11 @@ interface ILanguageItems {
   'Ugly Fossil': string;
   UMBER_KEY: string;
   UMBER_PLATE: string;
+  VOLTA: string;
   'Webbed Fossil': string;
+  WHEAT: string;
   WORM_MEMBRANE: string;
+  YELLOW_FLOWER: string;
 }
 
 interface ILanguageUI {
@@ -235,11 +293,18 @@ interface ILanguageUI {
   categoryTools: string;
   craftCost: string;
   filters: string;
+  fuelColumn: string;
+  fuelTitle: string;
   hotm: string;
   hour: string;
   item: string;
   itemPrice: string;
+  itemPricePerCompost: string;
   options: ILanguageUIOptions;
+  organicMattersColumn: string;
+  organicMattersTitle: string;
+  pageForge: string;
+  pageGarden: string;
   profit: string;
   profitByTimeEveryday: string;
   profitByTimeNonStop: string;
@@ -260,6 +325,8 @@ interface ILanguageUI {
 interface ILanguageUIOptions {
   auctionsBINOnlyDescription: string;
   auctionsBINOnlyLabel: string;
+  cancel: string;
+  delete: string;
   forceRefresh: string;
   hotmDescription: string;
   hotmLabel: string;
@@ -275,6 +342,8 @@ interface ILanguageUIOptions {
   languageOptionFrench: string;
   maxCraftingCostDescription: string;
   maxCraftingCostLabel: string;
+  playerName: string;
+  playerProfile: string;
   playFrequencyDescription: string;
   playFrequencyLabel: string;
   playFrequencyOptionEveryday: string;
@@ -284,5 +353,40 @@ interface ILanguageUIOptions {
   playFrequencyOptionTwice: string;
   quickForgeDescription: string;
   quickForgeLabel: string;
+  save: string;
+  syncProfileTitle: string;
   title: string;
+}
+
+interface ILanguageUI3 {
+  amount: string;
+  auction: string;
+  bazaar: string;
+  casting: string;
+  craftCost: string;
+  filters: string;
+
+  hotm: string;
+  hour: string;
+  item: string;
+  itemPrice: string;
+
+  options: ILanguageUIOptions;
+
+  profit: string;
+  profitByTimeEveryday: string;
+  profitByTimeNonStop: string;
+  profitByTimeThreeTime: string;
+  profitByTimeTwice: string;
+  refine: string;
+  sell: string;
+  sellPrice: string;
+  shoppingList: string;
+  time: string;
+  timer: string;
+  timerButton: string;
+  title: string;
+  totalPrice: string;
+  type: string;
+  vendor: string;
 }

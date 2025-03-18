@@ -6,11 +6,12 @@ import type { ILanguageContextDefinition, KeysLanguageType } from '../resources/
 import type { ICraft } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 import { setOptions } from '../services/options';
-import { setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
+import { setGardenPrices, setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
 
 import Worker from './stonks.worker?worker';
 import type {
   IWorkerCommandForceRefresh,
+  IWorkerCommandGetGardenPrices,
   IWorkerCommandGetLanguage,
   IWorkerCommandGetPrices,
   IWorkerCommandInitialize,
@@ -29,8 +30,10 @@ import type {
   WorkerResponseEventTimerSet
 } from './type';
 
-const audio = new Audio('/forge-stonks/orb.mp3');
+const audio = new Audio('/orb.mp3');
 audio.volume = 0.3;
+
+type OptionsValues = { id: string; name: string } | boolean | number | string | undefined;
 
 interface IWorkerContexts {
   dispatch: Dispatch<UnknownAction>;
@@ -57,6 +60,17 @@ export class WorkerRunner {
     };
     this._worker.postMessage(command);
     this._logCommand(`force refresh`);
+  }
+
+  public getGardenPrices() {
+    if (this._timeGetPrices === null) {
+      this._timeGetPrices = performance.now();
+      const command: IWorkerCommandGetGardenPrices = {
+        command: 'Command-GetGardenPrices'
+      };
+      this._worker.postMessage(command);
+      this._logCommand(`get garden prices`);
+    }
   }
 
   public getLanguage(): Promise<KeysLanguageType | null> {
@@ -105,7 +119,7 @@ export class WorkerRunner {
     this._logCommand(`set language to ${language}`);
   }
 
-  public setOption(option: keyof IOptionsState, value: boolean | IOptionsState['playFrequency'] | number) {
+  public setOption(option: keyof IOptionsState, value: OptionsValues) {
     const command: IWorkerCommandSetOptions = {
       command: 'Command-SetOptions',
       options: {
@@ -113,7 +127,7 @@ export class WorkerRunner {
       }
     };
     this._worker.postMessage(command);
-    this._logCommand(`set option ${option} to ${value}`);
+    this._logCommand(`set option ${option} to ${JSON.stringify(value)}`);
   }
 
   public startTimer(itemId: ICraft['itemId']) {
@@ -137,6 +151,9 @@ export class WorkerRunner {
   private _listener() {
     this._worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
+        case 'Response-GetGardenPrices':
+          this._contexts.dispatch(setGardenPrices(event.data.results));
+          break;
         case 'Response-GetLanguage':
           this._responseGetLanguage(event as WorkerResponseEventGetLanguage);
           break;
@@ -168,9 +185,11 @@ export class WorkerRunner {
   private _logCommand(...message: unknown[]) {
     Logger.log('%cWORKER COMMAND ::', 'font-weight:bold;color:green', ...message);
   }
+
   private _logResponse(...message: unknown[]) {
     Logger.log('%cWORKER RESPONSE ::', 'font-weight:bold;color:purple', ...message);
   }
+
   private _responseGetLanguage(event: WorkerResponseEventGetLanguage) {
     this._logResponse(`Received language key ${event.data.language}`);
 
@@ -205,17 +224,14 @@ export class WorkerRunner {
   private _responseOptions(event: WorkerResponseEventOptions) {
     this._contexts.dispatch(setOptions(event.data));
   }
-
   private _responseTimerEnded(event: WorkerResponseEventTimerEnded) {
     this._logResponse(`A timer has ended`);
-    const message = this._contexts.language.dictionary.notification.timerEnded.replace(
-      '{0}',
-      this._contexts.language.dictionary.items[event.data.itemId]
-    );
+    const message = this._contexts.language.dictionary.notification.timerEnded
+      .replace('{0}', this._contexts.language.dictionary.items[event.data.itemId])
+      .replace('{1}', String(event.data.slot ?? ''));
     this._contexts.notification.triggerSuccess(message);
     audio.play();
   }
-
   private _responseTimers(event: WorkerResponseEventTimers) {
     this._logResponse('Get Timers');
     this._contexts.dispatch(setTimers(event.data.timers));

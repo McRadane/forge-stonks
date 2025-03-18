@@ -6,9 +6,9 @@ import { type Theme, useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { useLanguage } from '../resources/lang/LanguageContext';
-import type { ITimer } from '../worker/type';
-import { useWorker } from '../worker/WorkerContext';
+import { useLanguage } from '../../resources/lang/LanguageContext';
+import type { ITimerDB } from '../../worker/type';
+import { useWorker } from '../../worker/WorkerContext';
 
 const getStyles = (theme: Theme) => ({
   container: {
@@ -38,7 +38,7 @@ const getStyles = (theme: Theme) => ({
   }
 });
 
-type TimerPropsType = ITimer;
+type TimerPropsType = ITimerDB;
 
 const getLabel = (hours: number | undefined, minutes: number | undefined, seconds: number) => {
   if (hours !== undefined) {

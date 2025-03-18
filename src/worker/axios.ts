@@ -37,7 +37,20 @@ interface IBazaarAPIResponse {
 interface IPlayerAPIResponse {
   profiles: Record<string, IProfile>;
 }
-interface IProfile {
+
+/*
+export const HOTM_XP = {
+  1: 0,
+  2: 3000,
+  3: 9000,
+  4: 25000,
+  5: 60000,
+  6: 100000,
+  7: 150000,
+};
+*/
+
+export interface IProfile {
   current: boolean;
   cute_name: string;
   data: {
@@ -50,6 +63,7 @@ interface IProfile {
       forge: {
         processes: {
           id: string;
+          slot: number;
           timeFinished: number;
         }[];
       };
@@ -62,6 +76,9 @@ interface IProfile {
       };
     };
   };
+}
+interface IPlayerAPIResponse {
+  profiles: Record<string, IProfile>;
 }
 
 export const getBazaarData = (): Promise<IBazaar[]> => {
@@ -169,22 +186,24 @@ export const getAuctionData = (): Promise<Array<IAuctions & { bin: boolean }>> =
     });
 };
 
-export const getPlayerProfiles = async (playerName: string): Promise<string[] | undefined> => {
+export const getPlayerProfiles = async (playerName: string): Promise<{ id: string; name: string }[] | undefined> => {
   if (!playerName) {
     return;
   }
+
   return axios
     .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
     .then((response) => response.data)
-    .then((response) => Object.keys(response.profiles));
+    .then((response) => Object.keys(response.profiles).map((id) => ({ id, name: response.profiles[id].cute_name })));
 };
 
 export const getPlayerData = async (playerName: string, profileName: string): Promise<IProfile | undefined> => {
   if (!playerName || !profileName) {
     return;
   }
+
   return axios
-    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}`)
+    .get<IPlayerAPIResponse>(`https://sky.shiiyu.moe/api/v2/profile/${playerName}?cache=${Date.now()}`)
     .then((response) => response.data)
     .then((response) => {
       return response.profiles[profileName];
