@@ -60,6 +60,10 @@ export const EnhancedTableHead: FC<IEnhancedTableProps> = (props) => {
 };
 
 const descendingComparator = <T extends string>(a: T, b: T, orderBy: keyof T) => {
+  if (typeof b[orderBy] === 'string' && typeof a[orderBy] === 'string') {
+    return b[orderBy].localeCompare(a[orderBy]);
+  }
+
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
