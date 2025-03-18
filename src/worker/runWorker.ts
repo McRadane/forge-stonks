@@ -33,6 +33,8 @@ import type {
 const audio = new Audio('/orb.mp3');
 audio.volume = 0.3;
 
+type OptionsValues = { id: string; name: string } | boolean | number | string | undefined;
+
 interface IWorkerContexts {
   dispatch: Dispatch<UnknownAction>;
   language: ILanguageContextDefinition;
@@ -117,10 +119,7 @@ export class WorkerRunner {
     this._logCommand(`set language to ${language}`);
   }
 
-  public setOption(
-    option: keyof IOptionsState,
-    value: { id: string; name: string } | boolean | IOptionsState['playFrequency'] | number | string | undefined
-  ) {
+  public setOption(option: keyof IOptionsState, value: OptionsValues) {
     const command: IWorkerCommandSetOptions = {
       command: 'Command-SetOptions',
       options: {
@@ -128,7 +127,7 @@ export class WorkerRunner {
       }
     };
     this._worker.postMessage(command);
-    this._logCommand(`set option ${option} to ${value}`);
+    this._logCommand(`set option ${option} to ${JSON.stringify(value)}`);
   }
 
   public startTimer(itemId: ICraft['itemId']) {

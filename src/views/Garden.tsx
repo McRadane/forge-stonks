@@ -1,5 +1,5 @@
-import { GardenDashboard } from '../garden/GardenDashboard';
 import { useGardenPrice } from '../garden/functions';
+import { GardenDashboard } from '../garden/GardenDashboard';
 
 const Garden = () => {
   const { fuels, organicMatters } = useGardenPrice();
@@ -10,5 +10,4 @@ const Garden = () => {
 /**
  * Needed for React.lazy
  */
-// eslint-disable-next-line import/no-default-export
 export default Garden;

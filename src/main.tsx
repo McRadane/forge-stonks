@@ -4,9 +4,9 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { HashRouter } from 'react-router-dom';
 
-import { Container } from './Container';
 import { DrawerProvider } from './components/DrawerProvider';
-// eslint-disable-next-line import/no-unassigned-import
+import { Container } from './Container';
+
 import './main.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

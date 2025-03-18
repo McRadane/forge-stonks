@@ -3,7 +3,7 @@ import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import { itemsSource, itemsVendorPrice } from '../resources/items';
 import { enUs } from '../resources/lang/enUs';
 import { frFr } from '../resources/lang/frFr';
-import type { ILanguage, ILanguageItems, KeysLanguageType } from '../resources/lang/type';
+import type { ILanguage, KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import { initialState, type IOptionsState } from '../services/common';
 
@@ -75,7 +75,7 @@ class ComputationWorker {
       if (!isNaN(result.buy)) {
         resultFuels[itemId as keyof typeof itemsFuels] = {
           price: result.buy,
-          ratio: ((result.buy / (itemsFuels[itemId as keyof typeof itemsFuels] as number)) as number) * 2000
+          ratio: (result.buy / (itemsFuels[itemId as keyof typeof itemsFuels] as number)) * 2000
         };
       }
     }
@@ -248,7 +248,7 @@ class ComputationWorker {
 
           this._database.timers.add({
             endTime: forge.timeFinished,
-            itemId: found.itemId as keyof ILanguageItems,
+            itemId: found.itemId,
             slot: forge.slot,
             startTime
           } as ITimer);

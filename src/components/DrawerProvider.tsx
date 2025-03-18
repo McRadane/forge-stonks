@@ -1,4 +1,4 @@
-import { FC, createContext, useContext, useState } from 'react';
+import { createContext, type FC, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 const DrawerContext = createContext<{ open: null | string; setOpen: (name: null | string) => void }>({
   open: null,
@@ -7,14 +7,16 @@ const DrawerContext = createContext<{ open: null | string; setOpen: (name: null 
   }
 });
 
-export const DrawerProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [open, setOpen2] = useState<null | string>(null);
+export const DrawerProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const [open, setOpen] = useState<null | string>(null);
 
-  const setOpen = (value: null | string) => {
-    setOpen2(value);
-  };
+  const setOpenHandler = useCallback((value: null | string) => {
+    setOpen(value);
+  }, []);
 
-  return <DrawerContext.Provider value={{ open, setOpen }}>{children}</DrawerContext.Provider>;
+  const value = useMemo(() => ({ open, setOpen: setOpenHandler }), [open, setOpenHandler]);
+
+  return <DrawerContext.Provider value={value}>{children}</DrawerContext.Provider>;
 };
 
 export const useDrawerOpen = (name: string) => {

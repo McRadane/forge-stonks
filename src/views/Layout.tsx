@@ -1,7 +1,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MenuIcon from '@mui/icons-material/Menu';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import MuiAppBar, { type AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Divider from '@mui/material/Divider';
 import MuiDrawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -9,9 +9,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { type CSSObject, styled, type Theme, useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { CSSObject, Theme, styled, useTheme } from '@mui/material/styles';
 import { useCallback, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Outlet, useLocation } from 'react-router-dom';
@@ -34,10 +34,10 @@ const openedMixin = (theme: Theme): CSSObject => ({
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
+  overflowX: 'hidden',
   [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`
   },
-  overflowX: 'hidden',
   transition: theme.transitions.create('width', {
     duration: theme.transitions.duration.leavingScreen,
     easing: theme.transitions.easing.sharp
@@ -54,13 +54,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar
 }));
 
-interface AppBarProps extends MuiAppBarProps {
+interface IAppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open'
-})<AppBarProps>(({ open, theme }) => ({
+})<IAppBarProps>(({ open, theme }) => ({
   transition: theme.transitions.create(['width', 'margin'], {
     duration: theme.transitions.duration.leavingScreen,
     easing: theme.transitions.easing.sharp
@@ -111,7 +111,7 @@ export const Layout = () => {
 
   const pageTitle = useMemo(() => {
     if (findRoute) {
-      return ` - ${ui[findRoute.title]}`;
+      return ` - ${ui[findRoute.title] as string}`;
     }
     return '';
   }, [findRoute, ui]);
@@ -127,14 +127,14 @@ export const Layout = () => {
       <AppBar open={open} position="fixed">
         <Toolbar>
           <IconButton
-            aria-label="Open menu"
-            color="inherit"
-            edge="start"
-            onClick={handleDrawerOpen}
             sx={{
               marginRight: 5,
               ...(open && { display: 'none' })
             }}
+            aria-label="Open menu"
+            color="inherit"
+            edge="start"
+            onClick={handleDrawerOpen}
           >
             <MenuIcon />
           </IconButton>
@@ -155,20 +155,20 @@ export const Layout = () => {
         <List>
           {routes.map((route) => {
             return (
-              <ListItem disablePadding key={route.path} sx={{ display: 'block' }}>
+              <ListItem key={route.path} sx={{ display: 'block' }} disablePadding>
                 <ListItemButton
                   sx={{
-                    minHeight: 48,
                     justifyContent: open ? 'initial' : 'center',
+                    minHeight: 48,
                     px: 2.5
                   }}
                   to={route.index ? '/' : `/${route.path}`}
                 >
                   <ListItemIcon
                     sx={{
+                      justifyContent: 'center',
                       minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center'
+                      mr: open ? 3 : 'auto'
                     }}
                   >
                     {route.icon}

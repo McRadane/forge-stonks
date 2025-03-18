@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -14,7 +13,7 @@ import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { type ChangeEvent, type FC, useCallback, useContext, useMemo, useState } from 'react';
+import { type ChangeEvent, type FC, useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LanguageContext, useLanguage } from '../../resources/lang/LanguageContext';
@@ -23,7 +22,7 @@ import type { IOptionsState } from '../../services/common';
 import type { RootState } from '../../store';
 import { useWorker } from '../../worker/WorkerContext';
 
-import { PlayerSyncDialog } from './PlayerSyncDialog';
+// import { PlayerSyncDialog } from './PlayerSyncDialog';
 
 interface IOptionsSwitcherProps {
   open: boolean;
@@ -42,15 +41,15 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     includePerfectGems,
     intermediateCraft,
     maxCraftingCost,
-    playerName,
-    playerProfile,
+    // playerName,
+    // playerProfile,
     playFrequency,
     quickForge
   } = useSelector((state: RootState) => state.options);
 
-  const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
+  // const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
 
-  const playerSync = playerName !== undefined && playerProfile !== undefined;
+  // const playerSync = playerName !== undefined && playerProfile !== undefined;
 
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
@@ -64,7 +63,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
     [worker]
   );
 
-  const handleClickOpen = useCallback(() => {
+  /* const handleClickOpen = useCallback(() => {
     setPlayerSyncOpen(true);
   }, []);
 
@@ -80,7 +79,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
       }
     },
     [worker]
-  );
+  ); */
 
   const handleIncludeAuctionsFlip = useCallback(() => {
     worker.setOption('includeAuctionsFlip', !includeAuctionsFlip);
@@ -163,7 +162,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
             overflow: 'scroll'
           }}
         >
-          {playerSync && (
+          {/*{playerSync && (
             <ListItem divider>
               <Typography id="syncProfile-label" variant="h6">
                 {playerName} ({playerProfile.name})
@@ -180,7 +179,7 @@ export const OptionsSwitcher: FC<IOptionsSwitcherProps> = ({ open, toggle }) => 
               onClose={handleClose}
               open={playerSyncOpen}
             />
-          </ListItem>
+          </ListItem>*/}
           <ListItem divider>
             <FormControl fullWidth variant="standard">
               <Typography id="playFrequency-label">{options.playFrequencyLabel}</Typography>

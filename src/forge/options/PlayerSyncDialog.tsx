@@ -10,9 +10,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import { getPlayerProfiles } from '../../worker/axios';
@@ -25,8 +25,8 @@ interface ISavedOptions {
 export interface IPlayerSyncDialogProps {
   currentPlayerName?: string;
   currentPlayerProfile?: { id: string; name: string };
-  open: boolean;
   onClose: (props?: ISavedOptions) => void;
+  open: boolean;
 }
 
 export const PlayerSyncDialog = (props: IPlayerSyncDialogProps) => {
@@ -60,7 +60,7 @@ export const PlayerSyncDialog = (props: IPlayerSyncDialogProps) => {
       });
   }, [playerName]);
 
-  const onPlayerNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPlayerNameChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setPlayerName(event.target.value);
   }, []);
 
@@ -129,8 +129,8 @@ export const PlayerSyncDialog = (props: IPlayerSyncDialogProps) => {
             {lang.ui.options.playerProfile}
           </InputLabel>
           <Select
-            disabled={!hasPlayerReady}
             id="player-profile"
+            disabled={!hasPlayerReady}
             label={lang.ui.options.playerProfile}
             labelId="player-profile-label"
             onChange={onProfileChange}

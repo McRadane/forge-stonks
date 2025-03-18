@@ -1,28 +1,16 @@
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
+import { type Theme, useTheme } from '@mui/material/styles';
 import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import { Theme, useTheme } from '@mui/material/styles';
-import { FC, forwardRef, useMemo } from 'react';
-import { TableComponents, TableVirtuoso } from 'react-virtuoso';
+import { type FC, type MouseEvent, useCallback, useMemo, useState } from 'react';
+import { TableVirtuoso } from 'react-virtuoso';
 
 import { Coin } from '../components/Coin';
+import { EnhancedTableRow, getComparator, type Order } from '../components/EnhancedTableHead';
 import { useLanguage } from '../resources/lang/LanguageContext';
 import type { ILanguage, ILanguageItems } from '../resources/lang/type';
 
-import type { IDataSourceItem } from './types';
-
-interface IData {
-  highlight: boolean;
-  id: string;
-  name: string;
-  price: number;
-  ratio: number;
-  value: number;
-}
+import type { IData, IDataSourceItem } from './types';
+import { VirtuosoTableComponents } from './VirtuosoTableComponents';
 
 export interface IGardenProps {
   dataSource: Partial<Record<keyof ILanguageItems, IDataSourceItem>>;
@@ -31,32 +19,39 @@ export interface IGardenProps {
   sourceItems: Partial<Record<keyof ILanguageItems, number>>;
 }
 
-const VirtuosoTableComponents: TableComponents<IData> = {
+const fixedHeaderContent =
+  ({
+    handleRequestSort,
+    labelRatio,
+    lang,
+    order,
+    orderBy
+  }: {
+    handleRequestSort: (_event: MouseEvent<unknown>, property: string) => void;
+    labelRatio: string;
+    lang: ILanguage;
+    order: Order;
+    orderBy: string;
+  }) =>
   // eslint-disable-next-line react/display-name
-  Scroller: forwardRef<HTMLDivElement>((props, ref) => <TableContainer component={Paper} {...props} ref={ref} />),
-  // eslint-disable-next-line react/display-name
-  TableBody: forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
-  TableHead,
-  Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
-  // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
-  TableRow: ({ item: _item, ...props }) => <TableRow {...props} />
-};
+  () => {
+    const heads = [
+      { id: 'name', label: lang.ui.item, numeric: false },
+      { id: 'price', label: lang.ui.itemPrice, numeric: true },
+      { id: 'ratio', label: lang.ui.itemPricePerCompost, numeric: true },
+      { id: 'value', label: labelRatio, numeric: true }
+    ];
 
-// eslint-disable-next-line react/display-name
-const fixedHeaderContent = (labelRatio: string, lang: ILanguage) => () => {
-  return (
-    <TableRow
-      sx={{
-        backgroundColor: 'background.paper'
-      }}
-    >
-      <TableCell>{lang.ui.item}</TableCell>
-      <TableCell align="right">{lang.ui.itemPrice}</TableCell>
-      <TableCell align="right">{lang.ui.itemPricePerCompost}</TableCell>
-      <TableCell align="right">{labelRatio}</TableCell>
-    </TableRow>
-  );
-};
+    return (
+      <EnhancedTableRow
+        backgroundColor="background.paper"
+        headCells={heads}
+        onRequestSort={handleRequestSort}
+        order={order}
+        orderBy={orderBy}
+      />
+    );
+  };
 
 // eslint-disable-next-line react/display-name
 const rowContent = (theme: Theme) => (_index: number, row: IData) => {
@@ -83,8 +78,23 @@ export const GardenTable: FC<IGardenProps> = ({ dataSource, highlightItem, label
   const lang = useLanguage();
   const theme = useTheme();
 
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<string>('ratio');
+
+  const handleRequestSort = useCallback(
+    (_event: MouseEvent<unknown>, property: string) => {
+      if (orderBy === property) {
+        setOrder(order === 'asc' ? 'desc' : 'asc');
+      } else {
+        setOrder('asc');
+        setOrderBy(property);
+      }
+    },
+    [order, orderBy]
+  );
+
   const rows = useMemo(() => {
-    const preparedData: { id: string; name: string; price: number; ratio: number; value: number; highlight: boolean }[] = [];
+    const preparedData: { highlight: boolean; id: string; name: string; price: number; ratio: number; value: number }[] = [];
 
     Object.keys(dataSource).forEach((key) => {
       const price = dataSource[key as keyof typeof dataSource];
@@ -100,17 +110,19 @@ export const GardenTable: FC<IGardenProps> = ({ dataSource, highlightItem, label
       });
     });
 
-    preparedData.filter((item) => item.price !== 0 && item.value !== 0).sort((a, b) => a.name.localeCompare(b.name));
-
-    return preparedData;
+    return preparedData.filter((item) => item.price !== 0 && item.value !== 0).sort((a, b) => a.name.localeCompare(b.name));
   }, [dataSource, highlightItem, lang.items, sourceItems]);
+
+  const sortedRows = useMemo(() => {
+    return [...rows].sort(getComparator(order, orderBy));
+  }, [order, orderBy, rows]);
 
   return (
     <Paper style={{ height: 400, width: '100%' }}>
       <TableVirtuoso
         components={VirtuosoTableComponents}
-        data={rows}
-        fixedHeaderContent={fixedHeaderContent(labelRatio, lang)}
+        data={sortedRows}
+        fixedHeaderContent={fixedHeaderContent({ handleRequestSort, labelRatio, lang, order, orderBy })}
         itemContent={rowContent(theme)}
       />
     </Paper>

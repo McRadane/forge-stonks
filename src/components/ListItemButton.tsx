@@ -1,10 +1,10 @@
 import type { ButtonBaseProps } from '@mui/material/ButtonBase';
 import MUIListItemButton from '@mui/material/ListItemButton';
-import { forwardRef, useMemo } from 'react';
-import { Link, LinkProps, To, useLocation, useResolvedPath } from 'react-router-dom';
+import { forwardRef, type ReactNode, useMemo } from 'react';
+import { Link, type LinkProps, type To, useLocation, useResolvedPath } from 'react-router-dom';
 
 interface ILinkRouterProps extends ButtonBaseProps {
-  children: React.ReactNode;
+  children: ReactNode;
   to?: To;
 }
 

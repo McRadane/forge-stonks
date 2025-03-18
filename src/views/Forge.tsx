@@ -39,5 +39,4 @@ const Forge = () => {
 /**
  * Needed for React.lazy
  */
-// eslint-disable-next-line import/no-default-export
 export default Forge;
