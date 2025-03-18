@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 
+import { enUs } from './lang/enUs';
 import type { ILanguage } from './lang/type';
 import type { ICraft, IPartialCraft } from './types';
 
@@ -1435,7 +1436,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'refining',
-        id: index + indexRefine
+        id: index + indexRefine,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsGear.map(
@@ -1443,7 +1445,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'gear',
-        id: index + indexGear
+        id: index + indexGear,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsGemstones.map(
@@ -1451,7 +1454,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'gemstone',
-        id: index + indexGemstone
+        id: index + indexGemstone,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsForging.map(
@@ -1459,7 +1463,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'forging',
-        id: index + indexForging
+        id: index + indexForging,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsStones.map(
@@ -1467,7 +1472,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'stones',
-        id: index + indexStones
+        id: index + indexStones,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsPets.map(
@@ -1475,7 +1481,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'pets',
-        id: index + indexPets
+        id: index + indexPets,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsTools.map(
@@ -1483,7 +1490,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'tools',
-        id: index + indexTools
+        id: index + indexTools,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsDrillParts.map(
@@ -1491,7 +1499,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'drill parts',
-        id: index + indexDrillParts
+        id: index + indexDrillParts,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   ),
   ...craftsOther.map(
@@ -1499,7 +1508,8 @@ export const crafts: ICraft[] = [
       ({
         ...craft,
         category: 'other',
-        id: index + indexOther
+        id: index + indexOther,
+        name: enUs.items[craft.itemId]
       }) as ICraft
   )
 ];

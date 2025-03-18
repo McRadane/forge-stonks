@@ -5,6 +5,7 @@ export type CraftCategory = 'drill parts' | 'forging' | 'gear' | 'gemstone' | 'o
 export interface ICraft extends IPartialCraft {
   category: CraftCategory;
   id: number;
+  name: string;
 }
 
 export interface ICraftMaterial {
