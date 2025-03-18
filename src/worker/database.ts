@@ -1,5 +1,7 @@
 import Dexie from 'dexie';
 
+import { forge } from '../models/forge';
+
 import { getAuctionData, getBazaarData } from './axios';
 import type { IAuctions, IBazaar, ITimer, IWorkerResponseLoading, IWorkerResponseMessage } from './type';
 
@@ -14,11 +16,11 @@ const commandLoadingFalse: IWorkerResponseLoading = { command: 'Response-Loading
 type StoreTypes = 'auctions' | 'auctions+bins' | 'bazaar' | 'bins';
 
 export class Database extends Dexie {
-  auctions!: Dexie.Table<IAuctions, string>;
-  bazaars!: Dexie.Table<IBazaar, string>;
-  bins!: Dexie.Table<IAuctions, string>;
-  cache!: Dexie.Table<ICache, string>;
-  timers!: Dexie.Table<ITimer, number>;
+  protected auctionsPrices!: Dexie.Table<IAuctions, string>;
+  protected bazaarsPrices!: Dexie.Table<IBazaar, string>;
+  protected binsPrices!: Dexie.Table<IAuctions, string>;
+  protected cache!: Dexie.Table<ICache, string>;
+  protected forgeTimers!: Dexie.Table<ITimer, number>;
 
   private _cacheDuration = -1;
   private readonly _ctx!: Worker;
@@ -29,19 +31,24 @@ export class Database extends Dexie {
   private readonly _postRefresh: () => void;
 
   constructor(ctx: Worker, postRefresh: () => void) {
-    super('Database');
+    super('Stonks');
 
     this._ctx = ctx;
     this._postRefresh = postRefresh;
 
     this.version(1).stores({
       // eslint-disable-next-line sonarjs/no-duplicate-string
-      auctions: 'item_name, sellPrice, buyPrice',
-      bazaars: 'item_name, sellPrice, buyPrice',
-      bins: 'item_name, sellPrice, buyPrice',
+      auctionsPrices: 'item_name, sellPrice, buyPrice',
+      bazaarsPrices: 'item_name, sellPrice, buyPrice',
+      binsPrices: 'item_name, sellPrice, buyPrice',
       cache: 'key',
-      timers: 'id++, itemId, startTime, endTime'
+      forgeTimers: 'id++, itemId, startTime, endTime'
     });
+  }
+
+  public async addTimers(timer: ITimer) {
+    await this.ensureInitialize();
+    return this.forgeTimers.add(timer);
   }
 
   public async addToCache(key: string, value: unknown) {
@@ -62,6 +69,21 @@ export class Database extends Dexie {
       this._cacheDuration = duration;
       this._startPolling();
     }
+  }
+
+  public async clearTimers() {
+    await this.ensureInitialize();
+    return this.forgeTimers.clear();
+  }
+
+  public async countTimers() {
+    await this.ensureInitialize();
+    return this.forgeTimers.count();
+  }
+
+  public async deleteTimer(timerId: number) {
+    await this.ensureInitialize();
+    return this.forgeTimers.delete(timerId);
   }
 
   public async ensureInitialize() {
@@ -90,7 +112,7 @@ export class Database extends Dexie {
     await this._refresh();
   }
 
-  public async getFromCache<T>(key: string): Promise<T | undefined> {
+  public async getFromCache<T = ICache>(key: string): Promise<T | undefined> {
     await this.ensureInitialize();
     const exists = await this.cache.get(key);
     return exists?.value as T;
@@ -98,32 +120,32 @@ export class Database extends Dexie {
 
   public async getItemAuctionsPrice(item: string) {
     await this.ensureInitialize();
-    return await this.auctions.get(item);
+    return await this.auctionsPrices.get(item);
   }
 
   public async getItemBazaarPrice(item: string) {
     await this.ensureInitialize();
-    return await this.bazaars.get(item);
+    return await this.bazaarsPrices.get(item);
   }
 
   public async getItemBinsPrice(item: string) {
     await this.ensureInitialize();
-    return await this.bins.get(item);
+    return await this.binsPrices.get(item);
   }
 
   public async getItemPrice(item: string, store: StoreTypes) {
     await this.ensureInitialize();
     if (store === 'bins') {
-      return await this.bins.get(item);
+      return await this.binsPrices.get(item);
     }
 
     if (store === 'auctions') {
-      return await this.auctions.get(item);
+      return await this.auctionsPrices.get(item);
     }
 
     if (store === 'auctions+bins') {
-      const resultBins = await this.bins.get(item);
-      const resultAuctions = await this.auctions.get(item);
+      const resultBins = await this.binsPrices.get(item);
+      const resultAuctions = await this.auctionsPrices.get(item);
 
       if (!resultBins) {
         return resultAuctions;
@@ -136,7 +158,12 @@ export class Database extends Dexie {
       return resultBins?.buyPrice < resultAuctions?.buyPrice ? resultBins : resultAuctions;
     }
 
-    return await this.bazaars.get(item);
+    return await this.bazaarsPrices.get(item);
+  }
+
+  public async getTimers(): Promise<ITimer[]> {
+    await this.ensureInitialize();
+    return this.forgeTimers.toArray();
   }
 
   public async removeFromCache(key: string) {
@@ -174,11 +201,11 @@ export class Database extends Dexie {
   }
 
   private async _getRefreshPromiseAuctionsAndBins(minAuctions: IAuctions[], resolve: (value: PromiseLike<void> | void) => void) {
-    return this.auctions
+    return this.auctionsPrices
       .toCollection()
       .delete()
       .then(() => {
-        this.auctions.bulkAdd(minAuctions);
+        this.auctionsPrices.bulkAdd(minAuctions);
         resolve();
         this._sendMessage('Auctions data has been updated');
       });
@@ -186,12 +213,12 @@ export class Database extends Dexie {
 
   private async _getRefreshPromiseBazaar(resolve: (value: PromiseLike<void> | void) => void) {
     const bazaars = await getBazaarData();
-    this.transaction('rw', this.bazaars, async () => {
-      return this.bazaars
+    this.transaction('rw', this.bazaarsPrices, async () => {
+      return this.bazaarsPrices
         .toCollection()
         .delete()
         .then(() => {
-          this.bazaars.bulkAdd(bazaars);
+          this.bazaarsPrices.bulkAdd(bazaars);
           resolve();
           this._sendMessage('Bazaar data has been updated');
         });
@@ -199,11 +226,11 @@ export class Database extends Dexie {
   }
 
   private async _getRefreshPromiseBins(minBins: IAuctions[], resolve: (value: PromiseLike<void> | void) => void) {
-    return this.bins
+    return this.binsPrices
       .toCollection()
       .delete()
       .then(() => {
-        this.bins.bulkAdd(minBins);
+        this.binsPrices.bulkAdd(minBins);
         resolve();
 
         this._sendMessage('BINs data has been updated');
@@ -218,9 +245,10 @@ export class Database extends Dexie {
     });
 
     const refreshPromiseAuctionsAndBins = getAuctionData().then((auctionsAndBins) => {
-      return this.transaction('rw', this.auctions, this.bins, async () => {
-        const auctions = auctionsAndBins.filter((auction) => !auction.bin);
-        const bins = auctionsAndBins.filter((auction) => auction.bin);
+      return this.transaction('rw', this.auctionsPrices, this.binsPrices, async () => {
+        const filteredAuctionsAndBins = auctionsAndBins.filter((auction) => forge.auctionItems.includes(auction.item_name));
+        const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
+        const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);
 
         const minAuctions = this._findMinPrice(auctions);
         const minBins = this._findMinPrice(bins);
