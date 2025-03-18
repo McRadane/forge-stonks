@@ -10,7 +10,6 @@ import { initialState, type IOptionsState } from '../services/common';
 import { getPlayerData, type IProfile } from './axios';
 import { Database } from './database';
 import type {
-  ITimer,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
   IWorkerResponseGetGardenPrices,
@@ -98,7 +97,7 @@ class ComputationWorker {
   }
   public async getLanguage() {
     this._messageResponse('ask for language');
-    const data = await this._database.cache.get('language');
+    const data = await this._database.getFromCache('language');
     if (data) {
       this._languageKey = data.value as KeysLanguageType;
       const command: IWorkerResponseGetLanguage = { command: 'Response-GetLanguage', language: this._languageKey };
@@ -129,7 +128,7 @@ class ComputationWorker {
     this._messageResponse('Initializing');
     this._getOptions();
     this._withNotification = withNotification;
-    const count = await this._database.timers.count();
+    const count = await this._database.countTimers();
 
     if (count !== 0 && this._timersInterval === undefined) {
       this._timersInterval = setInterval(() => {
@@ -144,7 +143,7 @@ class ComputationWorker {
       if (player) {
         this._database.addToCache('hotm', player.data.mining.core.tier ?? initialState.hotm);
         this._database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
-        this._database.timers.clear();
+        this._database.clearTimers();
         /* player.data.mining.forge.processes.forEach((forge) => {
           this.database.timers.add({
             itemId: forge.id
@@ -192,13 +191,13 @@ class ComputationWorker {
 
     if (found) {
       this._messageResponse(`Start timer for ${JSON.stringify(found)}`);
-      const count = await this._database.timers.count();
+      const count = await this._database.countTimers();
       const slots = await this._getForgeSlots();
 
       if (count < slots) {
         const startTime = Date.now();
         const endTime = startTime + found.time * 1000 * 60 * 60;
-        this._database.timers.add({ endTime, itemId, slot: count + 1, startTime } as ITimer);
+        this._database.addTimers({ endTime, itemId, slot: count + 1, startTime });
       }
 
       if (count === 0 && this._timersInterval === undefined) {
@@ -217,8 +216,8 @@ class ComputationWorker {
   }
 
   public async stopTimer({ id }: IWorkerCommandStopTimer) {
-    await this._database.timers.delete(id);
-    const count = await this._database.timers.count();
+    await this._database.deleteTimer(id);
+    const count = await this._database.countTimers();
 
     if (count === 0) {
       clearInterval(this._timersInterval);
@@ -239,19 +238,19 @@ class ComputationWorker {
         found = crafts.find((item) => item.itemId.toLowerCase() === forge.id.toLowerCase().replace('_', ' '));
       }
 
-      const existing = await this._database.timers.toArray();
+      const existing = await this._database.getTimers();
 
       if (found) {
         const foundExisting = existing.find((timer) => timer.endTime === forge.timeFinished);
         if (!foundExisting) {
           const startTime = forge.timeFinished - found.time * 1000 * 60 * 60;
 
-          this._database.timers.add({
+          this._database.addTimers({
             endTime: forge.timeFinished,
             itemId: found.itemId,
             slot: forge.slot,
             startTime
-          } as ITimer);
+          });
         }
       }
     });
@@ -259,13 +258,13 @@ class ComputationWorker {
 
   private async _checkTimers() {
     const now = Date.now();
-    const timers = await this._database.timers.toArray();
+    const timers = await this._database.getTimers();
 
     const lang = this._getLang();
     timers.forEach((timer) => {
       if (now > timer.endTime) {
         this._notifyMe(lang.notification.timerEnded.replace('{0}', lang.items[timer.itemId]));
-        this._database.timers.delete(timer.id);
+        this._database.deleteTimer(timer.id);
         this._getTimers();
         const command: IWorkerResponseTimerEnded = { command: 'Response-TimerEnded', itemId: timer.itemId, slot: timer.slot };
         ctx.postMessage(command);
@@ -431,7 +430,7 @@ class ComputationWorker {
   }
 
   private async _getTimers() {
-    const timers = await this._database.timers.toArray();
+    const timers = await this._database.getTimers();
     const command: IWorkerResponseTimers = { command: 'Response-Timers', timers };
     ctx.postMessage(command);
   }

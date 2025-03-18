@@ -15,13 +15,6 @@ export interface IBazaar {
   sellPrice: number;
 }
 
-export interface ITimer {
-  endTime: number;
-  id: number;
-  itemId: ICraft['itemId'];
-  startTime: number;
-}
-
 /**
  * Ask for a fll refresh
  */
@@ -170,7 +163,7 @@ export interface IWorkerResponseTimerEnded {
  */
 export interface IWorkerResponseTimers {
   command: 'Response-Timers';
-  timers: ITimer[];
+  timers: ITimerDB[];
 }
 /**
  * Tell the UI that the timer command has been executed
@@ -227,13 +220,6 @@ export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>
 export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
 export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
 
-export interface ITimer {
-  endTime: number;
-  id: number;
-  itemId: ICraft['itemId'];
-  slot: number;
-  startTime: number;
-}
 export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
 
 export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
@@ -241,3 +227,15 @@ export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnde
 export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
+
+export interface ITimer {
+  endTime: number;
+  // id: number;
+  itemId: ICraft['itemId'];
+  slot: number;
+  startTime: number;
+}
+
+export interface ITimerDB extends ITimer {
+  id: number;
+}
