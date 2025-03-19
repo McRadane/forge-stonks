@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 import { itemsWithAttributes } from '../resources/attributes';
+import { PetNames, petsAuctions } from '../resources/pets';
 
 import { cleanAuctionName } from './functions';
 import type {
   IAuctions,
-  IAuctionsAPI,
   IAuctionsAPIPaginatedResponse,
+  IAuctionsAPIPaginatedResponseWithCleanNames,
+  IAuctionsAPIWithCleanNames,
   IBazaar,
   IBazaarAPIResponse,
   IPlayerAPIResponse,
@@ -32,17 +34,19 @@ export const getBazaarPriceData = (): Promise<IBazaar[]> => {
     });
 };
 
-const isWantedItem = (item: IAuctionsAPI): boolean => {
-  const cleanName = cleanAuctionName(item.item_name);
-  return itemsWithAttributes.includes(cleanName);
-};
-
-const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPaginatedResponse['auctions']> => {
+const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPaginatedResponseWithCleanNames['auctions']> => {
   const pageDataResponse = await axios.get<IAuctionsAPIPaginatedResponse>(`https://api.hypixel.net/skyblock/auctions?page=${page}`);
   const pageData = pageDataResponse.data;
 
   if (pageData?.success) {
-    return pageData.auctions.filter((auction) => !auction.claimed && isWantedItem(auction));
+    return pageData.auctions
+      .filter((auction) => !auction.claimed)
+      .map((auction) => ({
+        ...auction,
+        buyPrice: auction.bin || auction.highest_bid_amount ? auction.starting_bid : auction.highest_bid_amount,
+        cleanName: cleanAuctionName(auction.item_name),
+        sellPrice: auction.bin || auction.highest_bid_amount ? auction.starting_bid : auction.highest_bid_amount
+      }));
   }
 
   return Promise.reject(new Error('No results'));
@@ -97,7 +101,11 @@ const sortResults = (
   });
 };
 
-export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Array<IAuctions & { bin: boolean }> }> => {
+export const getAuctionPriceData = (): Promise<{
+  attributes: IAuctionsAPIWithCleanNames[];
+  petsPrices: IAuctionsAPIWithCleanNames[];
+  price: Array<IAuctions & { bin: boolean }>;
+}> => {
   return axios
     .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
     .then((response) => response.data)
@@ -106,10 +114,18 @@ export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Arr
         throw new Error('Invalid query to auctions');
       }
 
-      const auctionsPrices = filterAuctions(data);
-      const allAuctions = data.auctions.filter((auction) => !auction.claimed && isWantedItem(auction));
+      const allAuctions = data.auctions.map((auction) => ({
+        ...auction,
+        buyPrice: auction.bin || auction.highest_bid_amount ? auction.starting_bid : auction.highest_bid_amount,
+        cleanName: cleanAuctionName(auction.item_name),
+        sellPrice: auction.bin || auction.highest_bid_amount ? auction.starting_bid : auction.highest_bid_amount
+      }));
 
-      const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
+      const auctionsPrices = filterAuctions(data);
+      const auctionsWithAttribute = allAuctions.filter((auction) => itemsWithAttributes.includes(auction.cleanName));
+      const petsPrices = allAuctions.filter((auction) => petsAuctions.includes(auction.cleanName as PetNames));
+
+      const promises: Promise<IAuctionsAPIPaginatedResponseWithCleanNames['auctions']>[] = [];
 
       if (data.totalPages > 1) {
         for (let page = 1; page < data.totalPages; page++) {
@@ -118,9 +134,13 @@ export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Arr
       }
       return Promise.all(promises).then((results) => {
         sortResults(results, auctionsPrices);
-        allAuctions.push(...results.flat());
+        const newAuctionsWithAttribute = results.flat().filter((auction) => itemsWithAttributes.includes(auction.cleanName));
+        const newPetsPrices = results.flat().filter((auction) => petsAuctions.includes(auction.cleanName as PetNames));
 
-        return { all: allAuctions, price: Array.from(auctionsPrices.values()) };
+        auctionsWithAttribute.push(...newAuctionsWithAttribute);
+        petsPrices.push(...newPetsPrices);
+
+        return { attributes: auctionsWithAttribute, petsPrices, price: Array.from(auctionsPrices.values()) };
       });
     });
 };

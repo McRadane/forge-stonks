@@ -91,6 +91,7 @@ export interface ILanguageItems {
   ENCHANTED_POISONOUS_POTATO: string;
   ENCHANTED_POTATO: string;
   ENCHANTED_PUMPKIN: string;
+  ENCHANTED_RAW_SALMON: string;
   ENCHANTED_RED_MUSHROOM: string;
   ENCHANTED_REDSTONE_BLOCK: string;
   ENCHANTED_SEEDS: string;

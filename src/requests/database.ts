@@ -1,10 +1,12 @@
 import Dexie from 'dexie';
 
 import { forge } from '../models/forge';
+import { rarities } from '../resources/items';
+import { pets } from '../resources/pets';
 import { IWorkerResponseLoading, IWorkerResponseMessage } from '../worker/type';
 
 import { getAuctionPriceData, getBazaarPriceData } from './axios';
-import type { IAuctions, IAuctionsAPI, IBazaar, ITimer, ITimerDB } from './types';
+import type { IAuctions, IAuctionsAPI, IAuctionsAPIWithCleanNames, IBazaar, IPetAuctions, ITimer, ITimerDB } from './types';
 
 interface ICache {
   key: string;
@@ -23,6 +25,7 @@ export class Database extends Dexie {
   protected binsPrices!: Dexie.Table<IAuctions, string>;
   protected cache!: Dexie.Table<ICache, string>;
   protected forgeTimers!: Dexie.Table<ITimerDB, number>;
+  protected petsAuctions!: Dexie.Table<IPetAuctions, [string, string]>;
 
   private _cacheDuration = -1;
   private readonly _ctx!: Worker;
@@ -45,7 +48,8 @@ export class Database extends Dexie {
       bazaarsPrices: 'item_name, sellPrice, buyPrice',
       binsPrices: 'item_name, sellPrice, buyPrice',
       cache: 'key',
-      forgeTimers: 'id++, itemId, startTime, endTime'
+      forgeTimers: 'id++, itemId, startTime, endTime',
+      petsAuctions: '[pet+rarity], sellPrice'
     });
   }
 
@@ -211,7 +215,7 @@ export class Database extends Dexie {
     }
   }
 
-  private _findMinPrice(auctions: IAuctions[]): IAuctions[] {
+  private _findMinPrice<T extends IAuctions = IAuctions | IAuctionsAPIWithCleanNames>(auctions: T[]): T[] {
     const minAuctionsRecord = auctions.reduce(
       (minItem, current) => {
         if (!minItem[current.item_name] || minItem[current.item_name].min > current.buyPrice) {
@@ -223,7 +227,7 @@ export class Database extends Dexie {
       {} as Record<string, { item: IAuctions; min: number }> // { min: Number.MAX_VALUE, item: undefined as unknown as IAuctions }
     );
 
-    return Object.values(minAuctionsRecord).map((record) => record.item);
+    return Object.values(minAuctionsRecord).map((record) => record.item) as T[];
   }
 
   private async _getRefreshPromiseAuctionsAndBins(minAuctions: IAuctions[], resolve: (value: PromiseLike<void> | void) => void) {
@@ -238,7 +242,7 @@ export class Database extends Dexie {
   }
 
   private async _getRefreshPromiseAuctionsAttributes(
-    auctionsAttributes: IAuctionsAPI[],
+    auctionsAttributes: IAuctionsAPIWithCleanNames[],
     resolve: (value: PromiseLike<void> | void) => void
   ) {
     await this.auctionsAttribute.clear();
@@ -275,6 +279,38 @@ export class Database extends Dexie {
       });
   }
 
+  private async _getRefreshPromisePetsFlip(
+    petsAndPetsItems: IAuctionsAPIWithCleanNames[],
+    resolve: (value: PromiseLike<void> | void) => void
+  ) {
+    await this.petsAuctions.clear();
+
+    const petsUpgrades: IPetAuctions[] = [];
+
+    pets.forEach((pet) => {
+      rarities.forEach((rarity) => {
+        //if (rarityOrder[pet.minTier] > rarityOrder[rarity]) {
+        const foundRarity = petsAndPetsItems.find((petItem) => petItem.cleanName === pet.name && petItem.tier === rarity);
+        const upgrade = pet.tier[rarity];
+
+        // eslint-disable-next-line no-console
+        console.log(`Searching for ${pet.name} with rarity ${rarity}`, { foundRarity, upgrade });
+
+        if (foundRarity && upgrade) {
+          const { buyPrice, sellPrice } = foundRarity;
+
+          petsUpgrades.push({ buyPrice, pet: pet.name, rarity, sellPrice });
+        }
+        // }
+      });
+    });
+
+    await this.petsAuctions.bulkAdd(petsUpgrades);
+    resolve();
+
+    this._sendMessage('Auction attributes data has been updated');
+  }
+
   private async _refresh() {
     this._ctx.postMessage(commandLoadingTrue);
 
@@ -283,13 +319,15 @@ export class Database extends Dexie {
     });
 
     const refreshPromiseAuctionsAndBins = getAuctionPriceData().then((auctionsAndBins) => {
-      return this.transaction('rw', this.auctionsPrices, this.binsPrices, this.auctionsAttribute, async () => {
+      return this.transaction('rw', this.auctionsPrices, this.binsPrices, this.auctionsAttribute, this.petsAuctions, async () => {
         const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => forge.auctionItems.includes(auction.item_name));
         const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
         const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);
 
         const minAuctions = this._findMinPrice(auctions);
         const minBins = this._findMinPrice(bins);
+
+        const minPetsBins = this._findMinPrice(auctionsAndBins.petsPrices.filter((pet) => pet.bin));
 
         const refreshPromiseAuctions = new Promise<void>((resolve) => {
           return this._getRefreshPromiseAuctionsAndBins(minAuctions, resolve);
@@ -300,10 +338,14 @@ export class Database extends Dexie {
         });
 
         const refreshPromiseAuctionsAttributes = new Promise<void>((resolve) => {
-          return this._getRefreshPromiseAuctionsAttributes(auctionsAndBins.all, resolve);
+          return this._getRefreshPromiseAuctionsAttributes(auctionsAndBins.attributes, resolve);
         });
 
-        return Promise.all([refreshPromiseAuctions, refreshPromiseBins, refreshPromiseAuctionsAttributes]);
+        const refreshPromisePetsFlip = new Promise<void>((resolve) => {
+          return this._getRefreshPromisePetsFlip(minPetsBins, resolve);
+        });
+
+        return Promise.all([refreshPromiseAuctions, refreshPromiseBins, refreshPromiseAuctionsAttributes, refreshPromisePetsFlip]);
       });
     });
 

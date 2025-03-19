@@ -74,6 +74,7 @@ export const itemsSource: Record<keyof ILanguage['items'], 'auction' | 'bazaar' 
   ENCHANTED_POISONOUS_POTATO: SOURCE_BAZAAR,
   ENCHANTED_POTATO: SOURCE_BAZAAR,
   ENCHANTED_PUMPKIN: SOURCE_BAZAAR,
+  ENCHANTED_RAW_SALMON: SOURCE_BAZAAR,
   ENCHANTED_RED_MUSHROOM: SOURCE_BAZAAR,
   ENCHANTED_REDSTONE_BLOCK: SOURCE_BAZAAR,
   ENCHANTED_SEEDS: SOURCE_BAZAAR,
@@ -371,3 +372,16 @@ export const reforges = [
   'Withered',
   'Zooming'
 ];
+
+export type Rarities = 'COMMON' | 'EPIC' | 'LEGENDARY' | 'MYTHIC' | 'RARE' | 'UNCOMMON';
+
+export const rarities: Rarities[] = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'];
+
+export const rarityOrder: Record<Rarities, number> = {
+  COMMON: 0,
+  EPIC: 3,
+  LEGENDARY: 4,
+  MYTHIC: 5,
+  RARE: 2,
+  UNCOMMON: 1
+};

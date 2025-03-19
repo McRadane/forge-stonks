@@ -1,3 +1,5 @@
+import { Rarities } from '../resources/items';
+import { PetNames } from '../resources/pets';
 import { ICraft } from '../resources/types';
 
 export interface IAuctions {
@@ -22,6 +24,13 @@ export interface ITimer {
 
 export interface ITimerDB extends ITimer {
   id: number;
+}
+
+export interface IPetAuctions {
+  buyPrice: number;
+  pet: PetNames;
+  rarity: Rarities;
+  sellPrice: number;
 }
 
 export interface IBazaarAPIResponse {
@@ -97,6 +106,12 @@ export interface IAuctionsAPI {
   uuid: string;
 }
 
+export interface IAuctionsAPIWithCleanNames extends IAuctionsAPI {
+  buyPrice: number;
+  cleanName: string;
+  sellPrice: number;
+}
+
 export interface IAuctionAttributes {
   attributes: Record<string, number>;
   bin: boolean;
@@ -111,6 +126,15 @@ export interface IAuctionAttributes {
 
 export interface IAuctionsAPIPaginatedResponse {
   auctions: IAuctionsAPI[];
+  lastUpdated: number;
+  page: number;
+  success: boolean;
+  totalAuctions: number;
+  totalPages: number;
+}
+
+export interface IAuctionsAPIPaginatedResponseWithCleanNames {
+  auctions: IAuctionsAPIWithCleanNames[];
   lastUpdated: number;
   page: number;
   success: boolean;
