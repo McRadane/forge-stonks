@@ -1,27 +1,38 @@
+import { IAuctionAttributes, ITimerDB } from '../requests/types';
 import type { itemsFuels, itemsOrganicMatter } from '../resources/garden';
 import type { KeysLanguageType } from '../resources/lang/type';
 import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 
-export interface IAuctions {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
+type WorkerEvent<T> = {
+  data: T;
+};
 
-export interface IBazaar {
-  buyPrice: number;
-  item_name: string;
-  sellPrice: number;
-}
-
+// #region Commands definitions
 /**
- * Ask for a fll refresh
+ * Ask for a full refresh
  */
 export interface IWorkerCommandForceRefresh {
   command: 'Command-ForceRefresh';
 }
 
+/**
+ * Ask for the auctions attributes
+ */
+export interface IWorkerCommandGetAuctionsAttributes {
+  command: 'Command-GetAuctionsAttributes';
+}
+
+/**
+ * Ask for the garden items prices
+ */
+export interface IWorkerCommandGetGardenPrices {
+  command: 'Command-GetGardenPrices';
+}
+
+/**
+ * Ask for the language
+ */
 export interface IWorkerCommandGetLanguage {
   command: 'Command-GetLanguage';
 }
@@ -31,11 +42,10 @@ export interface IWorkerCommandGetLanguage {
  */
 export interface IWorkerCommandGetPrices {
   command: 'Command-GetPrices';
-  // crafts: ICraft[];
 }
 
 /**
- * Initialize
+ * Initialize the worker
  */
 export interface IWorkerCommandInitialize {
   command: 'Command-Initialize';
@@ -50,6 +60,9 @@ export interface IWorkerCommandSetLanguage {
   language: KeysLanguageType;
 }
 
+/**
+ * Set the an options
+ */
 export interface IWorkerCommandSetOptions {
   command: 'Command-SetOptions';
   options: Partial<IOptionsState>;
@@ -71,34 +84,78 @@ export interface IWorkerCommandStopTimer {
   id: number;
 }
 
+// #endregion
+
+// #region Commands Events
+type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
+type WorkerCommandEventGetAuctionsAttributes = WorkerEvent<IWorkerCommandGetAuctionsAttributes>;
+type WorkerCommandEventGetGardenPrices = WorkerEvent<IWorkerCommandGetGardenPrices>;
+type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
+type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
+type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
+type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
+type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
+type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
+type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
+
+export type WorkerCommandEvents =
+  | WorkerCommandEventForceRefresh
+  | WorkerCommandEventGetAuctionsAttributes
+  | WorkerCommandEventGetGardenPrices
+  | WorkerCommandEventGetLanguage
+  | WorkerCommandEventGetPrices
+  | WorkerCommandEventInitialize
+  | WorkerCommandEventSetLanguage
+  | WorkerCommandEventSetOptions
+  | WorkerCommandEventStartTimer
+  | WorkerCommandEventStopTimer;
+
+// #endregion
+
+// #region Responses definitions
+
 /**
- * Ask for the items prices
+ * auctions attributes result
  */
-export interface IWorkerCommandGetPrices {
-  command: 'Command-GetPrices';
-  // crafts: ICraft[];
+export interface IWorkerResponseAuctionsAttributesResult {
+  auctionsAttributes: IAuctionAttributes[];
 }
 
 /**
- * Ask for the garden items prices
+ * Return the auctions attributes
  */
-export interface IWorkerCommandGetGardenPrices {
-  command: 'Command-GetGardenPrices';
-  // crafts: ICraft[];
+export interface IWorkerResponseGetAuctionsAttributes {
+  command: 'Response-GetAuctionsAttributes';
+  results: IWorkerResponseAuctionsAttributesResult;
 }
 
 /**
- * Ask for a fll refresh
+ * Garden prices result
  */
-export interface IWorkerCommandForceRefresh {
-  command: 'Command-ForceRefresh';
+export interface IWorkerResponseGetGardenPricesResult {
+  fuels: Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>>;
+  organics: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>>;
 }
 
+/**
+ * Return the items prices for the garden
+ */
+export interface IWorkerResponseGetGardenPrices {
+  command: 'Response-GetGardenPrices';
+  results: IWorkerResponseGetGardenPricesResult;
+}
+
+/**
+ * Return the language
+ */
 export interface IWorkerResponseGetLanguage {
   command: 'Response-GetLanguage';
   language: KeysLanguageType | null;
 }
 
+/**
+ * Prices result
+ */
 export interface IWorkerResponseGetPricesResult {
   crafts: Record<ICraft['itemId'], ICraftWithCosts>;
   materials: Record<ICraft['itemId'], ICraftWithPrice>;
@@ -110,24 +167,6 @@ export interface IWorkerResponseGetPricesResult {
 export interface IWorkerResponseGetPrices {
   command: 'Response-GetPrices';
   results: IWorkerResponseGetPricesResult;
-}
-
-export interface IWorkerResponseGetGardenPricesResult {
-  fuels: Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>>;
-  organics: Partial<Record<keyof typeof itemsOrganicMatter, { price: number; ratio: number }>>;
-}
-
-/**
- * Return the items prices
- */
-export interface IWorkerResponseGetGardenPrices {
-  command: 'Response-GetGardenPrices';
-  results: IWorkerResponseGetGardenPricesResult;
-}
-
-export interface IWorkerResponseGetPricesResult {
-  crafts: Record<ICraft['itemId'], ICraftWithCosts>;
-  materials: Record<ICraft['itemId'], ICraftWithPrice>;
 }
 
 /**
@@ -153,56 +192,46 @@ export interface IWorkerResponseOptions extends Partial<IOptionsState> {
   command: 'Response-Options';
 }
 
-export interface IWorkerResponseTimerEnded {
-  command: 'Response-TimerEnded';
-  itemId: ICraft['itemId'];
-}
-
-/**
- * Return the list of commands
- */
-export interface IWorkerResponseTimers {
-  command: 'Response-Timers';
-  timers: ITimerDB[];
-}
 /**
  * Tell the UI that the timer command has been executed
  */
-export interface IWorkerResponseTimerSet {
-  command: 'Response-TimerSet';
-  itemId: ICraft['itemId'];
-}
-
 export interface IWorkerResponseTimerEnded {
   command: 'Response-TimerEnded';
   itemId: ICraft['itemId'];
   slot: number;
 }
 
-type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
-type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
-type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
-type WorkerCommandEventGetGardenPrices = WorkerEvent<IWorkerCommandGetGardenPrices>;
-type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
-type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
-type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
-type WorkerCommandEventStartTimer = WorkerEvent<IWorkerCommandStartTimer>;
-type WorkerCommandEventStopTimer = WorkerEvent<IWorkerCommandStopTimer>;
+/**
+ * Return the list of timiers
+ */
+export interface IWorkerResponseTimers {
+  command: 'Response-Timers';
+  timers: ITimerDB[];
+}
+/**
+ * Tell the UI that the timer command has started
+ */
+export interface IWorkerResponseTimerSet {
+  command: 'Response-TimerSet';
+  itemId: ICraft['itemId'];
+}
 
-export type WorkerCommandEvents =
-  | WorkerCommandEventForceRefresh
-  | WorkerCommandEventGetGardenPrices
-  | WorkerCommandEventGetLanguage
-  | WorkerCommandEventGetPrices
-  | WorkerCommandEventInitialize
-  | WorkerCommandEventSetLanguage
-  | WorkerCommandEventSetOptions
-  | WorkerCommandEventStartTimer
-  | WorkerCommandEventStopTimer;
+// #endregion
 
-type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
+// #region Responses Events
+export type WorkerResponseEventGetAuctionsAttributes = WorkerEvent<IWorkerResponseGetAuctionsAttributes>;
+export type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
+export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
+export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
+export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
+export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
+export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
+export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
 
 export type WorkerResponseEvents =
+  | WorkerResponseEventGetAuctionsAttributes
   | WorkerResponseEventGetGardenPrices
   | WorkerResponseEventGetLanguage
   | WorkerResponseEventGetPrices
@@ -212,30 +241,4 @@ export type WorkerResponseEvents =
   | WorkerResponseEventTimerEnded
   | WorkerResponseEventTimers
   | WorkerResponseEventTimerSet;
-type WorkerEvent<T> = {
-  data: T;
-};
-export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
-export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
-export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
-export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
-
-export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
-
-export type WorkerResponseEventTimerEnded = WorkerEvent<IWorkerResponseTimerEnded>;
-
-export type WorkerResponseEventTimers = WorkerEvent<IWorkerResponseTimers>;
-
-export type WorkerResponseEventTimerSet = WorkerEvent<IWorkerResponseTimerSet>;
-
-export interface ITimer {
-  endTime: number;
-  // id: number;
-  itemId: ICraft['itemId'];
-  slot: number;
-  startTime: number;
-}
-
-export interface ITimerDB extends ITimer {
-  id: number;
-}
+// #endregion

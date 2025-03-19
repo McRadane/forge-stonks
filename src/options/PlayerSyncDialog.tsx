@@ -14,8 +14,8 @@ import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useLanguage } from '../../resources/lang/LanguageContext';
-import { getPlayerProfiles } from '../../worker/axios';
+import { getPlayerProfiles } from '../requests/axios';
+import { useLanguage } from '../resources/lang/LanguageContext';
 
 interface ISavedOptions {
   playerName: string;

@@ -13,7 +13,6 @@ import { type CSSObject, styled, type Theme, useTheme } from '@mui/material/styl
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useCallback, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { ListItemButton } from '../components/ListItemButton';
@@ -116,14 +115,14 @@ export const Layout = () => {
     return '';
   }, [findRoute, ui]);
 
+  const fullTitle = useMemo(() => {
+    return `${ui.title}${pageTitle}`;
+  }, [pageTitle, ui.title]);
+
   return (
     <>
-      <Helmet>
-        <title>
-          {ui.title}
-          {pageTitle}
-        </title>
-      </Helmet>
+      <title>{fullTitle}</title>
+
       <AppBar open={open} position="fixed">
         <Toolbar>
           <IconButton
@@ -139,8 +138,7 @@ export const Layout = () => {
             <MenuIcon />
           </IconButton>
           <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
-            {ui.title}
-            {pageTitle}
+            {fullTitle}
           </Typography>
           <OptionDrawerButton name={findRoute?.option ?? null} />
         </Toolbar>

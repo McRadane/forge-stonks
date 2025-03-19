@@ -4,13 +4,17 @@ import { Logger } from '../logger';
 import type { INotificationContextDefinition } from '../notification/NotificationContext';
 import type { ILanguageContextDefinition, KeysLanguageType } from '../resources/lang/type';
 import type { ICraft } from '../resources/types';
+import { setAttributes } from '../services/attributes';
 import type { IOptionsState } from '../services/common';
+import { setPrices, setTimerLaunched, setTimers } from '../services/forge';
+import { setGardenPrices } from '../services/garden';
 import { setOptions } from '../services/options';
-import { setGardenPrices, setLoading, setNotLoading, setPrices, setTimerLaunched, setTimers } from '../services/worker';
+import { setLoading, setNotLoading } from '../services/worker';
 
 import Worker from './stonks.worker?worker';
 import type {
   IWorkerCommandForceRefresh,
+  IWorkerCommandGetAuctionsAttributes,
   IWorkerCommandGetGardenPrices,
   IWorkerCommandGetLanguage,
   IWorkerCommandGetPrices,
@@ -19,6 +23,8 @@ import type {
   IWorkerCommandSetOptions,
   IWorkerCommandStartTimer,
   IWorkerCommandStopTimer,
+  WorkerResponseEventGetAuctionsAttributes,
+  WorkerResponseEventGetGardenPrices,
   WorkerResponseEventGetLanguage,
   WorkerResponseEventGetPrices,
   WorkerResponseEventLoading,
@@ -42,16 +48,29 @@ interface IWorkerContexts {
 }
 
 export class WorkerRunner {
-  private readonly _contexts: IWorkerContexts;
+  public _contexts: IWorkerContexts;
+  private static _instance: null | WorkerRunner = null;
   private _languageKeyResponse: KeysLanguageType | null = null;
   private _timeGetPrices: null | number = null;
   private readonly _worker!: Worker;
 
-  constructor(contexts: IWorkerContexts) {
+  private constructor(contexts: IWorkerContexts) {
     this._worker = new Worker();
     this._contexts = contexts;
 
     this._listener();
+  }
+
+  public static getInstance(contexts: IWorkerContexts) {
+    if (!WorkerRunner._instance) {
+      WorkerRunner._instance = new WorkerRunner(contexts);
+    }
+
+    const instance = WorkerRunner._instance;
+
+    instance._contexts = contexts;
+
+    return instance;
   }
 
   public forceRefresh() {
@@ -60,6 +79,17 @@ export class WorkerRunner {
     };
     this._worker.postMessage(command);
     this._logCommand(`force refresh`);
+  }
+
+  public getAuctionsAttributes() {
+    if (this._timeGetPrices === null) {
+      this._timeGetPrices = performance.now();
+      const command: IWorkerCommandGetAuctionsAttributes = {
+        command: 'Command-GetAuctionsAttributes'
+      };
+      this._worker.postMessage(command);
+      this._logCommand(`get auctions attributes`);
+    }
   }
 
   public getGardenPrices() {
@@ -149,10 +179,14 @@ export class WorkerRunner {
   }
 
   private _listener() {
+    // eslint-disable-next-line sonarjs/cyclomatic-complexity
     this._worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
+        case 'Response-GetAuctionsAttributes':
+          this._responseGetAuctionsAttributes(event as WorkerResponseEventGetAuctionsAttributes);
+          break;
         case 'Response-GetGardenPrices':
-          this._contexts.dispatch(setGardenPrices(event.data.results));
+          this._responseGetGardenPrices(event as WorkerResponseEventGetGardenPrices);
           break;
         case 'Response-GetLanguage':
           this._responseGetLanguage(event as WorkerResponseEventGetLanguage);
@@ -190,11 +224,24 @@ export class WorkerRunner {
     Logger.log('%cWORKER RESPONSE ::', 'font-weight:bold;color:purple', ...message);
   }
 
+  private _responseGetAuctionsAttributes(event: WorkerResponseEventGetAuctionsAttributes) {
+    this._logResponse('Get auctions attributes');
+
+    this._contexts.dispatch(setAttributes(event.data.results.auctionsAttributes));
+  }
+
+  private _responseGetGardenPrices(event: WorkerResponseEventGetGardenPrices) {
+    this._logResponse('Get prices for the garden');
+
+    this._contexts.dispatch(setGardenPrices(event.data.results));
+  }
+
   private _responseGetLanguage(event: WorkerResponseEventGetLanguage) {
     this._logResponse(`Received language key ${event.data.language}`);
 
     this._languageKeyResponse = event.data.language;
   }
+
   private _responseGetPrices(event: WorkerResponseEventGetPrices) {
     if (this._timeGetPrices !== null) {
       const endTime = performance.now();

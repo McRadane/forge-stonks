@@ -14,7 +14,7 @@ import type { RootState } from '../../store';
 import { Timer } from './Timer';
 
 export const Timers = () => {
-  const timers = useSelector((state: RootState) => state.worker.timers);
+  const timers = useSelector((state: RootState) => state.forge.timers);
   const theme = useTheme();
   const { ui } = useLanguage();
 

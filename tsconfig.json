@@ -1,23 +1,7 @@
 {
-  "compilerOptions": {
-    "allowJs": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "references": [{ "path": "tsconfig.node.json" }]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }

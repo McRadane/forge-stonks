@@ -5,8 +5,8 @@ import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
 export const useGardenPrice = () => {
-  const organicMatters = useSelector((state: RootState) => state.worker.organicMatters);
-  const fuels = useSelector((state: RootState) => state.worker.fuels);
+  const organicMatters = useSelector((state: RootState) => state.garden.organicMatters);
+  const fuels = useSelector((state: RootState) => state.garden.fuels);
   const workerRunner = useWorker();
 
   useEffect(() => {

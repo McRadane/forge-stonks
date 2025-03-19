@@ -3,9 +3,11 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { useSelector } from 'react-redux';
 
 import { useDrawerOpen, useDrawerSetStatus } from '../components/DrawerProvider';
+import { MainContainer } from '../components/MainContainer';
 import { CraftsContainer } from '../forge/CraftsContainer';
-import { OptionsSwitcher } from '../forge/options/OptionsSwitcher';
+import { ForgeOptionsSwitcher } from '../forge/ForgeOptionsSwitcher';
 import { Timers } from '../forge/timers/Timers';
+import { OptionsSwitcher } from '../options/OptionsSwitcher';
 import type { RootState } from '../store';
 
 const Forge = () => {
@@ -17,9 +19,11 @@ const Forge = () => {
   return (
     <>
       <Box component="aside">
-        <OptionsSwitcher open={open} toggle={toggle} />
+        <OptionsSwitcher open={open} toggle={toggle}>
+          <ForgeOptionsSwitcher />
+        </OptionsSwitcher>
       </Box>
-      <Box component="main" sx={{ width: '100%' }}>
+      <MainContainer>
         <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
         <Timers />
         <Box
@@ -31,7 +35,7 @@ const Forge = () => {
         >
           <CraftsContainer />
         </Box>
-      </Box>
+      </MainContainer>
     </>
   );
 };

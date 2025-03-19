@@ -278,10 +278,13 @@ export interface ILanguageItems {
   YELLOW_FLOWER: string;
 }
 
-interface ILanguageUI {
+export interface ILanguageUI {
   amount: string;
+  attributes: string;
   auction: string;
   bazaar: string;
+  bin: string;
+  both: string;
   categoryDrillParts: string;
   categoryForging: string;
   categoryGear: string;
@@ -291,6 +294,8 @@ interface ILanguageUI {
   categoryRefining: string;
   categoryStones: string;
   categoryTools: string;
+  copiedToClipboard: string;
+  copyToClipboard: string;
   craftCost: string;
   filters: string;
   fuelColumn: string;
@@ -300,9 +305,12 @@ interface ILanguageUI {
   item: string;
   itemPrice: string;
   itemPricePerCompost: string;
+  items: string;
+  levels: string;
   options: ILanguageUIOptions;
   organicMattersColumn: string;
   organicMattersTitle: string;
+  pageAttributeSearch: string;
   pageForge: string;
   pageGarden: string;
   profit: string;
@@ -356,37 +364,4 @@ interface ILanguageUIOptions {
   save: string;
   syncProfileTitle: string;
   title: string;
-}
-
-interface ILanguageUI3 {
-  amount: string;
-  auction: string;
-  bazaar: string;
-  casting: string;
-  craftCost: string;
-  filters: string;
-
-  hotm: string;
-  hour: string;
-  item: string;
-  itemPrice: string;
-
-  options: ILanguageUIOptions;
-
-  profit: string;
-  profitByTimeEveryday: string;
-  profitByTimeNonStop: string;
-  profitByTimeThreeTime: string;
-  profitByTimeTwice: string;
-  refine: string;
-  sell: string;
-  sellPrice: string;
-  shoppingList: string;
-  time: string;
-  timer: string;
-  timerButton: string;
-  title: string;
-  totalPrice: string;
-  type: string;
-  vendor: string;
 }

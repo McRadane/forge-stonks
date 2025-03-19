@@ -1,18 +1,17 @@
 import { fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
-import eslint from '@eslint/js';
+import js from '@eslint/js'
 import prettier from 'eslint-config-prettier';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
-import onlyWarnPlugin from 'eslint-plugin-only-warn';
 import perfectionistPlugin from 'eslint-plugin-perfectionist';
 import promisePlugin from 'eslint-plugin-promise';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import reactHooks from 'eslint-plugin-react-hooks'
+// import reactRefresh from 'eslint-plugin-react-refresh'
 import sonarjsPlugin, { configs as sonarjsConfigs } from 'eslint-plugin-sonarjs';
 import webPlugin from 'eslint-plugin-web';
-import globals from 'globals';
+import globals from 'globals'
 import path from 'path';
-import tseslint, { parser as typescriptParser } from 'typescript-eslint';
+import tseslint , { parser as typescriptParser } from 'typescript-eslint'
 import url from 'url';
 
 // eslint-disable-next-line sonarjs/variable-name
@@ -32,29 +31,27 @@ const legacyPlugin = (name, alias = name) => {
   return fixupPluginRules(plugin);
 };
 
-const baseRules = [
+export default tseslint.config(
+  { ignores: ['dist'] },
   {
-    files: ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.ts', '**/*.tsx'],
-    ignores: ['coverage/**', 'test/**', 'build/**', 'dist/**', '.yarn/**', '**/*.d.ts'],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
-    name: 'Global Include and Ignore',
-    plugins: { 'only-warn': onlyWarnPlugin }
-  },
-  { name: 'ESLint Recommended', ...eslint.configs.recommended },
-  {
-    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname
       },
-      sourceType: 'module'
+      sourceType: 'module',
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
-    // ignores: ['jest.config.ts', '**/*.d.ts'],
-    name: 'typescript-eslint',
-    plugins: { '@typescript-eslint': tseslint.plugin },
+    plugins: {
+      'react-hooks': reactHooks,
+      // 'react-refresh': reactRefresh,
+    },
     rules: {
+      ...reactHooks.configs.recommended.rules,
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/naming-convention': [
         'warn',
@@ -179,36 +176,13 @@ const baseRules = [
       'no-var': 'error',
       'prefer-const': 'error',
       'prefer-rest-params': 'error',
-      'prefer-spread': 'error'
-    }
-  },
-  {
-    name: 'React Hooks Plugin',
-    plugins: { 'react-hooks': fixupPluginRules(reactHooksPlugin) },
-    rules: reactHooksPlugin.configs.recommended.rules
-  },
-  {
-    languageOptions: {
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true
-        },
-        jsxPragma: null
-      }
+      'no-console': 'error',
+      'prefer-spread': 'error',
+      /*'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ]*/
     },
-    name: 'React Plugin',
-    plugins: { react: reactPlugin },
-    rules: {
-      ...reactPlugin.configs.recommended.rules,
-      'react/jsx-uses-react': 0,
-      'react/prop-types': 'off',
-      'react/react-in-jsx-scope': 0
-    },
-    settings: {
-      react: {
-        version: '19.0'
-      }
-    }
   },
   prettier,
   { name: 'Web Plugin', plugins: { web: webPlugin }, rules: webPlugin.configs.all.rules },
@@ -262,7 +236,7 @@ const baseRules = [
     }
   },
   {
-    ignores: ['jest.config.ts', '**/*.d.ts'],
+    ignores: ['vite.config.ts', '**/*.d.ts'],
     name: 'SonarLint Plugin',
     plugins: { sonarjs: sonarjsPlugin },
     rules: {
@@ -308,8 +282,4 @@ const baseRules = [
       'sonarjs/variable-name': 'warn'
     }
   }
-];
-
-const config = tseslint.config(...baseRules);
-
-export default config;
+)

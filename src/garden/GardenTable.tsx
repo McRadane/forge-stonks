@@ -14,6 +14,7 @@ import { VirtuosoTableComponents } from './VirtuosoTableComponents';
 
 export interface IGardenProps {
   dataSource: Partial<Record<keyof ILanguageItems, IDataSourceItem>>;
+  height?: number;
   highlightItem: keyof ILanguageItems;
   labelRatio: string;
   sourceItems: Partial<Record<keyof ILanguageItems, number>>;
@@ -33,7 +34,6 @@ const fixedHeaderContent =
     order: Order;
     orderBy: string;
   }) =>
-  // eslint-disable-next-line react/display-name
   () => {
     const heads = [
       { id: 'name', label: lang.ui.item, numeric: false },
@@ -53,7 +53,6 @@ const fixedHeaderContent =
     );
   };
 
-// eslint-disable-next-line react/display-name
 const rowContent = (theme: Theme) => (_index: number, row: IData) => {
   const backgroundColor = row.highlight ? theme.palette.action.hover : undefined;
   return (
@@ -74,7 +73,7 @@ const rowContent = (theme: Theme) => (_index: number, row: IData) => {
   );
 };
 
-export const GardenTable: FC<IGardenProps> = ({ dataSource, highlightItem, labelRatio, sourceItems }) => {
+export const GardenTable: FC<IGardenProps> = ({ dataSource, height, highlightItem, labelRatio, sourceItems }) => {
   const lang = useLanguage();
   const theme = useTheme();
 
@@ -118,7 +117,7 @@ export const GardenTable: FC<IGardenProps> = ({ dataSource, highlightItem, label
   }, [order, orderBy, rows]);
 
   return (
-    <Paper style={{ height: 400, width: '100%' }}>
+    <Paper style={{ height: height ?? 350, width: '100%' }}>
       <TableVirtuoso
         components={VirtuosoTableComponents}
         data={sortedRows}

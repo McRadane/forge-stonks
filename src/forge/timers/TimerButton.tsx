@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNotifications } from '../../notification/NotificationContext';
 import { useLanguage } from '../../resources/lang/LanguageContext';
 import type { ICraft } from '../../resources/types';
-import { setTimerPressed } from '../../services/worker';
+import { setTimerPressed } from '../../services/forge';
 import type { RootState } from '../../store';
 import { useWorker } from '../../worker/WorkerContext';
 
@@ -16,7 +16,7 @@ interface ITimerButtonProps {
 }
 
 export const TimerButton: FC<ITimerButtonProps> = ({ itemId }) => {
-  const timerActive = useSelector((state: RootState) => state.worker.timerLaunched.some((timer) => timer === itemId));
+  const timerActive = useSelector((state: RootState) => state.forge.timerLaunched.some((timer) => timer === itemId));
   const dispatch = useDispatch();
   const theme = useTheme();
   const worker = useWorker();

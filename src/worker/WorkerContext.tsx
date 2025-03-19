@@ -28,7 +28,7 @@ export const WorkerProvider: FC<IWorkerProviderProps> = ({ children }) => {
   const notification = useContext(NotificationContext);
 
   const value = useMemo(() => {
-    return { instance: new WorkerRunner({ dispatch, language, notification }) };
+    return { instance: WorkerRunner.getInstance({ dispatch, language, notification }) };
   }, [dispatch, language, notification]);
 
   return <WorkerRunnerContext.Provider value={value}>{children}</WorkerRunnerContext.Provider>;
