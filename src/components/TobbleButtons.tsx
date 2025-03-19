@@ -2,13 +2,14 @@ import { FormGroup, FormLabel, ToggleButton, ToggleButtonGroup } from '@mui/mate
 import { FC, MouseEvent, useState } from 'react';
 
 export interface IToggleButtonsProps {
+  defaultOption?: string;
   label: string;
   onChange: (value: string) => void;
   options: { text: string; value: string }[];
 }
 
-export const ToggleButtons: FC<IToggleButtonsProps> = ({ label, onChange, options }) => {
-  const [value, setValue] = useState(options[0].value);
+export const ToggleButtons: FC<IToggleButtonsProps> = ({ defaultOption, label, onChange, options }) => {
+  const [value, setValue] = useState(defaultOption ?? options[0].value);
   const handleOnChange = (_event: MouseEvent<HTMLElement>, value: string) => {
     setValue(value);
     onChange(value);

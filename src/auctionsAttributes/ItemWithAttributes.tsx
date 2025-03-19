@@ -4,11 +4,13 @@ import { FC, useCallback, useState } from 'react';
 
 import { Coin } from '../components/Coin';
 import { IAuctionAttributes } from '../requests/types';
+import { useLanguage } from '../resources/lang/LanguageContext';
 
 import { CARD_HEIGHT, CARD_WIDTH } from './consts';
 
 export const ItemWithAttributes: FC<{ auction: IAuctionAttributes }> = ({ auction }) => {
   const [copied, setCopied] = useState(false);
+  const { ui } = useLanguage();
 
   const handleCopy = useCallback(async () => {
     try {
@@ -26,7 +28,7 @@ export const ItemWithAttributes: FC<{ auction: IAuctionAttributes }> = ({ auctio
       <CardHeader
         title={
           <>
-            {auction.itemName} <Chip label={auction.bin ? 'BIN' : 'Auction'} />
+            {auction.itemName} <Chip label={auction.bin ? ui.bin : ui.auction} />
           </>
         }
       />
@@ -45,17 +47,17 @@ export const ItemWithAttributes: FC<{ auction: IAuctionAttributes }> = ({ auctio
           </List>
         </Typography>
         <Typography component="div" variant="h6" gutterBottom>
-          Price : <Coin amount={auction.startingBid} />
+          {ui.itemPrice} : <Coin amount={auction.startingBid} />
         </Typography>
       </CardContent>
       <CardActions>
         <Button onClick={handleCopy} size="small">
-          Copy to clipboard
+          {ui.copyToClipboard}
         </Button>
       </CardActions>
       {copied && (
         <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-          Copied to clipboard!
+          {ui.copiedToClipboard}
         </Alert>
       )}
     </Card>

@@ -263,8 +263,11 @@ export const enUs: ILanguage = {
   },
   ui: {
     amount: 'Amount',
+    attributes: 'Attributes',
     auction: 'Auction',
     bazaar: 'Bazaar',
+    bin: 'BIN',
+    both: 'Both',
     categoryDrillParts: 'Drill Parts',
     categoryForging: 'Forging',
     categoryGear: 'Gears',
@@ -272,9 +275,10 @@ export const enUs: ILanguage = {
     categoryOther: 'Other',
     categoryPets: 'Pets',
     categoryRefining: 'Refining',
-
     categoryStones: 'Reforge Stones',
     categoryTools: 'Tools',
+    copiedToClipboard: 'Copied to clipboard',
+    copyToClipboard: 'Copy to clipboard',
     craftCost: 'Crafting cost',
     filters: 'Filters',
     fuelColumn: 'Fuels (2k needed)',
@@ -284,6 +288,8 @@ export const enUs: ILanguage = {
     item: 'Item',
     itemPrice: 'Item price',
     itemPricePerCompost: 'Price / Compost',
+    items: 'Items',
+    levels: 'Levels',
     options: {
       auctionsBINOnlyDescription: 'Use BINs Auctions only for material.',
       auctionsBINOnlyLabel: 'BINs material',
@@ -329,7 +335,6 @@ export const enUs: ILanguage = {
     profitByTimeNonStop: 'Profit per hour',
     profitByTimeThreeTime: 'Profits for 8h',
     profitByTimeTwice: 'Profits for 12h',
-
     sell: 'Sell',
     sellPrice: 'Sell price',
     shoppingList: 'Shopping list',
