@@ -6,7 +6,7 @@ import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import perfectionistPlugin from 'eslint-plugin-perfectionist';
 import promisePlugin from 'eslint-plugin-promise';
 import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+// import reactRefresh from 'eslint-plugin-react-refresh'
 import sonarjsPlugin, { configs as sonarjsConfigs } from 'eslint-plugin-sonarjs';
 import webPlugin from 'eslint-plugin-web';
 import globals from 'globals'
@@ -48,7 +48,7 @@ export default tseslint.config(
     },
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      // 'react-refresh': reactRefresh,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -178,10 +178,10 @@ export default tseslint.config(
       'prefer-rest-params': 'error',
       'no-console': 'error',
       'prefer-spread': 'error',
-      'react-refresh/only-export-components': [
+      /*'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
-      ]
+      ]*/
     },
   },
   prettier,

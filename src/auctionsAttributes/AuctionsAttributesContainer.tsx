@@ -1,41 +1,75 @@
-import { AppBar, Box, LinearProgress, Toolbar, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { FC, useMemo, useState } from 'react';
+
+import { MultiSelect } from '../components/MultiSelect';
 import { RangeSlider } from '../components/RangeSlider';
 import { Select } from '../components/Select';
-import { GridItems } from './GridItems';
+import { ToggleButtons } from '../components/TobbleButtons';
 import { IAuctionAttributes } from '../requests/types';
-import { FC } from 'react';
+import { attributes, itemsWithAttributes } from '../resources/attributes';
+
+import { auctionTypes } from './consts';
+import { GridItems } from './GridItems';
 
 export interface IAuctionAttributesContainerProps {
-    auctions: IAuctionAttributes[]
+  auctions: IAuctionAttributes[];
 }
 
-export const AuctionsAttributesContainer: FC<IAuctionAttributesContainerProps> = ({auctions}) => {
-  return (
-    <Box sx={{ display: 'flex', paddingTop: '64px' }}>
-      <AppBar component="nav">
-        <Toolbar>
-          <Typography component="div" sx={{ flexGrow: 1 }} variant="h6">
-            Auction Attribute Search
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box component="main" sx={{ width: '100%' }}>
-        <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 1,
-            // justifyContent: "space-between",
-            gridTemplateColumns: 'auto auto auto',
-            padding: 1
-          }}
-        >
-          <Select label="Items" onChange={setFilterItem} values={items} allowEmpty />
-          <Select label="Attributes" onChange={setFilterAttribute} values={attributes} allowEmpty />
+export const AuctionsAttributesContainer: FC<IAuctionAttributesContainerProps> = ({ auctions }) => {
+  const [filterItem, setFilterItem] = useState<string>();
+  const [filterAttribute, setFilterAttribute] = useState<string[]>();
+  const [filterLevels, setFilterLevels] = useState<[number, number]>([1, 10]);
+  const [filterType, setFilterType] = useState('');
 
-          <RangeSlider label="Levels" max={10} min={1} onChange={handleFilterLevelsChange} />
-        </Box>
-        {/*<Box
+  const handleFilterLevelsChange = (newValue: number | number[]) => {
+    const newNumbers = newValue as [number, number];
+
+    setFilterLevels([newNumbers[0], newNumbers[1]]);
+  };
+
+  const filteredAuctions = useMemo(() => {
+    let filtered = [...auctions];
+
+    if (filterItem) {
+      filtered = filtered.filter((auction) => auction.itemName === filterItem);
+    }
+
+    if (filterAttribute) {
+      filterAttribute.forEach((attribute) => {
+        filtered = filtered.filter((auction) => auction.attributes[attribute]);
+        if (filterLevels[0] !== 1 || filterLevels[1] !== 10) {
+          filtered = filtered.filter(
+            (auction) => auction.attributes[attribute] >= filterLevels[0] && auction.attributes[attribute] <= filterLevels[1]
+          );
+        }
+      });
+    }
+
+    if (filterType) {
+      filtered = filtered.filter((auction) => auction.bin === (filterType === 'BIN'));
+    }
+
+    return filtered.sort((a, b) => a.startingBid - b.startingBid);
+  }, [auctions, filterItem, filterAttribute, filterType, filterLevels]);
+
+  return (
+    <>
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'grid',
+          gap: 1,
+          gridTemplateColumns: 'repeat(4, auto)',
+          padding: 1
+        }}
+      >
+        <Select label="Items" onChange={setFilterItem} values={itemsWithAttributes} />
+        <MultiSelect label="Attributes" maxItems={2} onChange={setFilterAttribute} values={attributes} />
+
+        <RangeSlider label="Levels" max={10} min={1} onChange={handleFilterLevelsChange} />
+        <ToggleButtons label="Auction Type" onChange={setFilterType} options={auctionTypes} />
+      </Box>
+      {/*<Box
               sx={{
                 width: "100%",
                 display: "grid",
@@ -44,8 +78,7 @@ export const AuctionsAttributesContainer: FC<IAuctionAttributesContainerProps> =
                 gap: 2,
               }}
             >*/}
-        <GridItems items={filteredAuctions} />
-      </Box>
-    </Box>
+      <GridItems items={filteredAuctions} />
+    </>
   );
 };

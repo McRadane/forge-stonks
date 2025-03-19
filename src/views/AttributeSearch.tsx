@@ -1,18 +1,17 @@
 import { Box, LinearProgress } from '@mui/material';
 import { useSelector } from 'react-redux';
 
+import { AuctionsAttributesContainer } from '../auctionsAttributes/AuctionsAttributesContainer';
+import { useAuctionsAttributes } from '../auctionsAttributes/hook';
 import { useDrawerOpen, useDrawerSetStatus } from '../components/DrawerProvider';
-import { MainContainer } from '../components/MainContainer';
-import { useGardenPrice } from '../garden/functions';
-import { GardenDashboard } from '../garden/GardenDashboard';
 import { OptionsSwitcher } from '../options/OptionsSwitcher';
 import { RootState } from '../store';
 
-const Garden = () => {
-  const open = useDrawerOpen('garden');
-  const { toggle } = useDrawerSetStatus('garden');
+const AttributeSearch = () => {
+  const open = useDrawerOpen('attribute');
+  const { toggle } = useDrawerSetStatus('attribute');
 
-  const { fuels, organicMatters } = useGardenPrice();
+  const { auctions } = useAuctionsAttributes();
 
   const loading = useSelector((state: RootState) => state.worker.loading);
 
@@ -21,10 +20,10 @@ const Garden = () => {
       <Box component="aside">
         <OptionsSwitcher open={open} toggle={toggle} />
       </Box>
-      <MainContainer>
+      <Box component="main" sx={{ width: '100%' }}>
         <Box sx={{ height: 8 }}>{loading && <LinearProgress />}</Box>
-        <GardenDashboard fuels={fuels} organicMatters={organicMatters} />
-      </MainContainer>
+        <AuctionsAttributesContainer auctions={auctions} />
+      </Box>
     </>
   );
 };
@@ -32,4 +31,4 @@ const Garden = () => {
 /**
  * Needed for React.lazy
  */
-export default Garden;
+export default AttributeSearch;

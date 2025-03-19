@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+import { itemsWithAttributes } from '../resources/attributes';
+
+import { cleanAuctionName } from './functions';
 import type {
   IAuctions,
   IAuctionsAPI,
@@ -29,12 +32,17 @@ export const getBazaarPriceData = (): Promise<IBazaar[]> => {
     });
 };
 
+const isWantedItem = (item: IAuctionsAPI): boolean => {
+  const cleanName = cleanAuctionName(item.item_name);
+  return itemsWithAttributes.includes(cleanName);
+};
+
 const getPageAuctionsRequests = async (page: number): Promise<IAuctionsAPIPaginatedResponse['auctions']> => {
   const pageDataResponse = await axios.get<IAuctionsAPIPaginatedResponse>(`https://api.hypixel.net/skyblock/auctions?page=${page}`);
   const pageData = pageDataResponse.data;
 
   if (pageData?.success) {
-    return pageData.auctions.filter((auction) => !auction.claimed);
+    return pageData.auctions.filter((auction) => !auction.claimed && isWantedItem(auction));
   }
 
   return Promise.reject(new Error('No results'));
@@ -89,7 +97,7 @@ const sortResults = (
   });
 };
 
-export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Array<IAuctions & { bin: boolean }>; }> => {
+export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Array<IAuctions & { bin: boolean }> }> => {
   return axios
     .get<IAuctionsAPIPaginatedResponse>('https://api.hypixel.net/skyblock/auctions')
     .then((response) => response.data)
@@ -99,7 +107,7 @@ export const getAuctionPriceData = (): Promise<{ all: IAuctionsAPI[]; price: Arr
       }
 
       const auctionsPrices = filterAuctions(data);
-      const allAuctions = data.auctions;
+      const allAuctions = data.auctions.filter((auction) => !auction.claimed && isWantedItem(auction));
 
       const promises: Promise<IAuctionsAPIPaginatedResponse['auctions']>[] = [];
 

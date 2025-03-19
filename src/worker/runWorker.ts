@@ -14,6 +14,7 @@ import { setLoading, setNotLoading } from '../services/worker';
 import Worker from './stonks.worker?worker';
 import type {
   IWorkerCommandForceRefresh,
+  IWorkerCommandGetAuctionsAttributes,
   IWorkerCommandGetGardenPrices,
   IWorkerCommandGetLanguage,
   IWorkerCommandGetPrices,
@@ -47,16 +48,29 @@ interface IWorkerContexts {
 }
 
 export class WorkerRunner {
-  private readonly _contexts: IWorkerContexts;
+  public _contexts: IWorkerContexts;
+  private static _instance: null | WorkerRunner = null;
   private _languageKeyResponse: KeysLanguageType | null = null;
   private _timeGetPrices: null | number = null;
   private readonly _worker!: Worker;
 
-  constructor(contexts: IWorkerContexts) {
+  private constructor(contexts: IWorkerContexts) {
     this._worker = new Worker();
     this._contexts = contexts;
 
     this._listener();
+  }
+
+  public static getInstance(contexts: IWorkerContexts) {
+    if (!WorkerRunner._instance) {
+      WorkerRunner._instance = new WorkerRunner(contexts);
+    }
+
+    const instance = WorkerRunner._instance;
+
+    instance._contexts = contexts;
+
+    return instance;
   }
 
   public forceRefresh() {
@@ -65,6 +79,17 @@ export class WorkerRunner {
     };
     this._worker.postMessage(command);
     this._logCommand(`force refresh`);
+  }
+
+  public getAuctionsAttributes() {
+    if (this._timeGetPrices === null) {
+      this._timeGetPrices = performance.now();
+      const command: IWorkerCommandGetAuctionsAttributes = {
+        command: 'Command-GetAuctionsAttributes'
+      };
+      this._worker.postMessage(command);
+      this._logCommand(`get auctions attributes`);
+    }
   }
 
   public getGardenPrices() {
@@ -154,18 +179,19 @@ export class WorkerRunner {
   }
 
   private _listener() {
+    // eslint-disable-next-line sonarjs/cyclomatic-complexity
     this._worker.addEventListener('message', (event: WorkerResponseEvents) => {
       switch (event.data.command) {
         case 'Response-GetAuctionsAttributes':
-            this._responseGetAuctionsAttributes(event as WorkerResponseEventGetAuctionsAttributes);
-            break;
+          this._responseGetAuctionsAttributes(event as WorkerResponseEventGetAuctionsAttributes);
+          break;
         case 'Response-GetGardenPrices':
           this._responseGetGardenPrices(event as WorkerResponseEventGetGardenPrices);
           break;
         case 'Response-GetLanguage':
           this._responseGetLanguage(event as WorkerResponseEventGetLanguage);
           break;
-          case 'Response-GetPrices':
+        case 'Response-GetPrices':
           this._responseGetPrices(event as WorkerResponseEventGetPrices);
           break;
         case 'Response-Loading':

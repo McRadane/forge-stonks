@@ -320,6 +320,7 @@ export const frFr: ILanguage = {
     },
     organicMattersColumn: 'Matières (4k nécessaire)',
     organicMattersTitle: 'Prix des matières organiques',
+    pageAttributeSearch: "Recherche d'attributs",
     pageForge: 'Forge',
     pageGarden: 'Jardin',
     profit: 'Bénéfices',

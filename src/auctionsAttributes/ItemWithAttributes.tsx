@@ -2,9 +2,10 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Alert, Button, Card, CardActions, CardContent, CardHeader, Chip, List, ListItem, ListItemText, Typography } from '@mui/material';
 import { FC, useCallback, useState } from 'react';
 
+import { Coin } from '../components/Coin';
 import { IAuctionAttributes } from '../requests/types';
 
-import { CARD_HEIGHT, CARD_WIDTH } from './sizes';
+import { CARD_HEIGHT, CARD_WIDTH } from './consts';
 
 export const ItemWithAttributes: FC<{ auction: IAuctionAttributes }> = ({ auction }) => {
   const [copied, setCopied] = useState(false);
@@ -44,7 +45,7 @@ export const ItemWithAttributes: FC<{ auction: IAuctionAttributes }> = ({ auctio
           </List>
         </Typography>
         <Typography component="div" variant="h6" gutterBottom>
-          Price : {Math.ceil(auction.startingBid).toLocaleString()}
+          Price : <Coin amount={auction.startingBid} />
         </Typography>
       </CardContent>
       <CardActions>

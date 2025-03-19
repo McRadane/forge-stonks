@@ -109,7 +109,8 @@
     "prepack": "pinst --disable",
     "prepare": "husky",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "type": "module",
   "version": "1.0.1"

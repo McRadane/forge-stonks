@@ -29,19 +29,33 @@ import type {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ctx: Worker = self as any;
+const glob = globalThis as unknown as { worker: ComputationWorker };
 
 const CACHE_DURATION = 3_600_000;
 
 class ComputationWorker {
+  private static _instance: ComputationWorker;
   private readonly _database: Database;
+  private readonly _instanceTimestamp: number;
   private _languageKey: KeysLanguageType = 'en-US';
   private _timersInterval: number | undefined;
+
   private _withNotification = false;
 
-  constructor() {
+  private constructor(timestamp: number) {
     this._database = new Database(ctx, () => {});
 
+    this._instanceTimestamp = timestamp;
+
     this._database.cacheDuration = CACHE_DURATION;
+  }
+
+  public static getInstance() {
+    if (!ComputationWorker._instance) {
+      ComputationWorker._instance = new ComputationWorker(Date.now());
+    }
+
+    return ComputationWorker._instance;
   }
 
   public async _getAuctionsAttributes(): Promise<void> {
@@ -459,7 +473,7 @@ class ComputationWorker {
   }
 
   private _messageResponse(message: string) {
-    const command: IWorkerResponseMessage = { command: 'Response-Message', message };
+    const command: IWorkerResponseMessage = { command: 'Response-Message', message: `[${this._instanceTimestamp}] ${message}` };
     ctx.postMessage(command);
   }
 
@@ -554,39 +568,48 @@ class ComputationWorker {
   }
 }
 
-const worker = new ComputationWorker();
+const init = () => {
+  if (glob.worker) {
+    return;
+  }
 
-ctx.addEventListener('message', (event: WorkerCommandEvents) => {
-  switch (event.data.command) {
-    case 'Command-ForceRefresh':
-      worker.forceRefresh();
-      break;
-    case 'Command-GetAuctionsAttributes':
-        worker._getAuctionsAttributes();
+  glob.worker = ComputationWorker.getInstance();
+
+  // eslint-disable-next-line sonarjs/cyclomatic-complexity
+  ctx.addEventListener('message', (event: WorkerCommandEvents) => {
+    switch (event.data.command) {
+      case 'Command-ForceRefresh':
+        glob.worker.forceRefresh();
+        break;
+      case 'Command-GetAuctionsAttributes':
+        glob.worker._getAuctionsAttributes();
         break;
       case 'Command-GetGardenPrices':
-      worker._getGardenPrices();
-      break;      
-    case 'Command-GetLanguage':
-      worker.getLanguage();
-      break;
-    case 'Command-GetPrices':
-      worker.getPrices();
-      break;
-    case 'Command-Initialize':
-      worker.initialize(event.data.withNotification);
-      break;
-    case 'Command-SetLanguage':
-      worker.setLanguage(event.data.language);
-      break;
-    case 'Command-SetOptions':
-      worker.setOptions(event.data.options);
-      break;
-    case 'Command-StartTimer':
-      worker.startTimer(event.data);
-      break;
-    case 'Command-StopTimer':
-      worker.stopTimer(event.data);
-      break;
-  }
-});
+        glob.worker._getGardenPrices();
+        break;
+      case 'Command-GetLanguage':
+        glob.worker.getLanguage();
+        break;
+      case 'Command-GetPrices':
+        glob.worker.getPrices();
+        break;
+      case 'Command-Initialize':
+        glob.worker.initialize(event.data.withNotification);
+        break;
+      case 'Command-SetLanguage':
+        glob.worker.setLanguage(event.data.language);
+        break;
+      case 'Command-SetOptions':
+        glob.worker.setOptions(event.data.options);
+        break;
+      case 'Command-StartTimer':
+        glob.worker.startTimer(event.data);
+        break;
+      case 'Command-StopTimer':
+        glob.worker.stopTimer(event.data);
+        break;
+    }
+  });
+};
+
+init();

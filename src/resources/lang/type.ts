@@ -303,6 +303,7 @@ interface ILanguageUI {
   options: ILanguageUIOptions;
   organicMattersColumn: string;
   organicMattersTitle: string;
+  pageAttributeSearch: string;
   pageForge: string;
   pageGarden: string;
   profit: string;
@@ -357,4 +358,3 @@ interface ILanguageUIOptions {
   syncProfileTitle: string;
   title: string;
 }
-

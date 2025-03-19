@@ -4,8 +4,8 @@ import { FixedSizeGrid, FixedSizeGridProps } from 'react-window';
 
 import { IAuctionAttributes } from '../requests/types';
 
+import { CARD_HEIGHT, CARD_WIDTH } from './consts';
 import { ItemWithAttributes } from './ItemWithAttributes';
-import { CARD_HEIGHT, CARD_WIDTH } from './sizes';
 
 import './GridItems.css';
 
@@ -42,9 +42,9 @@ const Cell: FC<{
 export const GridItems: FC<{ items: IAuctionAttributes[] }> = ({ items }) => (
   <div
     style={{
-      backgroundColor: '#d6cae2',
+      // backgroundColor: '#d6cae2',
       marginTop: '2em',
-      minHeight: '100vh',
+      minHeight: 'calc(100vh - 200px)',
       position: 'sticky',
       top: '0px'
     }}

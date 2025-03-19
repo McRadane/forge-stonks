@@ -241,15 +241,12 @@ export class Database extends Dexie {
     auctionsAttributes: IAuctionsAPI[],
     resolve: (value: PromiseLike<void> | void) => void
   ) {
-    return this.auctionsAttribute
-      .toCollection()
-      .delete()
-      .then(() => {
-        this.auctionsAttribute.bulkAdd(auctionsAttributes);
-        resolve();
+    await this.auctionsAttribute.clear();
 
-        this._sendMessage('Auction attributes data has been updated');
-      });
+    await this.auctionsAttribute.bulkAdd(auctionsAttributes);
+    resolve();
+
+    this._sendMessage('Auction attributes data has been updated');
   }
 
   private async _getRefreshPromiseBazaar(resolve: (value: PromiseLike<void> | void) => void) {
@@ -286,7 +283,7 @@ export class Database extends Dexie {
     });
 
     const refreshPromiseAuctionsAndBins = getAuctionPriceData().then((auctionsAndBins) => {
-      return this.transaction('rw', this.auctionsPrices, this.binsPrices, async () => {
+      return this.transaction('rw', this.auctionsPrices, this.binsPrices, this.auctionsAttribute, async () => {
         const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => forge.auctionItems.includes(auction.item_name));
         const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
         const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);

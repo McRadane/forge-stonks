@@ -321,6 +321,7 @@ export const enUs: ILanguage = {
     },
     organicMattersColumn: 'Matters (4k needed)',
     organicMattersTitle: 'Organic Matter costs',
+    pageAttributeSearch: 'Attribute Search',
     pageForge: 'Forge',
     pageGarden: 'Garden',
     profit: 'Profit',
