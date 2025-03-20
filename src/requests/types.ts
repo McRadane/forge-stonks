@@ -1,10 +1,11 @@
 import { Rarities } from '../resources/items';
 import { PetNames } from '../resources/pets';
-import { ICraft } from '../resources/types';
+import { IForgeCraft } from '../resources/types';
 
 export interface IAuctions {
   buyPrice: number;
   item_name: string;
+  rarity?: Rarities;
   sellPrice: number;
 }
 
@@ -17,7 +18,7 @@ export interface IBazaar {
 export interface ITimer {
   endTime: number;
   // id: number;
-  itemId: ICraft['itemId'];
+  itemId: IForgeCraft['itemId'];
   slot: number;
   startTime: number;
 }
@@ -101,6 +102,7 @@ export interface IAuctionsAPI {
   highest_bid_amount: number; // Price of auctions
   item_lore: string;
   item_name: string;
+  rarity: Rarities;
   starting_bid: number; // Price for BIN
   tier: string;
   uuid: string;

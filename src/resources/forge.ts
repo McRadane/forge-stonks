@@ -1,11 +1,11 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { SOURCE_AUCTION, SOURCE_BAZAAR, SOURCE_VENDOR } from './items';
-import type { ICraft, IPartialCraft } from './types';
+import type { IForgeCraft, IPartialForgeCraft } from './types';
 
 const DAY = 24;
 const SEC_30 = 1 / 120;
 
-const craftsRefine: IPartialCraft[] = [
+const craftsRefine: IPartialForgeCraft[] = [
   {
     bazaarItem: true,
     craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_DIAMOND_BLOCK', quantity: 2, source: SOURCE_BAZAAR }],
@@ -43,7 +43,7 @@ const craftsRefine: IPartialCraft[] = [
   }
 ];
 
-const craftsGear: IPartialCraft[] = [
+const craftsGear: IPartialForgeCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [{ intermediaryCraft: false, itemId: 'ENCHANTED_MITHRIL', quantity: 3, source: SOURCE_BAZAAR }],
@@ -309,7 +309,7 @@ const craftsGear: IPartialCraft[] = [
   }
 ];
 
-const craftsGemstones: IPartialCraft[] = [
+const craftsGemstones: IPartialForgeCraft[] = [
   {
     bazaarItem: true,
     craftMaterial: [
@@ -432,7 +432,7 @@ const craftsGemstones: IPartialCraft[] = [
   }
 ];
 
-const craftsForging: IPartialCraft[] = [
+const craftsForging: IPartialForgeCraft[] = [
   {
     bazaarItem: true,
     craftMaterial: [{ intermediaryCraft: false, itemId: 'GLACITE_JEWEL', quantity: 3, source: SOURCE_BAZAAR }],
@@ -542,7 +542,7 @@ const craftsForging: IPartialCraft[] = [
   }
 ];
 
-const craftsStones: IPartialCraft[] = [
+const craftsStones: IPartialForgeCraft[] = [
   {
     bazaarItem: true,
     craftMaterial: [{ intermediaryCraft: true, itemId: 'REFINED_DIAMOND', quantity: 3, source: SOURCE_BAZAAR }],
@@ -634,7 +634,7 @@ const craftsStones: IPartialCraft[] = [
   }
 ];
 
-const craftsPets: IPartialCraft[] = [
+const craftsPets: IPartialForgeCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
@@ -727,7 +727,7 @@ const craftsPets: IPartialCraft[] = [
   }
 ];
 
-const craftsTools: IPartialCraft[] = [
+const craftsTools: IPartialForgeCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
@@ -916,7 +916,7 @@ const craftsTools: IPartialCraft[] = [
   }
 ];
 
-const craftsDrillParts: IPartialCraft[] = [
+const craftsDrillParts: IPartialForgeCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
@@ -1096,7 +1096,7 @@ const craftsDrillParts: IPartialCraft[] = [
   }
 ];
 
-const craftsOther: IPartialCraft[] = [
+const craftsOther: IPartialForgeCraft[] = [
   {
     bazaarItem: false,
     craftMaterial: [
@@ -1221,14 +1221,14 @@ const indexTools = 600;
 const indexDrillParts = 700;
 const indexOther = 800;
 
-export const crafts: ICraft[] = [
+export const crafts: IForgeCraft[] = [
   ...craftsRefine.map(
     (craft, index) =>
       ({
         ...craft,
         category: 'refining',
         id: index + indexRefine
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsGear.map(
     (craft, index) =>
@@ -1236,7 +1236,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'gear',
         id: index + indexGear
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsGemstones.map(
     (craft, index) =>
@@ -1244,7 +1244,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'gemstone',
         id: index + indexGemstone
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsForging.map(
     (craft, index) =>
@@ -1252,7 +1252,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'forging',
         id: index + indexForging
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsStones.map(
     (craft, index) =>
@@ -1260,7 +1260,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'stones',
         id: index + indexStones
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsPets.map(
     (craft, index) =>
@@ -1268,7 +1268,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'pets',
         id: index + indexPets
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsTools.map(
     (craft, index) =>
@@ -1276,7 +1276,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'tools',
         id: index + indexTools
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsDrillParts.map(
     (craft, index) =>
@@ -1284,7 +1284,7 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'drill parts',
         id: index + indexDrillParts
-      }) as ICraft
+      }) as IForgeCraft
   ),
   ...craftsOther.map(
     (craft, index) =>
@@ -1292,6 +1292,105 @@ export const crafts: ICraft[] = [
         ...craft,
         category: 'other',
         id: index + indexOther
-      }) as ICraft
+      }) as IForgeCraft
   )
+];
+
+export const forgeAuctions = [
+  'Amber-polished Drill Engine',
+  'Amber Crystal',
+  'Amber Necklace',
+  'Amethyst Crystal',
+  'Amethyst Gauntlet',
+  'Ammonite Pet',
+  'Ankylosaurus Pet',
+  'Aquamarine Crystal',
+  'Artifact Of Power',
+  'Beacon I',
+  'Beacon II',
+  'Beacon III',
+  'Beacon IV',
+  'Beacon V',
+  'Bejeweled Collar',
+  'Blue Cheese Goblin Omelette',
+  'Boots Of Divan',
+  'Chestplate Of Divan',
+  'Citrine Crystal',
+  'Claw Fossil',
+  'Clubbed Fossil',
+  "Divan's Alloy",
+  "Divan's Drill",
+  'Dwarven Handwarmers',
+  'Dwarven Metal Talisman',
+  'Footprint Fossil',
+  'Gemstone Chamber',
+  'Gemstone Drill LT-522',
+  'Gemstone Fuel Tank',
+  'Glacite-Plated Chisel',
+  'Goblin Omelette',
+  'Goblin Pet',
+  'Helix Fossil',
+  'Helmet Of Divan',
+  'Jade Belt',
+  'Jade Crystal',
+  'Jasper Crystal',
+  'Jasper Drill X',
+  'Leggings Of Divan',
+  'Mammoth Pet',
+  'Mithril-Infused Fuel Tank',
+  'Mithril-Plated Drill Engine',
+  'Mithril Belt',
+  'Mithril Cloak',
+  'Mithril Drill SX-R226',
+  'Mithril Drill SX-R326',
+  'Mithril Gauntlet',
+  'Mithril Necklace',
+  'Mole Pet',
+  'Onyx Crystal',
+  'Opal Crystal',
+  'Pendant Of Divan',
+  'Penguin Pet',
+  'Perfect Chisel',
+  'Perfectly-Cut Fuel Tank',
+  'Peridot Crystal',
+  'Pesto Goblin Omelette',
+  'Polished Topaz Rod',
+  'Portable Campfire',
+  'Reinforced Chisel',
+  'Relic Of Power',
+  'Ruby-polished Drill Engine',
+  'Ruby Crystal',
+  'Ruby Drill TX-15',
+  'Sapphire-polished Drill Engine',
+  'Sapphire Cloak',
+  'Sapphire Crystal',
+  'Shattered Locket',
+  'Spicy Goblin Omelette',
+  'Spine Fossil',
+  'Spinosaurus Pet',
+  'Starfall Seasoning',
+  'Sunny Side Goblin Omelette',
+  'T-Rex Pet',
+  'Titanium-Infused Fuel Tank',
+  'Titanium-Plated Drill Engine',
+  'Titanium Artifact',
+  'Titanium Belt',
+  'Titanium Cloak',
+  'Titanium Drill DR-X355',
+  'Titanium Drill DR-X455',
+  'Titanium Drill DR-X555',
+  'Titanium Drill DR-X655',
+  'Titanium Gauntlet',
+  'Titanium Necklace',
+  'Titanium Relic',
+  'Titanium Ring',
+  'Titanium Talisman',
+  'Topaz Crystal',
+  'Topaz Drill KGR-12',
+  'Travel Scroll to the Dwarven Base Camp',
+  'Travel Scroll to the Dwarven Forge',
+  'Tungsten Regulator',
+  'Tusk Fossil',
+  'Ugly Fossil',
+  'Webbed Fossil'
 ];

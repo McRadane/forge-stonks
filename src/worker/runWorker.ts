@@ -3,12 +3,14 @@ import type { Dispatch, UnknownAction } from '@reduxjs/toolkit';
 import { Logger } from '../logger';
 import type { INotificationContextDefinition } from '../notification/NotificationContext';
 import type { ILanguageContextDefinition, KeysLanguageType } from '../resources/lang/type';
-import type { ICraft } from '../resources/types';
+import type { IForgeCraft } from '../resources/types';
 import { setAttributes } from '../services/attributes';
 import type { IOptionsState } from '../services/common';
-import { setPrices, setTimerLaunched, setTimers } from '../services/forge';
+import { setForgePrices, setTimerLaunched, setTimers } from '../services/forge';
 import { setGardenPrices } from '../services/garden';
 import { setOptions } from '../services/options';
+import { setPetPrices } from '../services/pets';
+import { setRNGPrices } from '../services/rng';
 import { setLoading, setNotLoading } from '../services/worker';
 
 import Worker from './stonks.worker?worker';
@@ -17,7 +19,9 @@ import type {
   IWorkerCommandGetAuctionsAttributes,
   IWorkerCommandGetGardenPrices,
   IWorkerCommandGetLanguage,
+  IWorkerCommandGetPetPrices,
   IWorkerCommandGetPrices,
+  IWorkerCommandGetRNGPrices,
   IWorkerCommandInitialize,
   IWorkerCommandSetLanguage,
   IWorkerCommandSetOptions,
@@ -26,7 +30,9 @@ import type {
   WorkerResponseEventGetAuctionsAttributes,
   WorkerResponseEventGetGardenPrices,
   WorkerResponseEventGetLanguage,
+  WorkerResponseEventGetPetPrices,
   WorkerResponseEventGetPrices,
+  WorkerResponseEventGetRNGPrices,
   WorkerResponseEventLoading,
   WorkerResponseEventMessage,
   WorkerResponseEventOptions,
@@ -119,6 +125,17 @@ export class WorkerRunner {
     });
   }
 
+  public getPetPrices() {
+    if (this._timeGetPrices === null) {
+      this._timeGetPrices = performance.now();
+      const command: IWorkerCommandGetPetPrices = {
+        command: 'Command-GetPetPrices'
+      };
+      this._worker.postMessage(command);
+      this._logCommand(`get pet prices`);
+    }
+  }
+
   public getPrices() {
     if (this._timeGetPrices === null) {
       this._timeGetPrices = performance.now();
@@ -127,6 +144,17 @@ export class WorkerRunner {
       };
       this._worker.postMessage(command);
       this._logCommand(`get prices`);
+    }
+  }
+
+  public getRNGPrices() {
+    if (this._timeGetPrices === null) {
+      this._timeGetPrices = performance.now();
+      const command: IWorkerCommandGetRNGPrices = {
+        command: 'Command-GetRNGPrices'
+      };
+      this._worker.postMessage(command);
+      this._logCommand(`get rng prices`);
     }
   }
 
@@ -160,7 +188,7 @@ export class WorkerRunner {
     this._logCommand(`set option ${option} to ${JSON.stringify(value)}`);
   }
 
-  public startTimer(itemId: ICraft['itemId']) {
+  public startTimer(itemId: IForgeCraft['itemId']) {
     const command: IWorkerCommandStartTimer = {
       command: 'Command-StartTimer',
       itemId
@@ -191,8 +219,14 @@ export class WorkerRunner {
         case 'Response-GetLanguage':
           this._responseGetLanguage(event as WorkerResponseEventGetLanguage);
           break;
+        case 'Response-GetPetPrices':
+          this._responseGetPetPrices(event as WorkerResponseEventGetPetPrices);
+          break;
         case 'Response-GetPrices':
           this._responseGetPrices(event as WorkerResponseEventGetPrices);
+          break;
+        case 'Response-GetRNGPrices':
+          this._responseGetRNGPrices(event as WorkerResponseEventGetRNGPrices);
           break;
         case 'Response-Loading':
           this._responseLoading(event as WorkerResponseEventLoading);
@@ -242,6 +276,17 @@ export class WorkerRunner {
     this._languageKeyResponse = event.data.language;
   }
 
+  private _responseGetPetPrices(event: WorkerResponseEventGetPetPrices) {
+    if (this._timeGetPrices !== null) {
+      const endTime = performance.now();
+
+      this._logResponse(`Calculated ${Object.keys(event.data.results).length} costs in ${endTime - this._timeGetPrices}ms`);
+      this._timeGetPrices = null;
+    }
+
+    this._contexts.dispatch(setPetPrices(event.data.results));
+  }
+
   private _responseGetPrices(event: WorkerResponseEventGetPrices) {
     if (this._timeGetPrices !== null) {
       const endTime = performance.now();
@@ -250,8 +295,20 @@ export class WorkerRunner {
       this._timeGetPrices = null;
     }
 
-    this._contexts.dispatch(setPrices(event.data.results));
+    this._contexts.dispatch(setForgePrices(event.data.results));
   }
+
+  private _responseGetRNGPrices(event: WorkerResponseEventGetRNGPrices) {
+    if (this._timeGetPrices !== null) {
+      const endTime = performance.now();
+
+      this._logResponse(`Calculated ${Object.keys(event.data.results).length} costs in ${endTime - this._timeGetPrices}ms`);
+      this._timeGetPrices = null;
+    }
+
+    this._contexts.dispatch(setRNGPrices(event.data.results));
+  }
+
   private _responseLoading(event: WorkerResponseEventLoading) {
     if (event.data.loading) {
       this._logResponse('Set Loading');

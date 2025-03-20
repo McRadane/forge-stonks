@@ -1,7 +1,9 @@
 import { IAuctionAttributes, ITimerDB } from '../requests/types';
 import type { itemsFuels, itemsOrganicMatter } from '../resources/garden';
-import type { KeysLanguageType } from '../resources/lang/type';
-import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
+import { Rarities } from '../resources/items';
+import type { ILanguage, ILanguageUIRNGFlips, KeysLanguageType } from '../resources/lang/type';
+import { PetNames } from '../resources/pets';
+import type { IForgeCraft, IForgeCraftWithCosts, IForgeCraftWithPrice } from '../resources/types';
 import type { IOptionsState } from '../services/common';
 
 type WorkerEvent<T> = {
@@ -38,10 +40,24 @@ export interface IWorkerCommandGetLanguage {
 }
 
 /**
+ * Ask for the pets prices
+ */
+export interface IWorkerCommandGetPetPrices {
+  command: 'Command-GetPetPrices';
+}
+
+/**
  * Ask for the items prices
  */
 export interface IWorkerCommandGetPrices {
   command: 'Command-GetPrices';
+}
+
+/**
+ * Ask for the rng items prices
+ */
+export interface IWorkerCommandGetRNGPrices {
+  command: 'Command-GetRNGPrices';
 }
 
 /**
@@ -73,7 +89,7 @@ export interface IWorkerCommandSetOptions {
  */
 export interface IWorkerCommandStartTimer {
   command: 'Command-StartTimer';
-  itemId: ICraft['itemId'];
+  itemId: IForgeCraft['itemId'];
 }
 
 /**
@@ -91,7 +107,9 @@ type WorkerCommandEventForceRefresh = WorkerEvent<IWorkerCommandForceRefresh>;
 type WorkerCommandEventGetAuctionsAttributes = WorkerEvent<IWorkerCommandGetAuctionsAttributes>;
 type WorkerCommandEventGetGardenPrices = WorkerEvent<IWorkerCommandGetGardenPrices>;
 type WorkerCommandEventGetLanguage = WorkerEvent<IWorkerCommandGetLanguage>;
+type WorkerCommandEventGetPetPrices = WorkerEvent<IWorkerCommandGetPetPrices>;
 type WorkerCommandEventGetPrices = WorkerEvent<IWorkerCommandGetPrices>;
+type WorkerCommandEventGetRNGPrices = WorkerEvent<IWorkerCommandGetRNGPrices>;
 type WorkerCommandEventInitialize = WorkerEvent<IWorkerCommandInitialize>;
 type WorkerCommandEventSetLanguage = WorkerEvent<IWorkerCommandSetLanguage>;
 type WorkerCommandEventSetOptions = WorkerEvent<IWorkerCommandSetOptions>;
@@ -103,7 +121,9 @@ export type WorkerCommandEvents =
   | WorkerCommandEventGetAuctionsAttributes
   | WorkerCommandEventGetGardenPrices
   | WorkerCommandEventGetLanguage
+  | WorkerCommandEventGetPetPrices
   | WorkerCommandEventGetPrices
+  | WorkerCommandEventGetRNGPrices
   | WorkerCommandEventInitialize
   | WorkerCommandEventSetLanguage
   | WorkerCommandEventSetOptions
@@ -153,12 +173,46 @@ export interface IWorkerResponseGetLanguage {
   language: KeysLanguageType | null;
 }
 
+export interface IPetCraftMaterial {
+  itemId: keyof ILanguage['items'];
+  quantity: number;
+  source: 'auction' | 'bazaar' | 'vendor';
+}
+
+export interface IPetPrices {
+  coins: number;
+  material: IPetCraftMaterial[];
+  petBasePrice: number;
+  petBaseRarity: Rarities;
+  petName: PetNames;
+  petUpgradedCost: number;
+  petUpgradedPrice: number;
+  petUpgradedRarity: Rarities;
+  upgradeTime: number;
+}
+
+/**
+ * Pet Prices result
+ */
+export interface IWorkerResponseGetPetPricesResult {
+  materials: Partial<Record<IPetCraftMaterial['itemId'], number>>;
+  pets: IPetPrices[];
+}
+
+/**
+ * Return the pet prices
+ */
+export interface IWorkerResponseGetPetPrices {
+  command: 'Response-GetPetPrices';
+  results: IWorkerResponseGetPetPricesResult;
+}
+
 /**
  * Prices result
  */
 export interface IWorkerResponseGetPricesResult {
-  crafts: Record<ICraft['itemId'], ICraftWithCosts>;
-  materials: Record<ICraft['itemId'], ICraftWithPrice>;
+  crafts: Record<IForgeCraft['itemId'], IForgeCraftWithCosts>;
+  materials: Record<IForgeCraft['itemId'], IForgeCraftWithPrice>;
 }
 
 /**
@@ -167,6 +221,21 @@ export interface IWorkerResponseGetPricesResult {
 export interface IWorkerResponseGetPrices {
   command: 'Response-GetPrices';
   results: IWorkerResponseGetPricesResult;
+}
+
+/**
+ * RNG prices result
+ */
+export interface IWorkerResponseGetRNGPricesResult {
+  flips: Record<keyof ILanguageUIRNGFlips, Partial<Record<keyof typeof itemsFuels, { price: number; ratio: number }>>>
+}
+
+/**
+ * Return the items prices for the rng flips
+ */
+export interface IWorkerResponseGetRNGPrices {
+  command: 'Response-GetRNGPrices';
+  results: IWorkerResponseGetRNGPricesResult;
 }
 
 /**
@@ -197,7 +266,7 @@ export interface IWorkerResponseOptions extends Partial<IOptionsState> {
  */
 export interface IWorkerResponseTimerEnded {
   command: 'Response-TimerEnded';
-  itemId: ICraft['itemId'];
+  itemId: IForgeCraft['itemId'];
   slot: number;
 }
 
@@ -213,7 +282,7 @@ export interface IWorkerResponseTimers {
  */
 export interface IWorkerResponseTimerSet {
   command: 'Response-TimerSet';
-  itemId: ICraft['itemId'];
+  itemId: IForgeCraft['itemId'];
 }
 
 // #endregion
@@ -222,7 +291,9 @@ export interface IWorkerResponseTimerSet {
 export type WorkerResponseEventGetAuctionsAttributes = WorkerEvent<IWorkerResponseGetAuctionsAttributes>;
 export type WorkerResponseEventGetGardenPrices = WorkerEvent<IWorkerResponseGetGardenPrices>;
 export type WorkerResponseEventGetLanguage = WorkerEvent<IWorkerResponseGetLanguage>;
+export type WorkerResponseEventGetPetPrices = WorkerEvent<IWorkerResponseGetPetPrices>;
 export type WorkerResponseEventGetPrices = WorkerEvent<IWorkerResponseGetPrices>;
+export type WorkerResponseEventGetRNGPrices = WorkerEvent<IWorkerResponseGetRNGPrices>;
 export type WorkerResponseEventLoading = WorkerEvent<IWorkerResponseLoading>;
 export type WorkerResponseEventMessage = WorkerEvent<IWorkerResponseMessage>;
 export type WorkerResponseEventOptions = WorkerEvent<IWorkerResponseOptions>;
@@ -234,7 +305,9 @@ export type WorkerResponseEvents =
   | WorkerResponseEventGetAuctionsAttributes
   | WorkerResponseEventGetGardenPrices
   | WorkerResponseEventGetLanguage
+  | WorkerResponseEventGetPetPrices
   | WorkerResponseEventGetPrices
+  | WorkerResponseEventGetRNGPrices
   | WorkerResponseEventLoading
   | WorkerResponseEventMessage
   | WorkerResponseEventOptions

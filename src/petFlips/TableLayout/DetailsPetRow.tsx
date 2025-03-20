@@ -6,16 +6,16 @@ import type { FC } from 'react';
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { IForgeCraftMaterial } from '../../resources/types';
-import { useItemCraftPrice } from '../functions';
+import { IPetCraftMaterial } from '../../worker/type';
+import { usePetItemPrice } from '../hook';
 
-interface IDetailsRowProps {
-  material: IForgeCraftMaterial;
-  slots: number;
+interface IDDetailsPetRowProps {
+  material: IPetCraftMaterial;
 }
 
-export const DetailsRow: FC<IDetailsRowProps> = ({ material, slots }) => {
-  const cost = useItemCraftPrice(material.itemId);
+export const DetailsPetRow: FC<IDDetailsPetRowProps> = ({ material }) => {
+
+  const cost = usePetItemPrice(material.itemId);
 
   const { ui } = useLanguage();
 
@@ -28,12 +28,9 @@ export const DetailsRow: FC<IDetailsRowProps> = ({ material, slots }) => {
         <Coin amount={cost} />
       </TableCell>
       <TableCell align="right">{material.quantity}</TableCell>
-      <TableCell align="right">{material.quantity * slots}</TableCell>
+
       <TableCell align="right">
         <Coin amount={material.quantity * cost} />
-      </TableCell>
-      <TableCell align="right">
-        <Coin amount={material.quantity * cost * slots} />
       </TableCell>
     </TableRow>
   );

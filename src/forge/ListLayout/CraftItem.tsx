@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraftWithCosts } from '../../resources/types';
+import type { IForgeCraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 import { getCategoryLabel, getProfitByTimeLabel } from '../functions';
 import { TimerButton } from '../timers/TimerButton';
@@ -21,7 +21,7 @@ import { DetailsList } from './DetailsList';
 import { GridRow } from './GridRow';
 
 interface ICraftItemProps {
-  craft: ICraftWithCosts;
+  craft: IForgeCraftWithCosts;
 }
 
 export const CraftItem: FC<ICraftItemProps> = ({ craft }) => {

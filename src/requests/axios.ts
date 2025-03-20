@@ -57,11 +57,12 @@ const filterAuctions = (data: IAuctionsAPIPaginatedResponse) => {
 
   data.auctions
     .filter((auction) => !auction.claimed)
-    .forEach(({ bin, highest_bid_amount: highestBidAmount, item_name: itemName, starting_bid: startingBid, uuid }) => {
+    .forEach(({ bin, highest_bid_amount: highestBidAmount, item_name: itemName, starting_bid: startingBid, uuid, rarity }) => {
       auctions.set(uuid, {
         bin,
         buyPrice: bin || highestBidAmount ? startingBid : highestBidAmount,
         item_name: itemName,
+        rarity,
         sellPrice: bin || highestBidAmount ? startingBid : highestBidAmount
       });
     });

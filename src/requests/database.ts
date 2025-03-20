@@ -1,11 +1,13 @@
 import Dexie from 'dexie';
 
-import { forge } from '../models/forge';
+import { forgeAuctions } from '../resources/forge';
 import { rarities } from '../resources/items';
 import { pets } from '../resources/pets';
+import { rngItemsFromAuctions } from '../resources/rng';
 import { IWorkerResponseLoading, IWorkerResponseMessage } from '../worker/type';
 
 import { getAuctionPriceData, getBazaarPriceData } from './axios';
+import { filterAuctions } from './functions';
 import type { IAuctions, IAuctionsAPI, IAuctionsAPIWithCleanNames, IBazaar, IPetAuctions, ITimer, ITimerDB } from './types';
 
 interface ICache {
@@ -161,6 +163,11 @@ export class Database extends Dexie {
   public async getItemBinsPrice(item: string) {
     await this.ensureInitialize();
     return await this.binsPrices.get(item);
+  }
+
+  public async getItemPetPrice() {
+    await this.ensureInitialize();
+    return this.petsAuctions.toArray();
   }
 
   public async getItemPrice(item: string, store: StoreTypes) {
@@ -320,7 +327,7 @@ export class Database extends Dexie {
 
     const refreshPromiseAuctionsAndBins = getAuctionPriceData().then((auctionsAndBins) => {
       return this.transaction('rw', this.auctionsPrices, this.binsPrices, this.auctionsAttribute, this.petsAuctions, async () => {
-        const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => forge.auctionItems.includes(auction.item_name));
+        const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => filterAuctions(auction, [forgeAuctions, rngItemsFromAuctions]));
         const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
         const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);
 

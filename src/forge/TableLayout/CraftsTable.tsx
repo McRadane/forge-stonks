@@ -7,13 +7,13 @@ import { useSelector } from 'react-redux';
 
 import { EnhancedTableHead, getComparator, type Order } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraftWithCosts } from '../../resources/types';
+import type { IForgeCraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 
 import { CraftRow } from './CraftRow';
 
 interface ICraftsTableProps {
-  crafts: ICraftWithCosts[];
+  crafts: IForgeCraftWithCosts[];
 }
 
 export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {

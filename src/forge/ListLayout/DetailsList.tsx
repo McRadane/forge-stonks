@@ -5,12 +5,12 @@ import Typography from '@mui/material/Typography';
 import type { FC } from 'react';
 
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraft } from '../../resources/types';
+import type { IForgeCraft } from '../../resources/types';
 
 import { DetailsRow } from './DetailsRow';
 
 interface IDetailsListProps {
-  item: ICraft;
+  item: IForgeCraft;
 }
 
 export const DetailsList: FC<IDetailsListProps> = ({ item }) => {

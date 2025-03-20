@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useNotifications } from '../../notification/NotificationContext';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraft } from '../../resources/types';
+import type { IForgeCraft } from '../../resources/types';
 import { setTimerPressed } from '../../services/forge';
 import type { RootState } from '../../store';
 import { useWorker } from '../../worker/WorkerContext';
 
 interface ITimerButtonProps {
-  itemId: ICraft['itemId'];
+  itemId: IForgeCraft['itemId'];
 }
 
 export const TimerButton: FC<ITimerButtonProps> = ({ itemId }) => {

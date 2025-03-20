@@ -5,31 +5,32 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { type FC, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { type FC } from 'react';
 
+import { Coin } from '../../components/Coin';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { IForgeCraft } from '../../resources/types';
-import type { RootState } from '../../store';
+import { IPetPrices } from '../../worker/type';
 
-import { DetailsRow } from './DetailsRow';
+import { DetailsPetRow } from './DetailsPetRow';
 
-interface IDetailsTableProps {
-  item: IForgeCraft;
+interface IDetailsPetTableProps {
+  pet: IPetPrices;
 }
 
-export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
+export const DetailsPetTable: FC<IDetailsPetTableProps> = ({ pet }) => {
   const { ui } = useLanguage();
-  const hotm = useSelector((state: RootState) => state.options.hotm);
-
-  const slots = useMemo(() => {
-    return Math.min(hotm, 7);
-  }, [hotm]);
+  const { coins, material, upgradeTime } = pet;
 
   return (
     <Box sx={{ margin: 1 }}>
       <Typography component="div" variant="h6" gutterBottom>
         {ui.shoppingList}
+      </Typography>
+      <Typography component="div" variant="h6" gutterBottom>
+        Base price : <Coin amount={coins} />
+      </Typography>
+      <Typography component="div" variant="h6" gutterBottom>
+        Time : {upgradeTime < 0.5 ? 0 : upgradeTime}
       </Typography>
       <Table aria-label={ui.shoppingList} size="small">
         <TableHead>
@@ -37,18 +38,12 @@ export const DetailsTable: FC<IDetailsTableProps> = ({ item }) => {
             <TableCell>{ui.item}</TableCell>
             <TableCell align="right">{ui.itemPrice}</TableCell>
             <TableCell align="right">{ui.amount}</TableCell>
-            <TableCell align="right">
-              {ui.amount} x {slots}
-            </TableCell>
             <TableCell align="right">{ui.totalPrice}</TableCell>
-            <TableCell align="right">
-              {ui.totalPrice} x {slots}
-            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {item.craftMaterial.map((material) => (
-            <DetailsRow key={material.itemId} material={material} slots={slots} />
+          {material.map((mat) => (
+            <DetailsPetRow key={mat.itemId} material={mat} />
           ))}
         </TableBody>
       </Table>

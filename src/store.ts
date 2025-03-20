@@ -6,6 +6,8 @@ import { attributesReducer } from './services/attributes';
 import { forgeReducer } from './services/forge';
 import { gardenReducer } from './services/garden';
 import { optionsReducer } from './services/options';
+import { petsReducer } from './services/pets';
+import { rngReducer } from './services/rng';
 import { workerReducer } from './services/worker';
 
 const middlewares: Middleware[] = [];
@@ -25,6 +27,8 @@ export const store = configureStore({
     forge: forgeReducer,
     garden: gardenReducer,
     options: optionsReducer,
+    pets: petsReducer,
+    rng: rngReducer,
     worker: workerReducer
   }
 });

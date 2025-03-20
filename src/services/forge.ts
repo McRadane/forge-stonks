@@ -1,19 +1,19 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { ITimerDB } from '../requests/types';
-import type { ICraft, ICraftWithCosts, ICraftWithPrice } from '../resources/types';
+import type { IForgeCraft, IForgeCraftWithCosts, IForgeCraftWithPrice } from '../resources/types';
 import type { IWorkerResponseGetPricesResult } from '../worker/type';
 
 interface IForgeState {
-  materialPrices: Partial<Record<ICraft['itemId'], ICraftWithPrice>>;
-  prices: Partial<Record<ICraft['itemId'], ICraftWithCosts>>;
-  timerLaunched: ICraft['itemId'][];
+  forgePrices: Partial<Record<IForgeCraft['itemId'], IForgeCraftWithCosts>>;
+  materialPrices: Partial<Record<IForgeCraft['itemId'], IForgeCraftWithPrice>>;
+  timerLaunched: IForgeCraft['itemId'][];
   timers: ITimerDB[];
 }
 
 const initialState: IForgeState = {
+  forgePrices: {},
   materialPrices: {},
-  prices: {},
   timerLaunched: [],
   timers: []
 };
@@ -22,14 +22,14 @@ const forgeSlice = createSlice({
   initialState,
   name: 'forge',
   reducers: {
-    setPrices: (state, action: PayloadAction<IWorkerResponseGetPricesResult>) => {
-      state.prices = action.payload.crafts;
+    setForgePrices: (state, action: PayloadAction<IWorkerResponseGetPricesResult>) => {
+      state.forgePrices = action.payload.crafts;
       state.materialPrices = action.payload.materials;
     },
-    setTimerLaunched: (state, action: PayloadAction<ICraft['itemId']>) => {
+    setTimerLaunched: (state, action: PayloadAction<IForgeCraft['itemId']>) => {
       state.timerLaunched = state.timerLaunched.filter((item) => item !== action.payload);
     },
-    setTimerPressed: (state, action: PayloadAction<ICraft['itemId']>) => {
+    setTimerPressed: (state, action: PayloadAction<IForgeCraft['itemId']>) => {
       state.timerLaunched.push(action.payload);
     },
     setTimers: (state, action: PayloadAction<ITimerDB[]>) => {
@@ -38,6 +38,6 @@ const forgeSlice = createSlice({
   }
 });
 
-export const { setPrices, setTimerLaunched, setTimerPressed, setTimers } = forgeSlice.actions;
+export const { setForgePrices, setTimerLaunched, setTimerPressed, setTimers } = forgeSlice.actions;
 
 export const { reducer: forgeReducer } = forgeSlice;

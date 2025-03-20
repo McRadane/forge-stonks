@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 
 import { getComparator, type Order } from '../../components/EnhancedTableHead';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraftWithCosts } from '../../resources/types';
+import type { IForgeCraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 import { getProfitByTimeLabel } from '../functions';
 
@@ -21,7 +21,7 @@ import { CraftItem } from './CraftItem';
 import { Filter } from './Filter';
 
 interface ICraftsListProps {
-  crafts: ICraftWithCosts[];
+  crafts: IForgeCraftWithCosts[];
 }
 
 export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {

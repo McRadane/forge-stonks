@@ -1,4 +1,5 @@
 import { reforges } from '../resources/items';
+import { IAuctions } from './types';
 
 interface IReplaceNotFrom {
   notFrom: string;
@@ -182,4 +183,13 @@ export const cleanAuctionName = (name: string): string => {
   });
 
   return cleanedName.trim();
+};
+
+export const filterAuctions = (
+  auction: IAuctions & {
+    bin: boolean;
+  },
+  stores: string[][]
+): boolean => {
+  return stores.some((store) => store.includes(auction.item_name));
 };

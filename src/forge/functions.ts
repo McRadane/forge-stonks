@@ -8,7 +8,7 @@ import type { RootState } from '../store';
 import { useWorker } from '../worker/WorkerContext';
 
 export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
-  const costs = useSelector((state: RootState) => state.forge.prices);
+  const costs = useSelector((state: RootState) => state.forge.forgePrices);
   const materialCosts = useSelector((state: RootState) => state.forge.materialPrices);
 
   if (materialCosts[id]?.craft !== undefined) {
@@ -24,7 +24,7 @@ export const useItemCraftPrice = (id: keyof ILanguage['items']) => {
 
 export const useItemsWithCraftPrice = () => {
   const { loadingTimestamp } = useSelector((state: RootState) => state.worker);
-  const { prices: costs } = useSelector((state: RootState) => state.forge);
+  const { forgePrices: costs } = useSelector((state: RootState) => state.forge);
   const workerRunner = useWorker();
 
   useEffect(() => {

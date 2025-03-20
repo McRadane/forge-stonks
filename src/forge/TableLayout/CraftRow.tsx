@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraftWithCosts } from '../../resources/types';
+import type { IForgeCraftWithCosts } from '../../resources/types';
 import type { RootState } from '../../store';
 import { getCategoryLabel } from '../functions';
 import { TimerButton } from '../timers/TimerButton';
@@ -22,7 +22,7 @@ import { TimerButton } from '../timers/TimerButton';
 import { DetailsTable } from './DetailsTable';
 
 interface ICraftRowProps {
-  craft: ICraftWithCosts;
+  craft: IForgeCraftWithCosts;
 }
 
 export const CraftRow: FC<ICraftRowProps> = ({ craft }) => {

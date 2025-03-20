@@ -6,13 +6,13 @@ import type { FC } from 'react';
 import { Coin } from '../../components/Coin';
 import { Item } from '../../components/Item';
 import { useLanguage } from '../../resources/lang/LanguageContext';
-import type { ICraftMaterial } from '../../resources/types';
+import type { IForgeCraftMaterial } from '../../resources/types';
 import { useItemCraftPrice } from '../functions';
 
 import { GridRow } from './GridRow';
 
 interface IDetailsRowProps {
-  material: ICraftMaterial;
+  material: IForgeCraftMaterial;
 }
 export const DetailsRow: FC<IDetailsRowProps> = ({ material }) => {
   const cost = useItemCraftPrice(material.itemId);
