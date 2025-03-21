@@ -289,19 +289,14 @@ export class Database extends Dexie {
 
     pets.forEach((pet) => {
       rarities.forEach((rarity) => {
-        //if (rarityOrder[pet.minTier] > rarityOrder[rarity]) {
         const foundRarity = petsAndPetsItems.find((petItem) => petItem.cleanName === pet.name && petItem.tier === rarity);
         const upgrade = pet.tier[rarity];
-
-        // eslint-disable-next-line no-console
-        console.log(`Searching for ${pet.name} with rarity ${rarity}`, { foundRarity, upgrade });
 
         if (foundRarity && upgrade) {
           const { buyPrice, sellPrice } = foundRarity;
 
           petsUpgrades.push({ buyPrice, pet: pet.name, rarity, sellPrice });
         }
-        // }
       });
     });
 

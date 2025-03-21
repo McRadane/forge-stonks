@@ -179,6 +179,7 @@ class ComputationWorker {
     await this._database.ensureInitialize();
     await this._database.forceRefresh();
   }
+
   public async getLanguage() {
     this._messageResponse('ask for language');
     const data = await this._database.getFromCache('language');
@@ -240,14 +241,30 @@ class ComputationWorker {
     if (playerName && playerProfile) {
       const player = await getPlayerData(playerName, playerProfile.id);
       if (player) {
-        this._database.addToCache('hotm', player.data.mining.core.tier ?? initialState.hotm);
-        this._database.addToCache('quickForge', player.raw.mining_core.nodes.forge_time ?? initialState.quickForge);
+        this._database.addToCache('hotm', player.data.mining.core.level.level ?? initialState.hotm);
+        this._database.addToCache('quickForge', player.data.mining.core.nodes.forge_time ?? initialState.quickForge);
         this._database.clearTimers();
-        /* player.data.mining.forge.processes.forEach((forge) => {
-          this.database.timers.add({
-            itemId: forge.id
+
+        // TODO This work, but the processes seems to be updated only some times.
+        // Using Hypixel API may solve this
+        player.data.mining.forge.processes.forEach((forge) => {
+
+          const craft = crafts.find((item) => item.itemId === forge.id);
+
+          if (!craft) {
+            return;
+          }
+
+           // calulate the start time from the end time
+          const startTime = forge.timeFinished - craft.time * 1000 * 60 * 60;
+
+          this._database.addTimers({
+            endTime: forge.timeFinished,
+            itemId: forge.id,
+            slot: forge.slot,
+            startTime
           });
-        }); */
+        });
       }
     }
 

@@ -9,24 +9,25 @@ import { LanguageContext, useLanguage } from '@shared/resources/lang/LanguageCon
 import type { KeysLanguageType } from '@shared/resources/lang/type';
 import { useAppSelector } from '@ui/store';
 import { useWorker } from '@ui/worker/WorkerContext';
-import { type FC, useCallback, useContext } from 'react';
+import { type FC, useCallback, useContext, useState } from 'react';
 
-// import { PlayerSyncDialog } from './PlayerSyncDialog';
+import { PlayerSyncDialog } from './PlayerSyncDialog';
 
 export const OptionsSwitcherOptions: FC = () => {
   const {
     ui: { options }
   } = useLanguage();
 
-  // const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
+  const { playerName, playerProfile } = useAppSelector((state) => state.options);
+  const [playerSyncOpen, setPlayerSyncOpen] = useState(false);
 
-  // const playerSync = playerName !== undefined && playerProfile !== undefined;
+  const playerSync = playerName !== undefined && playerProfile !== undefined;
 
   const { userLanguage } = useContext(LanguageContext);
   const worker = useWorker();
   const loading = useAppSelector((state) => state.worker.loading);
 
-  /* const handleClickOpen = useCallback(() => {
+  const handleClickOpen = useCallback(() => {
     setPlayerSyncOpen(true);
   }, []);
 
@@ -42,7 +43,7 @@ export const OptionsSwitcherOptions: FC = () => {
       }
     },
     [worker]
-  ); */
+  );
 
   const handleForceRefresh = useCallback(() => {
     if (!loading) {
@@ -64,24 +65,19 @@ export const OptionsSwitcherOptions: FC = () => {
           {options.forceRefresh}
         </Button>
       </ListItem>
-      {/*{playerSync && (
-            <ListItem divider>
-              <Typography id="syncProfile-label" variant="h6">
-                {playerName} ({playerProfile.name})
-              </Typography>
-            </ListItem>
-          )}
-          <ListItem divider>
-            <Button onClick={handleClickOpen} variant="outlined">
-              {options.syncProfileTitle}
-            </Button>
-            <PlayerSyncDialog
-              currentPlayerName={playerName}
-              currentPlayerProfile={playerProfile}
-              onClose={handleClose}
-              open={playerSyncOpen}
-            />
-          </ListItem>*/}
+      {playerSync && (
+        <ListItem divider>
+          <Typography id="syncProfile-label" variant="h6">
+            {playerName} ({playerProfile.name})
+          </Typography>
+        </ListItem>
+      )}
+      <ListItem divider>
+        <Button onClick={handleClickOpen} variant="outlined">
+          {options.syncProfileTitle}
+        </Button>
+        <PlayerSyncDialog currentPlayerName={playerName} currentPlayerProfile={playerProfile} onClose={handleClose} open={playerSyncOpen} />
+      </ListItem>
       <ListItem divider>
         <FormControl fullWidth variant="standard">
           <Typography id="language-label">{options.languageLabel}</Typography>

@@ -1,4 +1,5 @@
 import { Rarities } from '@shared/resources/items';
+import { ILanguageItems } from '@shared/resources/lang/type';
 import { PetNames } from '@shared/resources/pets';
 import { IForgeCraft } from '@shared/resources/types';
 
@@ -52,45 +53,76 @@ export interface IPlayerAPIResponse {
   profiles: Record<string, IProfile>;
 }
 
-/*
-  export const HOTM_XP = {
-    1: 0,
-    2: 3000,
-    3: 9000,
-    4: 25000,
-    5: 60000,
-    6: 100000,
-    7: 150000,
-  };
-  */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const HOTM_CUMULATIVE_XP = {
+  1: 0,
+  10: 1_247_000,
+  2: 3000,
+  3: 12_000,
+  4: 37_000,
+  5: 97_000,
+  6: 197_000,
+  7: 347_000,
+  8: 557_000,
+  9: 847_000
 
-export interface IProfile {
+  //814_030
+};
+
+interface IProfileSkyCrypt {
   current: boolean;
   cute_name: string;
   data: {
     mining: {
       core: {
-        tier: {
-          level?: number;
+        level: {
+          level: number;
+        };
+        nodes: {
+          forge_time?: number;
         };
       };
       forge: {
         processes: {
-          id: string;
+          id: keyof ILanguageItems;
           slot: number;
           timeFinished: number;
         }[];
       };
     };
   };
-  raw: {
-    mining_core: {
-      nodes: {
-        forge_time?: number;
-      };
+}
+
+interface IProfileHypixelProfile {
+  forge: {
+    forge_processes: {
+      forge_1: Record<
+        number,
+        {
+          id: keyof ILanguageItems;
+          slot: number;
+          startTime: number;
+        }
+      >;
+    };
+  };
+  mining_core: {
+    experience: number; // HOTM level => compare with HOTM_CUMULATIVE_XP
+    nodes: {
+      forge_time?: number;
     };
   };
 }
+
+export interface IProfileHypixel {
+  current: boolean;
+  cute_name: string;
+  profile: {
+    members: Record<string, IProfileHypixelProfile>;
+  };
+}
+
+export type IProfile = IProfileSkyCrypt;
 
 export interface IAuctionsAPI {
   bin: boolean; // Indicate if auction or BIN
