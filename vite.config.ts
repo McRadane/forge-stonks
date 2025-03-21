@@ -1,12 +1,11 @@
 /// <reference types="vitest/config" />
 
 import react from '@vitejs/plugin-react';
+import path from 'path';
 import { defineConfig, UserConfigExport } from 'vite';
 
 export default defineConfig(({ command }) => {
   const baseConfig: UserConfigExport = {
-    // base: '/forge-stonks/',
-    // base: '/forge-stonks/',
     build: {
       rollupOptions: {
         output: {
@@ -17,6 +16,14 @@ export default defineConfig(({ command }) => {
       }
     },
     plugins: [react()],
+    // base: '/forge-stonks/',
+    resolve: {
+      alias: {
+        '@shared': path.resolve(__dirname, './src/shared'),
+        '@ui': path.resolve(__dirname, './src/ui'),
+        '@worker': path.resolve(__dirname, './src/worker')
+      }
+    },
     test: {
       environment: 'jsdom',
       globals: true,

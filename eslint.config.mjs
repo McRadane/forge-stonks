@@ -9,6 +9,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 // import reactRefresh from 'eslint-plugin-react-refresh'
 import sonarjsPlugin, { configs as sonarjsConfigs } from 'eslint-plugin-sonarjs';
 import webPlugin from 'eslint-plugin-web';
+import importPlugin from 'eslint-plugin-import';
 import globals from 'globals'
 import path from 'path';
 import tseslint , { parser as typescriptParser } from 'typescript-eslint'
@@ -176,13 +177,20 @@ export default tseslint.config(
       'no-var': 'error',
       'prefer-const': 'error',
       'prefer-rest-params': 'error',
-      'no-console': 'error',
+      'no-console': 'warn',
       'prefer-spread': 'error',
       /*'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ]*/
     },
+  },
+  importPlugin.flatConfigs.recommended,
+  {
+    rules: {
+      'import/no-relative-parent-imports': 'error',
+      'import/no-unresolved': 'off' // Already handled by TypeScript
+    }
   },
   prettier,
   { name: 'Web Plugin', plugins: { web: webPlugin }, rules: webPlugin.configs.all.rules },

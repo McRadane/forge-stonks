@@ -4664,7 +4664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import@npm:~2.31.0":
+"eslint-plugin-import@npm:^2.31.0":
   version: 2.31.0
   resolution: "eslint-plugin-import@npm:2.31.0"
   dependencies:
@@ -5330,7 +5330,7 @@ __metadata:
     eslint-config-prettier: "npm:~10.0.1"
     eslint-formatter-vscode: "npm:0.1.6"
     eslint-module-utils: "npm:~2.12.0"
-    eslint-plugin-import: "npm:~2.31.0"
+    eslint-plugin-import: "npm:^2.31.0"
     eslint-plugin-jsx-a11y: "npm:~6.10.2"
     eslint-plugin-only-warn: "npm:^1.1.0"
     eslint-plugin-perfectionist: "npm:~4.9.0"
