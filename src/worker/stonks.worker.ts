@@ -1,19 +1,16 @@
 /* eslint-disable perfectionist/sort-classes */
-import { rawAuctionToAuction } from '../auctionsAttributes/functions';
-import { getPlayerData } from '../requests/axios';
-import { Database } from '../requests/database';
-import { IProfile } from '../requests/types';
-import { crafts } from '../resources/forge';
-import { itemsFuels, itemsOrganicMatter } from '../resources/garden';
-import { itemsSource, itemsVendorPrice, rarities } from '../resources/items';
-import { enUs } from '../resources/lang/enUs';
-import { frFr } from '../resources/lang/frFr';
-import type { ILanguage, ILanguageItems, ILanguageUIRNGFlips, KeysLanguageType } from '../resources/lang/type';
-import { pets } from '../resources/pets';
-import { rngFlips } from '../resources/rng';
-import type { IForgeCraft, IForgeCraftWithCosts, IForgeCraftWithPrice } from '../resources/types';
-import { initialState, type IOptionsState } from '../services/common';
-
+import { rawAuctionToAuction } from '@shared/functions/attributes';
+import { crafts } from '@shared/resources/forge';
+import { itemsFuels, itemsOrganicMatter } from '@shared/resources/garden';
+import { itemsSource, itemsVendorPrice, Rarities, rarities } from '@shared/resources/items';
+import { enUs } from '@shared/resources/lang/enUs';
+import { frFr } from '@shared/resources/lang/frFr';
+import type { ILanguage, ILanguageItems, ILanguageUIRNGFlips, KeysLanguageType } from '@shared/resources/lang/type';
+import { IPet, IPetTier, pets } from '@shared/resources/pets';
+import { rngFlips } from '@shared/resources/rng';
+import type { IForgeCraft, IForgeCraftWithCosts, IForgeCraftWithPrice } from '@shared/resources/types';
+import { initialState, type IOptionsState } from '@shared/services/common';
+import { IPetAuctions, IProfile } from '@shared/types/requests';
 import type {
   IPetCraftMaterial,
   IPetPrices,
@@ -33,10 +30,13 @@ import type {
   IWorkerResponseTimers,
   IWorkerResponseTimerSet,
   WorkerCommandEvents
-} from './type';
+} from '@shared/types/worker';
+import { getPlayerData } from '@worker/requests/axios';
+import { Database } from '@worker/requests/database';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ctx: Worker = self as any;
+// eslint-disable-next-line sonarjs/no-reference-error
 const glob = globalThis as unknown as { worker: ComputationWorker };
 
 const CACHE_DURATION = 3_600_000;
@@ -514,14 +514,13 @@ class ComputationWorker {
 
   private async _getPricesForPetMaterial(
     itemId: keyof ILanguage['items'],
-    craftMaterial: 'bazaar' | 'vendor' | 'auction',
+    craftMaterial: 'auction' | 'bazaar' | 'vendor',
     auctionsBINOnly: boolean
   ): Promise<false | number> {
     switch (craftMaterial) {
       case 'bazaar': {
         const bazaarPrice = await this._database.getItemPrice(itemId, 'bazaar');
         if (bazaarPrice) {
-          console.log('found bazaar price', bazaarPrice);
           return bazaarPrice.buyPrice;
         } else {
           return false;
@@ -530,7 +529,6 @@ class ComputationWorker {
       case 'vendor': {
         const vendorPrice = itemsVendorPrice[itemId];
         if (vendorPrice) {
-          console.log('found vendor price', vendorPrice);
           return vendorPrice;
         } else {
           return false;
@@ -541,7 +539,6 @@ class ComputationWorker {
         const storeType = auctionsBINOnly ? 'auctions+bins' : 'bins';
         const auctionPrice = await this._database.getItemPrice(itemId, storeType);
         if (auctionPrice) {
-          console.log('found auction price', auctionPrice);
           return auctionPrice.buyPrice;
         } else {
           return false;
@@ -555,87 +552,84 @@ class ComputationWorker {
   private async _getPetsWithUpgradePrice(options: IOptionsState): Promise<IWorkerResponseGetPetPricesResult> {
     const petsPrice = await this._database.getItemPetPrice();
 
-    console.log({ petsPrice });
-
-    const result: IPetPrices[] = [];
+    const result: Array<IPetPrices | undefined> = [];
     const materials: Partial<Record<IPetCraftMaterial['itemId'], number>> = {};
-
-    /*
-    return value:
-    {
-      petName
-      petBaseRarity
-      petUpgradedRarity
-      petBasePrice
-      petUpgraded
-    }
-    */
 
     for await (const pet of pets) {
       let rarityIndex = -1;
       for await (const rarity of rarities) {
         rarityIndex++;
 
-        if (rarity !== 'COMMON') {
-          if (pet.tier[rarity]) {
-            const tier = pet.tier[rarity];
-            const previousRarity = rarities[rarityIndex - 1];
+        if (rarity !== 'COMMON' && pet.tier[rarity]) {
+          const individualPrice = await this._getPetsWithUpgradePriceIndividual({
+            auctionsBINOnly: options.auctionsBINOnly,
+            materials,
+            pet,
+            petsPrice,
+            rarity,
+            rarityIndex
+          });
 
-            const foundBase = petsPrice.find((item) => item.pet === pet.name && item.rarity === previousRarity);
-            const foundUpgraded = petsPrice.find((item) => item.pet === pet.name && item.rarity === rarity);
-            let petUpgradedCost = tier.price;
-            let allPrices = true;
-
-            const materialsIds = Object.keys(tier.items);
-            const material: IPetCraftMaterial[] = [];
-            //'auctions+bins'
-            for await (const itemId of materialsIds) {
-              const craftMaterial = itemsSource[itemId as keyof ILanguage['items']] ?? 'vendor';
-              const quantity = tier.items[itemId as keyof typeof tier.items] ?? 0;
-
-              if (quantity !== 0) {
-                const result = await this._getPricesForPetMaterial(
-                  itemId as keyof ILanguage['items'],
-                  craftMaterial,
-                  options.auctionsBINOnly
-                );
-
-                if (result !== false) {
-                  petUpgradedCost += result * quantity;
-                  material.push({ itemId: itemId as keyof ILanguageItems, quantity, source: craftMaterial });
-
-                  if (!materials[itemId as keyof ILanguageItems]) {
-                    materials[itemId as keyof ILanguageItems] = result;
-                  }
-                } else {
-                  allPrices = false;
-                }
-              } else {
-                allPrices = false;
-              }
-            }
-
-            console.log(pet.name, previousRarity, { petsPrice, foundBase, foundUpgraded, allPrices });
-
-            if (foundBase && foundUpgraded && allPrices) {
-              result.push({
-                coins: tier.price,
-                material,
-                petBasePrice: foundBase.buyPrice,
-                petBaseRarity: previousRarity,
-                petName: pet.name,
-                petUpgradedCost,
-                petUpgradedPrice: foundUpgraded.sellPrice,
-                petUpgradedRarity: rarity,
-                upgradeTime: tier.time
-              });
-            }
-          }
+          result.push(individualPrice);
         }
       }
     }
 
-    return { materials, pets: result };
+    return { materials, pets: result.filter((pet) => pet !== undefined) };
+  }
+
+  private async _getPetsWithUpgradePriceIndividual(options: {
+    auctionsBINOnly: boolean;
+    materials: Partial<Record<keyof ILanguageItems, number>>;
+    pet: IPet;
+    petsPrice: IPetAuctions[];
+    rarity: Rarities;
+    rarityIndex: number;
+  }): Promise<IPetPrices | undefined> {
+    const { auctionsBINOnly, materials, pet, petsPrice, rarity, rarityIndex } = options;
+    const tier = pet.tier[rarity] as IPetTier;
+    const previousRarity = rarities[rarityIndex - 1];
+
+    const foundBase = petsPrice.find((item) => item.pet === pet.name && item.rarity === previousRarity);
+    const foundUpgraded = petsPrice.find((item) => item.pet === pet.name && item.rarity === rarity);
+    let petUpgradedCost = tier.price;
+
+    const materialsIds = Object.keys(tier.items);
+    const material: IPetCraftMaterial[] = [];
+
+    for await (const itemId of materialsIds) {
+      const craftMaterial = itemsSource[itemId as keyof ILanguage['items']] ?? 'vendor';
+      const quantity = tier.items[itemId as keyof typeof tier.items] ?? 0;
+
+      if (quantity === 0) {
+        return;
+      }
+      const result = await this._getPricesForPetMaterial(itemId as keyof ILanguage['items'], craftMaterial, auctionsBINOnly);
+
+      if (result === false) {
+        return;
+      }
+      petUpgradedCost += result * quantity;
+      material.push({ itemId: itemId as keyof ILanguageItems, quantity, source: craftMaterial });
+
+      if (!materials[itemId as keyof ILanguageItems]) {
+        materials[itemId as keyof ILanguageItems] = result;
+      }
+    }
+
+    if (foundBase && foundUpgraded) {
+      return {
+        coins: tier.price,
+        material,
+        petBasePrice: foundBase.buyPrice,
+        petBaseRarity: previousRarity,
+        petName: pet.name,
+        petUpgradedCost,
+        petUpgradedPrice: foundUpgraded.sellPrice,
+        petUpgradedRarity: rarity,
+        upgradeTime: tier.time
+      };
+    }
   }
 
   private _getQuickForgeBonus(quickForge: number) {
@@ -779,7 +773,6 @@ const init = () => {
         glob.worker.getLanguage();
         break;
       case 'Command-GetPetPrices':
-        console.log('get pet prices');
         glob.worker.getPetPrices();
         break;
       case 'Command-GetPrices':

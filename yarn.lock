@@ -4664,7 +4664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import@npm:~2.31.0":
+"eslint-plugin-import@npm:^2.31.0":
   version: 2.31.0
   resolution: "eslint-plugin-import@npm:2.31.0"
   dependencies:
@@ -5330,7 +5330,7 @@ __metadata:
     eslint-config-prettier: "npm:~10.0.1"
     eslint-formatter-vscode: "npm:0.1.6"
     eslint-module-utils: "npm:~2.12.0"
-    eslint-plugin-import: "npm:~2.31.0"
+    eslint-plugin-import: "npm:^2.31.0"
     eslint-plugin-jsx-a11y: "npm:~6.10.2"
     eslint-plugin-only-warn: "npm:^1.1.0"
     eslint-plugin-perfectionist: "npm:~4.9.0"
@@ -5358,6 +5358,7 @@ __metadata:
     typescript: "npm:^5.7.3"
     typescript-eslint: "npm:^8.24.1"
     vite: "npm:^6.2.0"
+    vite-tsconfig-paths: "npm:^5.1.4"
     vitest: "npm:^3.0.6"
   languageName: unknown
   linkType: soft
@@ -5673,6 +5674,13 @@ __metadata:
     merge2: "npm:^1.4.1"
     slash: "npm:^3.0.0"
   checksum: 10c0/b39511b4afe4bd8a7aead3a27c4ade2b9968649abab0a6c28b1a90141b96ca68ca5db1302f7c7bd29eab66bf51e13916b8e0a3d0ac08f75e1e84a39b35691189
+  languageName: node
+  linkType: hard
+
+"globrex@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "globrex@npm:0.1.2"
+  checksum: 10c0/a54c029520cf58bda1d8884f72bd49b4cd74e977883268d931fd83bcbd1a9eb96d57c7dbd4ad80148fb9247467ebfb9b215630b2ed7563b2a8de02e1ff7f89d1
   languageName: node
   linkType: hard
 
@@ -8957,6 +8965,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tsconfck@npm:^3.0.3":
+  version: 3.1.5
+  resolution: "tsconfck@npm:3.1.5"
+  peerDependencies:
+    typescript: ^5.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  bin:
+    tsconfck: bin/tsconfck.js
+  checksum: 10c0/9b62cd85d5702aa23ea50ea578d7124f3d59cc4518fcc7eacc04f4f9c9c481f720738ff8351bd4472247c0723a17dfd01af95a5b60ad623cdb8727fbe4881847
+  languageName: node
+  linkType: hard
+
 "tsconfig-paths@npm:^3.15.0":
   version: 3.15.0
   resolution: "tsconfig-paths@npm:3.15.0"
@@ -9203,6 +9225,22 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: 10c0/bfef19ac659b453c31fc00b42f8d08b3f7539092f67b0b02504dc2f802af1fe9bcf3531a4ecd248bf8ce2f00b7f4b9a67e20cdd57c2e50d9ff8cea5ff941bedd
+  languageName: node
+  linkType: hard
+
+"vite-tsconfig-paths@npm:^5.1.4":
+  version: 5.1.4
+  resolution: "vite-tsconfig-paths@npm:5.1.4"
+  dependencies:
+    debug: "npm:^4.1.1"
+    globrex: "npm:^0.1.2"
+    tsconfck: "npm:^3.0.3"
+  peerDependencies:
+    vite: "*"
+  peerDependenciesMeta:
+    vite:
+      optional: true
+  checksum: 10c0/6228f23155ea25d92b1e1702284cf8dc52ad3c683c5ca691edd5a4c82d2913e7326d00708cef1cbfde9bb226261df0e0a12e03ef1d43b6a92d8f02b483ef37e3
   languageName: node
   linkType: hard
 

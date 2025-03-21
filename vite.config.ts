@@ -2,6 +2,7 @@
 
 import react from '@vitejs/plugin-react';
 import { defineConfig, UserConfigExport } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ command }) => {
   const baseConfig: UserConfigExport = {
@@ -16,7 +17,7 @@ export default defineConfig(({ command }) => {
         }
       }
     },
-    plugins: [react()],
+    plugins: [react(), tsconfigPaths()],
     test: {
       environment: 'jsdom',
       globals: true,
