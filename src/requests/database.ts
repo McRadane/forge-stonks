@@ -20,6 +20,8 @@ const commandLoadingFalse: IWorkerResponseLoading = { command: 'Response-Loading
 
 type StoreTypes = 'auctions' | 'auctions+bins' | 'bazaar' | 'bins';
 
+type TableTypes = 'auctionsAttribute' | 'auctionsPrices' | 'bazaarsPrices' | 'binsPrices' | 'forgeTimers' | 'petsAuctions';
+
 export class Database extends Dexie {
   protected auctionsAttribute!: Dexie.Table<IAuctionsAPI, string>;
   protected auctionsPrices!: Dexie.Table<IAuctions, string>;
@@ -95,7 +97,7 @@ export class Database extends Dexie {
     return this.forgeTimers.delete(timerId);
   }
 
-  public async ensureInitialize() {
+  public async ensureInitialize(store?: TableTypes | TableTypes[]) {
     if (this._initialized) {
       return;
     }
@@ -110,6 +112,14 @@ export class Database extends Dexie {
     }
 
     this._initialized = true;
+
+    if (!store) {
+      return;
+    }
+
+    const storeArray = Array.isArray(store) ? store : [store];
+
+    await Promise.all(storeArray.map((store) => this._waitForStore(store)));
   }
 
   public async forceRefresh() {
@@ -122,26 +132,9 @@ export class Database extends Dexie {
   }
 
   public async getAuctionsAttribute(): Promise<IAuctionsAPI[]> {
-    await this.ensureInitialize();
+    await this.ensureInitialize('auctionsAttribute');
 
-    return new Promise<IAuctionsAPI[]>((resolve, reject) => {
-      this.auctionsAttribute
-        .toArray()
-        .then((array) => {
-          if (array.length > 0) {
-            resolve(array);
-          } else {
-            const interval = setInterval(async () => {
-              const newArray = await this.auctionsAttribute.toArray();
-              if (newArray.length > 0) {
-                clearInterval(interval);
-                resolve(newArray);
-              }
-            }, 100);
-          }
-        })
-        .catch((reason: Error) => reject(reason));
-    });
+    return this.auctionsAttribute.toArray();
   }
 
   public async getFromCache<T = ICache>(key: string): Promise<T | undefined> {
@@ -151,27 +144,27 @@ export class Database extends Dexie {
   }
 
   public async getItemAuctionsPrice(item: string) {
-    await this.ensureInitialize();
+    await this.ensureInitialize('auctionsPrices');
     return await this.auctionsPrices.get(item);
   }
 
   public async getItemBazaarPrice(item: string) {
-    await this.ensureInitialize();
+    await this.ensureInitialize('bazaarsPrices');
     return await this.bazaarsPrices.get(item);
   }
 
   public async getItemBinsPrice(item: string) {
-    await this.ensureInitialize();
+    await this.ensureInitialize('binsPrices');
     return await this.binsPrices.get(item);
   }
 
   public async getItemPetPrice() {
-    await this.ensureInitialize();
+    await this.ensureInitialize('petsAuctions');
     return this.petsAuctions.toArray();
   }
 
   public async getItemPrice(item: string, store: StoreTypes) {
-    await this.ensureInitialize();
+    await this.ensureInitialize(['binsPrices', 'auctionsPrices', 'bazaarsPrices']);
     if (store === 'bins') {
       return await this.binsPrices.get(item);
     }
@@ -327,7 +320,9 @@ export class Database extends Dexie {
 
     const refreshPromiseAuctionsAndBins = getAuctionPriceData().then((auctionsAndBins) => {
       return this.transaction('rw', this.auctionsPrices, this.binsPrices, this.auctionsAttribute, this.petsAuctions, async () => {
-        const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) => filterAuctions(auction, [forgeAuctions, rngItemsFromAuctions]));
+        const filteredAuctionsAndBins = auctionsAndBins.price.filter((auction) =>
+          filterAuctions(auction, [forgeAuctions, rngItemsFromAuctions])
+        );
         const auctions = filteredAuctionsAndBins.filter((auction) => !auction.bin);
         const bins = filteredAuctionsAndBins.filter((auction) => auction.bin);
 
@@ -390,5 +385,23 @@ export class Database extends Dexie {
     if (this._polling) {
       clearInterval(this._polling);
     }
+  }
+
+  private async _waitForStore(store: TableTypes) {
+    const values = await this[store].toArray();
+
+    if (values.length > 0) {
+      return;
+    }
+
+    return new Promise<void>((resolve) => {
+      const interval = setInterval(async () => {
+        const newArray = await this[store].toArray();
+        if (newArray.length > 0) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    });
   }
 }

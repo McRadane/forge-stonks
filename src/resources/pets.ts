@@ -122,7 +122,7 @@ interface IPetTier {
   time: number;
 }
 
-interface IPet {
+export interface IPet {
   minTier: Rarities;
   name: PetNames;
   tier: Partial<Record<Rarities, IPetTier>>;

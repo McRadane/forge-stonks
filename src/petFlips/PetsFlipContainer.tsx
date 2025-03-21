@@ -1,25 +1,48 @@
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
 import { type FC, useMemo } from 'react';
 
-import { usePetPrice } from './hook';
+import { pets } from '../resources/pets';
+
 // import { CraftsList } from './ListLayout/CraftsList';
-import { PetsTable } from './TableLayout/PetsTable';
+import { PetTable } from './PetTable';
 
 export const PetsFlipContainer: FC = () => {
-  const allPets = usePetPrice();
+  // const allPets = usePetPrice();
 
-  const filteredPets = useMemo(
-    () => allPets.filter((pet) => pet.petBasePrice !== 0 && pet.petUpgradedPrice !== 0 && pet.petUpgradedCost !== 0),
-    [allPets]
+  // const theme = useTheme();
+
+  const tables = useMemo(() => {
+    return pets.map((pet) => pet.name);
+  }, [])
+
+  console.log({tables})
+
+  return (
+    <>
+      {tables.map((table) => {
+        // const petsPrices = allPets.filter((pet) => pet.petName === table);
+        const petDefinition = pets.find((pet) => pet.name === table);
+
+        if (!petDefinition) {
+          return null;
+        }
+        return (
+          <Accordion key={table}>
+            <AccordionSummary expandIcon={<ArrowDownwardIcon />}>
+              <Typography component="span" variant="h3">
+                {table}
+              </Typography>
+            </AccordionSummary>
+
+            <AccordionDetails>
+              <PetTable petDefinition={petDefinition} />
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
+    </>
   );
 
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('md'));
-
-  if (matches) {
-    // return <CraftsList pets={allPets} />;
-  }
-
-  return <PetsTable pets={filteredPets} />;
+  // return <PetsTable pets={filteredPets} />;
 };
