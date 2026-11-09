@@ -13,6 +13,7 @@ export interface IPartialForgeCraft {
 export interface IForgeCraft extends IPartialForgeCraft {
   category: CraftCategory;
   id: number;
+  name: string;
 }
 
 export interface IForgeCraftMaterial {

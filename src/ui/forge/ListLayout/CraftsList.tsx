@@ -26,7 +26,7 @@ export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
   const { playFrequency } = useAppSelector((state) => state.options);
 
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<string>('id');
+  const [orderBy, setOrderBy] = useState<string>('name');
 
   const { ui } = useLanguage();
 
@@ -44,7 +44,7 @@ export const CraftsList: FC<ICraftsListProps> = ({ crafts }) => {
               <ListItemText
                 primary={
                   <Grid container>
-                    <Filter property="id" setOrder={setOrder} setOrderBy={setOrderBy}>
+                    <Filter property="name" setOrder={setOrder} setOrderBy={setOrderBy}>
                       {ui.item}
                     </Filter>
                     <Filter property="sell" setOrder={setOrder} setOrderBy={setOrderBy}>
