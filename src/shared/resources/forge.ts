@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { SOURCE_AUCTION, SOURCE_BAZAAR, SOURCE_VENDOR } from './items';
+import { enUs } from './lang/enUs';
 import type { IForgeCraft, IPartialForgeCraft } from './types';
 
 const DAY = 24;
@@ -1227,7 +1228,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'refining',
-        id: index + indexRefine
+        id: index + indexRefine,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsGear.map(
@@ -1235,7 +1237,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'gear',
-        id: index + indexGear
+        id: index + indexGear,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsGemstones.map(
@@ -1243,7 +1246,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'gemstone',
-        id: index + indexGemstone
+        id: index + indexGemstone,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsForging.map(
@@ -1251,7 +1255,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'forging',
-        id: index + indexForging
+        id: index + indexForging,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsStones.map(
@@ -1259,7 +1264,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'stones',
-        id: index + indexStones
+        id: index + indexStones,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsPets.map(
@@ -1267,7 +1273,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'pets',
-        id: index + indexPets
+        id: index + indexPets,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsTools.map(
@@ -1275,7 +1282,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'tools',
-        id: index + indexTools
+        id: index + indexTools,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsDrillParts.map(
@@ -1283,7 +1291,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'drill parts',
-        id: index + indexDrillParts
+        id: index + indexDrillParts,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   ),
   ...craftsOther.map(
@@ -1291,7 +1300,8 @@ export const crafts: IForgeCraft[] = [
       ({
         ...craft,
         category: 'other',
-        id: index + indexOther
+        id: index + indexOther,
+        name: enUs.items[craft.itemId]
       }) as IForgeCraft
   )
 ];

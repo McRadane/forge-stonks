@@ -18,7 +18,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
   const { playFrequency } = useAppSelector((state) => state.options);
 
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<string>('id');
+  const [orderBy, setOrderBy] = useState<string>('name');
 
   const { ui } = useLanguage();
 
@@ -27,7 +27,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
       if (orderBy === property) {
         setOrder(order === 'asc' ? 'desc' : 'asc');
       } else {
-        if (property === 'id') {
+        if (property === 'name') {
           setOrder('asc');
         } else {
           setOrder('desc');
@@ -40,7 +40,7 @@ export const CraftsTable: FC<ICraftsTableProps> = ({ crafts }) => {
 
   const headCells = useMemo(() => {
     const heads = [
-      { disablePadding: true, id: 'id', label: ui.item, numeric: false },
+      { disablePadding: true, id: 'name', label: ui.item, numeric: false },
       { disablePadding: false, id: 'timer', label: ui.timer, numeric: true },
       { disablePadding: false, id: 'sell', label: ui.sellPrice, numeric: true },
       { disablePadding: false, id: 'time', label: ui.time, numeric: true },
